@@ -9,7 +9,8 @@ on:
         type: string
 
 permissions:
-  contents: read
+  # Draft releases are visible only to tokens with push-level repository access.
+  contents: write
 
 jobs:
   windows-installer:
