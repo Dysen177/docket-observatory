@@ -76,4 +76,4 @@ npm run desktop:dmg
 npm run desktop:exe
 ```
 
-See [RELEASING.md](RELEASING.md) and [SIGNING.md](SIGNING.md) for fail-closed signing, notarization, Windows-native code signing, GitHub asset naming, and the complete-data acceptance checklist.
+See [RELEASING.md](RELEASING.md), [SIGNING.md](SIGNING.md), and [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) for formal fail-closed signing, explicitly unsigned zero-cost community builds, GitHub asset naming, and the complete-data acceptance checklist.

@@ -1,6 +1,6 @@
 # 案卷观察台
 
-[中文说明](README.md) | [English](README.en.md) | [下载与校验 / Downloads](DOWNLOADS.md) | [安全说明 / Security](SECURITY.md) | [隐私说明 / Privacy](PRIVACY.md)
+[中文说明](README.md) | [English](README.en.md) | [下载与校验 / Downloads](DOWNLOADS.md) | [代码签名政策 / Code signing](CODE_SIGNING_POLICY.md) | [安全说明 / Security](SECURITY.md) | [隐私说明 / Privacy](PRIVACY.md)
 
 面向 macOS 与 Windows 的本地法律情报工作台，用于跟踪郭文贵相关刑事、民事、SEC/Fair Fund、破产、上诉、G 系列实体、资产和政策主线。程序保持中立，区分法院裁判、政府指控、当事人主张、第三方申请和公共镜像。
 
@@ -268,10 +268,18 @@ PUT  /api/settings
 
 See [RELEASING.md](RELEASING.md) and [SIGNING.md](SIGNING.md) for the bilingual full-release, signing, notarization, Windows-native code-signing, data-sanitization, and clean-build checklist. Do not package the raw developer cache; always stage the reviewed release baseline first.
 
-Build the DMG only after all changes are done:
+Build a formally signed DMG only after all changes are done and Apple credentials are available:
 
 ```bash
 npm run desktop:dmg
 ```
 
 Packaging fails closed unless a valid Apple Developer ID identity and authenticated notarization credentials are available. The project does not produce an unsigned public DMG fallback.
+
+For a zero-cost community build that users can still install with the operating system's explicit first-run confirmation:
+
+```bash
+npm run desktop:dmg:community
+```
+
+Windows community EXEs must be built on Windows with `npm run desktop:exe:community`. Community artifact names contain `-unsigned`; they never claim Apple notarization or a trusted Windows publisher. See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) for the exact installation and verification boundary.

@@ -11,6 +11,7 @@
    - Apple 芯片 Mac：`Docket-Observatory-<版本>-macOS-arm64.dmg`
    - Intel Mac：`Docket-Observatory-<版本>-macOS-x64.dmg`
    - Windows 10/11 x64：`Docket-Observatory-<版本>-Windows-x64.exe`
+   - 零成本社区构建会在扩展名前增加 `-unsigned`，不会冒充正式签名版本。
 3. 同时下载 `SHA256SUMS.txt`，核对安装包是否与发布者生成的文件完全一致。
 
 macOS 终端校验：
@@ -35,8 +36,10 @@ Get-FileHash .\Docket-Observatory-*.exe -Algorithm SHA256
 
 - 正式公开 DMG 应使用 Apple Developer ID 签名并完成 notarization。
 - 正式公开 EXE 应使用可信代码签名证书签名。
+- 明确标注 `-unsigned` 的社区构建可以安装使用，但首次打开可能需要使用 macOS 的“打开/仍要打开”或 Windows SmartScreen 的“更多信息/仍要运行”。不要关闭系统安全功能。
 - 如果系统显示“未知发布者”或签名与 Release 说明不一致，不要绕过警告安装。
 - 只从本项目 GitHub Releases 下载，不要从来源不明的网盘、聊天附件或二次打包网站获取。
+- 详见 [代码签名政策](CODE_SIGNING_POLICY.md)。
 
 ## English
 
@@ -47,6 +50,7 @@ Get-FileHash .\Docket-Observatory-*.exe -Algorithm SHA256
    - Apple silicon Mac: `Docket-Observatory-<version>-macOS-arm64.dmg`
    - Intel Mac: `Docket-Observatory-<version>-macOS-x64.dmg`
    - Windows 10/11 x64: `Docket-Observatory-<version>-Windows-x64.exe`
+   - Zero-cost community builds add `-unsigned` before the extension and never impersonate formally signed releases.
 3. Download `SHA256SUMS.txt` and verify the installer.
 
 macOS:
@@ -71,5 +75,7 @@ The complete edition is not an empty library. Its release baseline contains 1,57
 
 - Public DMGs are required to be signed with Apple Developer ID, notarized, and stapled; the release build fails instead of producing an unsigned fallback.
 - Public EXEs are required to be built on Windows and carry a trusted, timestamped Authenticode signature.
+- Explicitly labeled `-unsigned` community builds remain installable, but first launch can require the macOS Open/Open Anyway or Windows SmartScreen More info/Run anyway confirmation. Do not disable system security controls.
 - Do not bypass an unexpected publisher or signature warning.
 - Download only from this project's GitHub Releases, not from repackaged third-party mirrors.
+- See the [Code Signing Policy](CODE_SIGNING_POLICY.md).

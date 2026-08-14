@@ -4,6 +4,20 @@
 
 ## 中文
 
+### 零成本社区构建
+
+如果当前目标只是让用户在零预算下安装使用，可以构建明确标注的未签名社区包，同时保留本文件后续章节的正式签名配置：
+
+```bash
+npm run desktop:dmg:community
+# 必须在 Windows 上执行
+npm run desktop:exe:community
+```
+
+社区配置位于 `electron-builder.community.cjs`。它只关闭平台身份签名和 Apple 公证，不关闭 Electron fuses、ASAR 完整性、完整资料载荷或发布数据校验。产物名称固定包含 `-unsigned`，避免用户把它误认为可信发布者签名版本。macOS 用户首次运行时使用系统提供的“打开”或“仍要打开”；Windows 用户可能需要使用 SmartScreen 的“更多信息”与“仍要运行”。不得指导用户关闭 Gatekeeper、SmartScreen 或防病毒软件。
+
+Apple 不向普通个人开源项目免费提供 Developer ID。开源本身不符合免年费条件；Apple 官方免年费仅面向符合条件的非营利法人、受认可教育机构和政府实体。Windows 在项目公开发布并达到资格后可申请 SignPath Foundation 免费开源签名，但批准权属于 SignPath，不能在获批前承诺。详见 [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md)。
+
 正式公开版本不允许使用临时签名、ad-hoc 签名或未签名安装包。项目的 `forceCodeSigning`、发布预检和安装包验证均采用失败即停止策略。
 
 ### macOS Developer ID 与公证
@@ -52,6 +66,20 @@ Windows 正式 EXE 必须在 Windows 上生成。推荐从可信代码签名服�
 Mac runner 需要自定义标签 `docket-observatory-release`。发布证书、私钥、PFX、密码、`.p8` 和 Apple 凭据均不得进入 Git 历史或 Actions artifact。
 
 ## English
+
+### Zero-cost community builds
+
+When the immediate requirement is installability at zero budget, build explicitly unsigned community artifacts while preserving the formal signing path below:
+
+```bash
+npm run desktop:dmg:community
+# Run on Windows
+npm run desktop:exe:community
+```
+
+`electron-builder.community.cjs` disables only platform identity signing and Apple notarization. It preserves Electron fuses, ASAR integrity, the complete-data payload, and release-data verification. Artifact names always contain `-unsigned`. macOS users confirm first launch through Open or Open Anyway; Windows users may need SmartScreen's More info and Run anyway flow. Never instruct users to disable Gatekeeper, SmartScreen, or antivirus protection.
+
+Apple does not provide free Developer ID certificates to ordinary individual open-source developers. Open-source status alone does not qualify for Apple's fee waiver. After a public release and eligibility review, the Windows build can apply for free SignPath Foundation open-source signing, but approval cannot be promised in advance. See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md).
 
 Public releases must never use ad-hoc or unsigned installers. `forceCodeSigning`, release preflights, and post-build verification all fail closed.
 

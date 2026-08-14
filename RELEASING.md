@@ -66,6 +66,20 @@ npm sbom --omit=dev --sbom-format=cyclonedx > SBOM.cdx.json
 
 ### 打包
 
+#### 零成本社区安装包
+
+在没有 Apple Developer ID 或 Windows 可信代码签名证书时，可以生成明确标注的社区安装包：
+
+```bash
+npm run desktop:dmg:community
+# Windows 原生机器
+npm run desktop:exe:community
+```
+
+文件名包含 `-unsigned`。社区构建仍执行完整资料审计、资料哈希、生产构建和 Electron 硬化检查，但不执行平台签名预检、Apple 公证或 Authenticode 验证。发布说明必须明确披露首次安装可能出现的系统确认，不得把社区包描述为“已签名”“已公证”或“未知发布者提示已消除”。
+
+#### 正式签名安装包
+
 最终开发完成后再执行：
 
 ```bash
@@ -122,6 +136,8 @@ npm run desktop:exe
 ```
 
 Sign and notarize the DMGs with Apple Developer ID. Sign the EXE with a trusted Windows code-signing certificate. Never commit signing material or provider credentials.
+
+For zero-budget distribution, `npm run desktop:dmg:community` on macOS and `npm run desktop:exe:community` on Windows produce explicitly `-unsigned` installers. They retain the complete-data and Electron-hardening checks but require the operating system's first-run confirmation and must never be described as signed or notarized.
 
 ### Acceptance And Disclosure
 
