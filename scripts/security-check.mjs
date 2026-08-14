@@ -416,8 +416,13 @@ async function assertProjectControls() {
   if (!automationRunner.includes("['downloaded', 'downloaded_new_version'].includes(right.file.status)")) {
     addFinding('automation-fresh-file-priority', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must prioritize files downloaded or updated in the current run so new filings cannot starve behind older high-priority records.')
   }
-  if (!automationRunner.includes('automation-selection-cursor.json') || !automationRunner.includes('nextIndex: (start + existingCount) % existing.length')) {
+  if (!automationRunner.includes('automation-selection-cursor.json') || !automationRunner.includes('nextIndex: (start + existingCount) % rotating.length')) {
     addFinding('automation-existing-file-fairness', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must persist a rotating cursor so the local corpus eventually receives extraction, translation assistance, and legal reads instead of repeating the same first batch forever.')
+  }
+  if (!automationRunner.includes('buildProcessingGapIndex(files, run)')
+    || !automationRunner.includes('processingGapWeight(item.processingGap) > 0')
+    || !automationRunner.includes('selected.push(...selectedGaps)')) {
+    addFinding('automation-processing-gap-priority', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must fill missing extraction, translation, and legal-read caches before rotating through already-complete files.')
   }
   if (!automationRunner.includes('caseDossierSchema') || !automationRunner.includes('validateCaseDossierAnalysis')) {
     addFinding('case-ai-schema-validation', 'high', path.join(root, 'server', 'automation-runner.js'), 'Case-level AI must use Structured Outputs and validate evidence ids and page citations before caching.')

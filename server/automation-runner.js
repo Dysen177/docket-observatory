@@ -1,10 +1,11 @@
 import { createHash, randomUUID } from 'node:crypto'
-import { mkdir, readFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { atomicWriteJson } from './atomic-write.js'
 import { analyzeDocumentBySourceUrl, buildDocumentAnalysis, localDocumentAnalysis } from './document-analysis.js'
 import { runDocumentDownload } from './download-documents.js'
 import { extractPdfSnippetForFile } from './pdf-extraction.js'
+import { humanDocumentResearch } from './human-legal-research.js'
 import { translateLegalTextToZh } from './i18n.js'
 import { runtimeSetting } from './settings-store.js'
 import { sortCaseDocuments } from './case-dossier-utils.js'
@@ -34,6 +35,7 @@ const runPath = path.join(cacheRoot, 'automation-run.json')
 const selectionCursorPath = path.join(cacheRoot, 'automation-selection-cursor.json')
 const translationDir = path.join(cacheRoot, 'translations')
 const caseAiDir = path.join(cacheRoot, 'case-ai')
+const extractionCacheVersion = 8
 const translationCacheVersion = 'translation-v7'
 let activeRun = null
 
@@ -409,48 +411,126 @@ async function failRun(run, message) {
 
 async function selectAutomationFiles(manifest, state, run) {
   const limit = limitForRun(run)
-  const records = (manifest.files ?? [])
-	    .filter((file) => file.status !== 'error' && file.path && file.url)
-	    .map((file) => ({ file, analysis: localDocumentAnalysis(file, state, run.language) }))
-	    .sort((left, right) => {
-	      const freshDelta = Number(['downloaded', 'downloaded_new_version'].includes(right.file.status))
-	        - Number(['downloaded', 'downloaded_new_version'].includes(left.file.status))
-	      if (freshDelta) return freshDelta
-	      const rightNeedsRelationReview = right.file.relationStatus === 'pending_review'
-	        || right.analysis.relationshipStatus === 'pending_manual_review'
-	        || String(right.file.caseId).startsWith('discovered-')
-	      const leftNeedsRelationReview = left.file.relationStatus === 'pending_review'
-	        || left.analysis.relationshipStatus === 'pending_manual_review'
-	        || String(left.file.caseId).startsWith('discovered-')
-	      const pendingRelationDelta = Number(rightNeedsRelationReview) - Number(leftNeedsRelationReview)
-	      if (run.requested.processingScope !== 'all' && pendingRelationDelta) return pendingRelationDelta
+  const files = (manifest.files ?? []).filter((file) => file.status !== 'error' && file.path && file.url)
+  const processingGaps = await buildProcessingGapIndex(files, run)
+  const records = files
+    .map((file) => ({
+      file,
+      analysis: localDocumentAnalysis(file, state, run.language),
+      processingGap: processingGaps.get(file.url) ?? null,
+    }))
+    .sort((left, right) => {
+      const processingGapDelta = processingGapWeight(right.processingGap) - processingGapWeight(left.processingGap)
+      if (processingGapDelta) return processingGapDelta
+      const freshDelta = Number(['downloaded', 'downloaded_new_version'].includes(right.file.status))
+        - Number(['downloaded', 'downloaded_new_version'].includes(left.file.status))
+      if (freshDelta) return freshDelta
+      const rightNeedsRelationReview = right.file.relationStatus === 'pending_review'
+        || right.analysis.relationshipStatus === 'pending_manual_review'
+        || String(right.file.caseId).startsWith('discovered-')
+      const leftNeedsRelationReview = left.file.relationStatus === 'pending_review'
+        || left.analysis.relationshipStatus === 'pending_manual_review'
+        || String(left.file.caseId).startsWith('discovered-')
+      const pendingRelationDelta = Number(rightNeedsRelationReview) - Number(leftNeedsRelationReview)
+      if (run.requested.processingScope !== 'all' && pendingRelationDelta) return pendingRelationDelta
       const priority = { critical: 4, high: 3, medium: 2, low: 1 }
       const priorityDelta = (priority[right.analysis.priority] ?? 0) - (priority[left.analysis.priority] ?? 0)
-	      if (priorityDelta) return priorityDelta
-	      return compareDocNumber(right.file.docNumber, left.file.docNumber)
-	    })
-	  if (limit === Number.MAX_SAFE_INTEGER || records.length <= limit) return records.map((item) => item.file)
+      if (priorityDelta) return priorityDelta
+      return compareDocNumber(right.file.docNumber, left.file.docNumber)
+    })
+  if (limit === Number.MAX_SAFE_INTEGER || records.length <= limit) return records.map((item) => item.file)
 
-	  const fresh = records.filter((item) => ['downloaded', 'downloaded_new_version'].includes(item.file.status))
-	  const existing = records.filter((item) => !['downloaded', 'downloaded_new_version'].includes(item.file.status))
-	  const selected = fresh.slice(0, limit)
-	  const remaining = Math.max(0, limit - selected.length)
-	  if (!remaining || !existing.length) return selected.map((item) => item.file)
+  const fresh = records.filter((item) => ['downloaded', 'downloaded_new_version'].includes(item.file.status))
+  const existing = records.filter((item) => !['downloaded', 'downloaded_new_version'].includes(item.file.status))
+  const selected = fresh.slice(0, limit)
+  let remaining = Math.max(0, limit - selected.length)
+  if (!remaining || !existing.length) return selected.map((item) => item.file)
 
-	  const cursorState = await readJsonFile(selectionCursorPath)
-	  const start = boundedCursor(cursorState?.nextIndex, existing.length)
-	  const existingCount = Math.min(remaining, existing.length)
-	  for (let offset = 0; offset < existingCount; offset += 1) {
-	    selected.push(existing[(start + offset) % existing.length])
-	  }
-	  await writeJsonFile(selectionCursorPath, {
-	    schemaVersion: 1,
-	    nextIndex: (start + existingCount) % existing.length,
-	    candidateCount: existing.length,
-	    selectedCount: existingCount,
-	    updatedAt: new Date().toISOString(),
-	  })
-	  return selected.map((item) => item.file)
+  const gaps = existing.filter((item) => processingGapWeight(item.processingGap) > 0)
+  const selectedGaps = gaps.slice(0, remaining)
+  selected.push(...selectedGaps)
+  remaining -= selectedGaps.length
+  if (!remaining) return selected.map((item) => item.file)
+
+  const cursorState = await readJsonFile(selectionCursorPath)
+  const rotating = existing.filter((item) => processingGapWeight(item.processingGap) === 0)
+  if (!rotating.length) return selected.map((item) => item.file)
+  const start = boundedCursor(cursorState?.nextIndex, rotating.length)
+  const existingCount = Math.min(remaining, rotating.length)
+  for (let offset = 0; offset < existingCount; offset += 1) {
+    selected.push(rotating[(start + offset) % rotating.length])
+  }
+  await writeJsonFile(selectionCursorPath, {
+    schemaVersion: 1,
+    nextIndex: (start + existingCount) % rotating.length,
+    candidateCount: rotating.length,
+    selectedCount: existingCount,
+    updatedAt: new Date().toISOString(),
+  })
+  return selected.map((item) => item.file)
+}
+
+async function buildProcessingGapIndex(files, run) {
+  const [extractions, translations, analyses] = await Promise.all([
+    readJsonDirectory('pdf-text'),
+    readJsonDirectory('translations'),
+    readJsonDirectory('document-ai'),
+  ])
+  const filesByUrl = new Map(files.map((file) => [file.url, file]))
+  const currentHashes = new Set(files.map((file) => file.sha256).filter(Boolean))
+  const extractedHashes = new Set(extractions
+    .filter((value) => value?.cacheVersion === extractionCacheVersion && value?.status === 'extracted')
+    .map((value) => value.signature?.contentSha256 || value.signature?.manifestSha256)
+    .filter((value) => currentHashes.has(value)))
+  const translationKeys = new Set(translations
+    .filter((value) => value?.schemaVersion === translationCacheVersion
+      && filesByUrl.get(value.sourceUrl)?.sha256 === value.sourceSha256
+      && ['translated', 'assistive_only', 'no_translation_needed'].includes(value.status))
+    .map((value) => `${value.sourceUrl}|${value.sourceSha256}|${cachedLanguage(value.targetLanguage)}`))
+  const analysisKeys = new Set(analyses
+    .filter((value) => value?.aiStatus?.generated && filesByUrl.get(value.sourceUrl)?.sha256 === value.sourceSha256)
+    .map((value) => `${value.sourceUrl}|${value.sourceSha256}|${cachedAnalysisLanguage(value)}`))
+  const outputLanguages = resolveAutomationOutputLanguages(run.requested.outputLanguages, run.language)
+  return new Map(files.map((file) => {
+    const needsExtraction = !file.sha256 || !extractedHashes.has(file.sha256)
+    const needsTranslation = run.requested.includeTranslation === true
+      && outputLanguages.some((language) => !translationKeys.has(`${file.url}|${file.sha256}|${language}`))
+    const needsAnalysis = run.requested.includeAi === true
+      && outputLanguages.some((language) => !humanDocumentResearch(file, language)
+        && !analysisKeys.has(`${file.url}|${file.sha256}|${language}`))
+    return [file.url, { needsExtraction, needsTranslation, needsAnalysis }]
+  }))
+}
+
+function processingGapWeight(gap) {
+  if (!gap) return 0
+  return (gap.needsExtraction ? 8 : 0) + (gap.needsAnalysis ? 4 : 0) + (gap.needsTranslation ? 2 : 0)
+}
+
+async function readJsonDirectory(relativeDirectory) {
+  const directory = path.join(cacheRoot, relativeDirectory)
+  const entries = await readdir(directory, { withFileTypes: true }).catch(() => [])
+  const filenames = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json')).map((entry) => entry.name)
+  const values = []
+  for (let index = 0; index < filenames.length; index += 32) {
+    const batch = await Promise.all(filenames.slice(index, index + 32).map((filename) => readJsonFile(path.join(directory, filename))))
+    values.push(...batch.filter(Boolean))
+  }
+  return values
+}
+
+function cachedLanguage(value) {
+  return /chinese|中文/i.test(String(value ?? '')) ? 'zh' : 'en'
+}
+
+function cachedAnalysisLanguage(value) {
+  if (value?.analysisLanguage === 'zh' || value?.analysisLanguage === 'en') return value.analysisLanguage
+  return /[\u3400-\u9fff]/u.test([
+    value?.aiStatus?.mode,
+    value?.summary,
+    value?.plainEnglish,
+    ...(value?.legalReading ?? []),
+  ].filter(Boolean).join(' ')) ? 'zh' : 'en'
 }
 
 function boundedCursor(value, length) {

@@ -1558,8 +1558,8 @@ const ui = {
     metricRecentDetail: '以资料库最新日期为基准',
     metricVerify: '待官方核验',
     metricVerifyDetail: '镜像文件需由 PACER/RECAP 复核',
-    metricAiBacklog: '待法律解读',
-    metricAiBacklogDetail: '本地文件中尚无缓存规则或生成式法律解读',
+    metricAiBacklog: '待补齐法律解读',
+    metricAiBacklogDetail: '仅统计尚未补齐缓存的本地文件，不代表全部文件没有解读',
     metricDeadline: '期限待核验',
     metricDeadlineDetail: '不得作为最终截止日依赖',
     metricOpenIssues: '开放法律问题',
@@ -2146,8 +2146,8 @@ const ui = {
     metricRecentDetail: 'Relative to the latest library date',
     metricVerify: 'Needs official check',
     metricVerifyDetail: 'Mirror files awaiting PACER/RECAP confirmation',
-    metricAiBacklog: 'Awaiting legal read',
-    metricAiBacklogDetail: 'Local files without a cached deterministic or generative legal read',
+    metricAiBacklog: 'Legal reads to complete',
+    metricAiBacklogDetail: 'Only files missing a current cache; it does not mean every file lacks a legal read',
     metricDeadline: 'Deadlines to verify',
     metricDeadlineDetail: 'Do not rely on these as final deadlines',
     metricOpenIssues: 'Open legal questions',
@@ -5901,10 +5901,10 @@ function DocumentAnalysisView({
   useEffect(() => () => catalogAbortRef.current?.abort(), [])
 
   useEffect(() => {
-    if (!catalogSearchStatus?.building) return undefined
-    const handle = window.setTimeout(() => void fetchCatalogPage(0, false), 1200)
-    return () => window.clearTimeout(handle)
-  }, [catalogSearchStatus?.building, fetchCatalogPage])
+    if (!catalogSearchStatus?.building && !catalogSearchStatus?.stale) return undefined
+    const handle = window.setInterval(() => void fetchCatalogPage(0, false), 1200)
+    return () => window.clearInterval(handle)
+  }, [catalogSearchStatus?.building, catalogSearchStatus?.stale, fetchCatalogPage])
 
   function loadMoreCatalog() {
     if (catalogLoading) return
