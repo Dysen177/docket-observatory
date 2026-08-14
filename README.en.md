@@ -41,8 +41,10 @@
 | Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe) | about 1.47 GB |
 
 1. If you are unsure which Mac installer to use, open **About This Mac** and check whether the chip is Apple or Intel.
-2. Download the matching [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt) and follow [Download, install, and verify](DOWNLOADS.md).
+2. Optional but recommended: download the matching [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt) and follow [Download, install, and verify](DOWNLOADS.md) to compare file fingerprints.
 3. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. GitHub's automatically generated source archives are not the complete application.
+
+> **Why compare SHA-256?** `SHA256SUMS.txt` is not an installation component and the application never reads it. It is a plain-text list of the expected 64-character hexadecimal "digital fingerprint" for each installer in this Release. Comparing the fingerprint calculated on your computer with the line for the same filename detects incomplete downloads, corruption, stale installers, or changed bytes. An exact match means the downloaded file is byte-for-byte identical to the file published by this project; do not install it if even one character differs. This check alone does not prove that software is malware-free, so also consider the official source, open code, signing status, SBOM, and security audits. You may delete `SHA256SUMS.txt` after the comparison.
 
 > **Before installing:** All three installers are explicitly labeled free unsigned builds. macOS may require **Open Anyway** in Privacy & Security; Windows may require **More info** in SmartScreen. Do not disable operating-system security controls. Confirm the filename and SHA-256 first.
 

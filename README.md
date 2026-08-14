@@ -41,8 +41,10 @@
 | Windows 10/11 64 位 | [下载 Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe) | 约 1.47 GB |
 
 1. 不确定 Mac 芯片：打开“关于本机”，看“芯片”是 Apple 还是 Intel。
-2. 下载同一个版本的 [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt)，按 [下载、安装与校验说明](DOWNLOADS.md) 核对。
+2. 可选但推荐：下载同一个版本的 [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt)，按 [下载、安装与校验说明](DOWNLOADS.md) 核对文件指纹。
 3. 只从 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest) 或上述直达链接下载，不要把 GitHub 自动生成的源代码压缩包当成完整应用。
+
+> **为什么要比较 SHA-256？** `SHA256SUMS.txt` 不是安装组件，也不会被程序读取；它只是列出本次 Release 中每个安装包应有的“数字指纹”，表现为 64 个十六进制字符（对应 256 位）。把电脑计算出的指纹与同名文件所在行比较，可以发现下载不完整、文件损坏、拿到旧版本或内容被改动。完全一致表示下载文件与本项目发布文件逐字节相同；任何一个字符不同都不要安装。该校验不能单独证明程序没有恶意代码，仍应结合官方来源、开源代码、签名状态、SBOM 和安全审计判断。校验完成后可以删除 `SHA256SUMS.txt`。
 
 > **安装前知道：** 三个安装包都明确标注为免费未签名版。首次打开时，macOS 可能需要在“隐私与安全性”中点击“仍要打开”，Windows 可能需要在 SmartScreen 中选择“更多信息”。不要关闭系统安全机制；先确认文件名和 SHA-256。
 

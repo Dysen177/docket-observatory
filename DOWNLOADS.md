@@ -21,11 +21,24 @@
 
 不知道 Mac 是哪种芯片：打开屏幕左上角 **苹果菜单 → 关于本机**，查看“芯片”或“处理器”。
 
-### 2. 校验 SHA-256
+### 2. 可选但推荐：用 SHA-256 核对安装包
 
-同时下载 Release 里的 `SHA256SUMS.txt`。任何一个字符不一致都不要安装。
+`SHA256SUMS.txt` 不是安装文件，不需要放进应用程序，也不会被案卷观察台读取。它是一个普通文本清单，列出同一 Release 中每个 DMG/EXE 应有的 SHA-256“数字指纹”。专业用户可以直接计算并在线查看预期值；新手下载这个清单后更容易把预期值和实际值放在一起比较。校验完成后可以删除它。
 
-macOS 终端：
+比较的目的：
+
+- **完全一致：** 当前 DMG/EXE 与项目发布的对应文件逐字节相同，可排除常见的下载不完整、传输损坏、误用旧安装包或文件内容被改动。
+- **任何一个字符不同：** 不要安装，删除 DMG/EXE 和 `SHA256SUMS.txt`，再从本项目 GitHub Release 重新下载。
+- **校验边界：** 一致不等于“已经证明绝对安全”。SHA-256 只核对文件是否与发布版本相同，不能代替源码审查、代码签名、SBOM、安全扫描或对发布账户的信任判断。
+
+具体操作：
+
+1. 把安装包和同一 Release 的 `SHA256SUMS.txt` 都下载到“下载”文件夹。
+2. 打开 `SHA256SUMS.txt`，找到与你下载的安装包**文件名完全相同**的那一行；行首 64 个十六进制字符是预期指纹。
+3. 用下面的系统命令计算已下载文件的实际指纹。
+4. 将命令输出的 64 个字符与清单中的 64 个字符逐字比较。文件名和指纹都必须对应，不能拿 arm64 的指纹核对 x64 文件。
+
+macOS“终端”：
 
 ```bash
 shasum -a 256 ~/Downloads/Docket-Observatory-*.dmg
@@ -36,6 +49,8 @@ Windows PowerShell：
 ```powershell
 Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 ```
+
+命令只计算指纹，不会安装、打开或修改程序。输出一致后继续下一步；不一致就停止安装。
 
 ### 3. macOS：把应用拖入“应用程序”
 
@@ -129,9 +144,22 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 To identify your Mac, open **Apple menu > About This Mac** and check **Chip** or **Processor**.
 
-### 2. Verify SHA-256
+### 2. Optional but recommended: verify the installer with SHA-256
 
-Download `SHA256SUMS.txt` from the same Release. Do not install a file whose hash differs by even one character.
+`SHA256SUMS.txt` is not an installer, does not belong in Applications, and is never read by Docket Observatory. It is a plain-text manifest listing the expected SHA-256 "digital fingerprint" of every DMG/EXE in the same Release. An experienced user can calculate a hash and inspect the expected value online; downloading the manifest simply makes the comparison clearer for a new user. You may delete it after verification.
+
+What the comparison means:
+
+- **Exact match:** the DMG/EXE is byte-for-byte identical to the corresponding file published by this project. This detects common incomplete downloads, transfer corruption, an outdated installer, or changed bytes.
+- **Any character differs:** do not install it. Delete both the installer and `SHA256SUMS.txt`, then download them again from this project's GitHub Release.
+- **Limit of the check:** a match does not prove that software is absolutely safe. SHA-256 confirms equality with the published file; it does not replace source review, code signing, an SBOM, security scanning, or trust in the publishing account.
+
+Steps:
+
+1. Download the installer and `SHA256SUMS.txt` from the same Release into Downloads.
+2. Open `SHA256SUMS.txt` and find the line whose **filename exactly matches** your installer. The first 64 hexadecimal characters are the expected fingerprint.
+3. Calculate the downloaded file's actual fingerprint with the appropriate command below.
+4. Compare all 64 characters. Both the filename and fingerprint must correspond; do not compare an arm64 installer with the x64 line.
 
 macOS Terminal:
 
@@ -144,6 +172,8 @@ Windows PowerShell:
 ```powershell
 Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 ```
+
+These commands only calculate a fingerprint. They do not install, open, or modify the application. Continue only after the values match; stop if they differ.
 
 ### 3. macOS: drag the application into Applications
 
