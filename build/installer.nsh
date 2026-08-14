@@ -1,19 +1,8 @@
-; CrossOver/Wine does not reliably implement the PowerShell/tasklist path used
-; by electron-builder's default app-running check. Use the bundled NSIS process
-; plugin so an assisted installer can finish an upgrade without a deadlock.
+; CrossOver/Wine does not reliably implement the PowerShell/tasklist query used
+; by electron-builder's default app-running check. Ask the operating system to
+; stop the app directly and continue even when no matching process exists.
 !macro customCheckAppRunning
-  nsProcess::FindProcess "${APP_EXECUTABLE_FILENAME}"
+  nsExec::Exec '"$SYSDIR\taskkill.exe" /F /T /IM "${APP_EXECUTABLE_FILENAME}"'
   Pop $R0
-  ${If} $R0 == 0
-    nsProcess::CloseProcess "${APP_EXECUTABLE_FILENAME}"
-    Pop $R1
-    Sleep 500
-    nsProcess::FindProcess "${APP_EXECUTABLE_FILENAME}"
-    Pop $R0
-    ${If} $R0 == 0
-      nsProcess::KillProcess "${APP_EXECUTABLE_FILENAME}"
-      Pop $R1
-      Sleep 1000
-    ${EndIf}
-  ${EndIf}
+  Sleep 1000
 !macroend
