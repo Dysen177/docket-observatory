@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "appVersion": "0.1.0",
+  "generatedAt": "2026-08-14T12:36:06.271Z",
+  "evidence": {
+    "package-lock.json": {
+      "bytes": 234329,
+      "sha256": "86f38603ff494de2d57eeb1841db9577d9054b20933cecbf021c8319efbf52c7"
+    },
+    "output/release-review/corpus-risk-audit.json": {
+      "bytes": 200429,
+      "sha256": "23716602b751357c2362a3ebdf9cae067165e96831754f942043434589565c7a"
+    },
+    "release-metadata/corpus-review-decisions.json": {
+      "bytes": 370464,
+      "sha256": "dc91490d312e2d5045ce8658281a60d745ea3a9a60e77e70c4b04b3a447472e8"
+    },
+    "release-metadata/corpus-manifest.json": {
+      "bytes": 2250273,
+      "sha256": "da953ab3fb4c4a6885635205d3c04ee6b7a756ac336fa54425feea9f4be64f55"
+    },
+    "release-metadata/seed-cache-manifest.json": {
+      "bytes": 2639373,
+      "sha256": "98d2f5830ff0ab9e7643d988b10a2b34de9d7da15b45623ad33debd9e8116d10"
+    }
+  }
+}
