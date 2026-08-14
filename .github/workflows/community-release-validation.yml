@@ -1,0 +1,90 @@
+name: Community release native validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Draft or published community release tag, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  windows-installer:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Download Windows installer and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-assets | Out-Null
+          gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --dir release-assets --pattern '*Windows-x64-unsigned.exe' --pattern 'SHA256SUMS.txt'
+
+      - name: Verify published Windows SHA-256
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
+          if (-not $installer) { throw 'Windows x64 installer is missing.' }
+          $line = Get-Content release-assets\SHA256SUMS.txt | Where-Object { $_ -match [regex]::Escape($installer.Name) } | Select-Object -First 1
+          if (-not $line) { throw 'SHA256SUMS.txt does not list the Windows installer.' }
+          $expected = ($line -split '\s+')[0].ToLowerInvariant()
+          $actual = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($actual -ne $expected) { throw "Windows installer SHA-256 mismatch: $actual" }
+
+      - name: Test NSIS archive
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
+          & 7z t $installer.FullName
+          if ($LASTEXITCODE -ne 0) { throw "7-Zip installer test failed with exit code $LASTEXITCODE" }
+
+      - name: Install complete edition silently
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
+          $installDir = 'C:\docket-observatory-release-test'
+          $process = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$installDir" -Wait -PassThru
+          if ($process.ExitCode -ne 0) { throw "NSIS install failed with exit code $($process.ExitCode)" }
+          "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Verify installed x64 application and complete corpus
+        shell: pwsh
+        run: |
+          $app = Join-Path $env:INSTALL_DIR '案卷观察台.exe'
+          $resources = Join-Path $env:INSTALL_DIR 'resources'
+          if (-not (Test-Path $app)) { throw 'Installed application executable is missing.' }
+          $stream = [System.IO.File]::OpenRead($app)
+          try {
+            $reader = [System.IO.BinaryReader]::new($stream)
+            $stream.Position = 0x3c
+            $peOffset = $reader.ReadInt32()
+            $stream.Position = $peOffset + 4
+            $machine = $reader.ReadUInt16()
+          } finally {
+            $reader.Dispose()
+            $stream.Dispose()
+          }
+          if ($machine -ne 0x8664) { throw "Installed application is not x86-64; PE machine is 0x$($machine.ToString('x4'))" }
+          $pdfCount = (Get-ChildItem (Join-Path $resources 'court-files') -Recurse -Filter '*.pdf').Count
+          if ($pdfCount -ne 1578) { throw "Installed corpus contains $pdfCount PDFs instead of 1578." }
+          $corpus = Get-Content (Join-Path $resources 'court-files\manifest.json') -Raw | ConvertFrom-Json
+          $seed = Get-Content (Join-Path $resources 'seed-cache-manifest.json') -Raw | ConvertFrom-Json
+          if ($corpus.files.Count -ne 1605) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of 1605." }
+          if ($seed.seedFiles -ne 12259) { throw "Installed seed contains $($seed.seedFiles) files instead of 12259." }
+          Write-Host "Validated Windows x64 install with $pdfCount PDFs and $($seed.seedFiles) seed files."
+
+      - name: Uninstall test application
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not $env:INSTALL_DIR) { exit 0 }
+          $uninstaller = Join-Path $env:INSTALL_DIR 'Uninstall 案卷观察台.exe'
+          if (Test-Path $uninstaller) {
+            $process = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
+            if ($process.ExitCode -ne 0) { throw "NSIS uninstall failed with exit code $($process.ExitCode)" }
+          }

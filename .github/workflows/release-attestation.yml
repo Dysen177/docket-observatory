@@ -26,12 +26,16 @@ jobs:
         working-directory: release-assets
         run: sha256sum --check SHA256SUMS.txt
 
-      - name: Require signed-platform assets and release evidence
+      - name: Require desktop assets and release evidence
         run: |
           test -n "$(find release-assets -maxdepth 1 -type f -name '*.dmg' -print -quit)"
           test -n "$(find release-assets -maxdepth 1 -type f -name '*.exe' -print -quit)"
           test -s release-assets/SBOM.cdx.json
           test -s release-assets/BUILD-PROVENANCE.json
+          test -s release-assets/corpus-manifest.json
+          test -s release-assets/seed-cache-manifest.json
+          test -s release-assets/corpus-publication-review.md
+          test -s release-assets/corpus-review-decisions.json
 
       - name: Attest published installers
         uses: actions/attest-build-provenance@8beda2b7ed98355c0e97c0a63bec38ae472e66c4 # v4

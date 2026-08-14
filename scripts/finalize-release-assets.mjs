@@ -8,6 +8,12 @@ import process from 'node:process'
 const root = process.cwd()
 const releaseDirectory = path.resolve(process.argv[2] ?? path.join(root, 'release'))
 const artifactPattern = /\.(?:dmg|exe|zip|tar\.gz)$/i
+const publicEvidenceNames = [
+  'corpus-manifest.json',
+  'corpus-publication-review.md',
+  'corpus-review-decisions.json',
+  'seed-cache-manifest.json',
+]
 
 async function sha256(filePath) {
   const hash = createHash('sha256')
@@ -17,9 +23,17 @@ async function sha256(filePath) {
 
 const entries = await readdir(releaseDirectory, { withFileTypes: true }).catch(() => [])
 const artifactNames = entries.filter((entry) => entry.isFile() && artifactPattern.test(entry.name)).map((entry) => entry.name).sort()
+const publicEvidence = publicEvidenceNames.filter((name) => entries.some((entry) => entry.isFile() && entry.name === name))
 if (!artifactNames.some((name) => name.endsWith('.dmg')) || !artifactNames.some((name) => name.endsWith('.exe'))) {
-  throw new Error('Final release assets must include at least one signed DMG and one signed EXE before metadata is generated.')
+  throw new Error('Final release assets must include at least one DMG and one EXE before metadata is generated.')
 }
+
+const installerNames = artifactNames.filter((name) => /\.(?:dmg|exe)$/i.test(name))
+const unsignedInstallers = installerNames.filter((name) => name.includes('-unsigned.'))
+if (unsignedInstallers.length > 0 && unsignedInstallers.length !== installerNames.length) {
+  throw new Error('Do not mix signed and explicitly unsigned installers in one release set.')
+}
+const releaseMode = unsignedInstallers.length === installerNames.length ? 'community_unsigned' : 'platform_signed'
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const sbomResult = spawnSync(npmCommand, ['sbom', '--omit=dev', '--sbom-format=cyclonedx'], {
@@ -59,6 +73,10 @@ await writeFile(provenancePath, `${JSON.stringify({
   generatedAt: new Date().toISOString(),
   application: packageJson.productName ?? packageJson.build?.productName ?? 'Docket Observatory',
   version: packageJson.version,
+  releaseMode,
+  signingStatus: releaseMode === 'community_unsigned'
+    ? 'Installers are explicitly unsigned and not notarized. Verify SHA-256 and follow the operating-system confirmation flow.'
+    : 'Installers are expected to carry platform-trusted signatures verified by the formal release pipeline.',
   sourceCommit: process.env.RELEASE_SOURCE_COMMIT || process.env.GITHUB_SHA || null,
   sourceReference: process.env.GITHUB_REF || null,
   runtime: { node: process.version, platform: process.platform, arch: process.arch },
@@ -66,9 +84,9 @@ await writeFile(provenancePath, `${JSON.stringify({
   artifacts,
 }, null, 2)}\n`, { mode: 0o600 })
 
-const checksumNames = [...artifactNames, path.basename(sbomPath), path.basename(provenancePath)].sort()
+const checksumNames = [...artifactNames, ...publicEvidence, path.basename(sbomPath), path.basename(provenancePath)].sort()
 const checksumLines = []
 for (const name of checksumNames) checksumLines.push(`${await sha256(path.join(releaseDirectory, name))}  ${name}`)
 await writeFile(path.join(releaseDirectory, 'SHA256SUMS.txt'), `${checksumLines.join('\n')}\n`, { mode: 0o600 })
 
-console.log(`Finalized ${artifactNames.length} signed release assets with SBOM, provenance record, and SHA-256 checksums.`)
+console.log(`Finalized ${artifactNames.length} ${releaseMode} release assets with SBOM, provenance record, and SHA-256 checksums.`)
