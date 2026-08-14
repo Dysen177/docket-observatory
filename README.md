@@ -1,6 +1,6 @@
 # 案卷观察台
 
-[中文说明](README.md) | [English](README.en.md) | [下载与校验 / Downloads](DOWNLOADS.md) | [代码签名政策 / Code signing](CODE_SIGNING_POLICY.md) | [安全说明 / Security](SECURITY.md) | [隐私说明 / Privacy](PRIVACY.md)
+[中文说明](README.md) | [English](README.en.md) | [下载与校验 / Downloads](DOWNLOADS.md) | [代码签名政策 / Code signing](CODE_SIGNING_POLICY.md) | [GitHub 运营 / GitHub operations](GITHUB_OPERATIONS.md) | [安全说明 / Security](SECURITY.md) | [隐私说明 / Privacy](PRIVACY.md)
 
 面向 macOS 与 Windows 的本地法律情报工作台，用于跟踪郭文贵相关刑事、民事、SEC/Fair Fund、破产、上诉、G 系列实体、资产和政策主线。程序保持中立，区分法院裁判、政府指控、当事人主张、第三方申请和公共镜像。
 
