@@ -23,7 +23,21 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path release-assets | Out-Null
-          gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --dir release-assets --pattern '*Windows-x64-unsigned.exe' --pattern 'SHA256SUMS.txt'
+          $releases = gh api "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" | ConvertFrom-Json
+          $release = $releases | Where-Object { $_.tag_name -eq $env:RELEASE_TAG } | Select-Object -First 1
+          if (-not $release) { throw "Release $env:RELEASE_TAG was not found, including drafts." }
+
+          $assetNames = @(
+            ($release.assets | Where-Object { $_.name -like '*Windows-x64-unsigned.exe' } | Select-Object -First 1).name
+            ($release.assets | Where-Object { $_.name -eq 'SHA256SUMS.txt' } | Select-Object -First 1).name
+          )
+          foreach ($assetName in $assetNames) {
+            if (-not $assetName) { throw "A required Windows release asset is missing from $env:RELEASE_TAG." }
+            $asset = $release.assets | Where-Object { $_.name -eq $assetName } | Select-Object -First 1
+            $destination = Join-Path 'release-assets' $asset.name
+            gh api "repos/$env:GITHUB_REPOSITORY/releases/assets/$($asset.id)" -H 'Accept: application/octet-stream' > $destination
+            if ($LASTEXITCODE -ne 0) { throw "Failed to download $($asset.name)." }
+          }
 
       - name: Verify published Windows SHA-256
         shell: pwsh
