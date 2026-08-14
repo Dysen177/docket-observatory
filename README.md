@@ -9,7 +9,7 @@
 <p align="center"><strong>Docket Observatory</strong></p>
 
 <p align="center">
-  面向 macOS 和 Windows 的本地优先法律资料研究工作台，用于追踪公开案卷、核验来源、检索 PDF、进行双语阅读，并理解跨案件关联。
+  专门用于研究和追踪郭文贵（Guo Wengui / Miles Guo / Ho Wan Kwok）相关美国法院案件与监管事项的本地优先法律研究工作台，覆盖刑事、民事、上诉、证券监管、GTV / Fair Fund、破产财产、没收，以及关联人物、公司、基金和其他实体。
 </p>
 
 <p align="center">
@@ -132,7 +132,7 @@ Settings 支持 OpenAI Responses、Anthropic Messages、Google Gemini、Ollama �
 
 ## 案件范围
 
-当前资料基线覆盖与郭文贵相关的刑事、民事、上诉、证券监管、 GTV / Fair Fund、破产财产、没收、关联人物、实体、公司、基金和政策观察主线。案件关系图只表示公开材料中出现的关联，区分“已核实公开关系”、“较可能关系”与“待人工核验”，不自动推定所有权、控制、共谋或责任。
+本程序不是通用法院案卷浏览器，而是围绕郭文贵（Guo Wengui / Miles Guo / Ho Wan Kwok）及其相关诉讼网络建设的专题法律研究工作台。当前资料基线覆盖刑事、民事、上诉、证券监管、GTV / Fair Fund、破产财产、没收，以及关联人物、实体、公司、基金和政策观察主线。案件关系图只表示公开材料中出现的关联，区分“已核实公开关系”、“较可能关系”与“待人工核验”，不自动推定所有权、控制、共谋或责任。
 
 ## 本地优先与安全
 

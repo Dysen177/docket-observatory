@@ -9,7 +9,7 @@
 <p align="center"><strong>案卷观察台</strong></p>
 
 <p align="center">
-  A local-first legal research workbench for macOS and Windows. Track public dockets, verify sources, search PDFs, read bilingual material, and understand relationships across cases.
+  A local-first legal research workbench purpose-built to research and track U.S. court cases and regulatory matters involving Guo Wengui (Miles Guo / Ho Wan Kwok), including criminal, civil, appellate, securities, GTV / Fair Fund, bankruptcy-estate, forfeiture, and related-person, company, fund, and entity matters.
 </p>
 
 <p align="center">
@@ -132,7 +132,7 @@ Each item should expose an external link, filing date, docket number, document n
 
 ## Case Scope
 
-The current baseline covers Guo-related criminal, civil, appellate, securities, GTV/Fair Fund, bankruptcy-estate, forfeiture, related-person, entity, company, fund, and policy-monitoring tracks. The relationship graph records associations found in public material and distinguishes verified public relationships, probable relationships, and items requiring human verification. It does not infer ownership, control, conspiracy, or liability.
+This is not a general-purpose docket browser. It is a focused legal-research workbench built around Guo Wengui (Miles Guo / Ho Wan Kwok) and the related litigation network. The current baseline covers criminal, civil, appellate, securities, GTV / Fair Fund, bankruptcy-estate, forfeiture, related-person, entity, company, fund, and policy-monitoring tracks. The relationship graph records associations found in public material and distinguishes verified public relationships, probable relationships, and items requiring human verification. It does not infer ownership, control, conspiracy, or liability.
 
 ## Local-First And Security
 
