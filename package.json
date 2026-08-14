@@ -21,6 +21,7 @@
     "release:prepare-data": "node scripts/prepare-release-data.mjs",
     "release:audit-research": "node scripts/research-audit.mjs",
     "release:audit-corpus-risk": "node scripts/corpus-risk-audit.mjs",
+    "release:record-publication-review": "node scripts/record-publication-review.mjs",
     "release:verify-corpus-review": "node scripts/verify-corpus-review.mjs",
     "release:verify-data": "node scripts/verify-release-data.mjs",
     "release:test-seed-install": "node scripts/release-seed-install-check.mjs",
