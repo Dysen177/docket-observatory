@@ -21,6 +21,7 @@
 ### 已核对的仓库设置
 
 - 仓库为公开仓库，默认分支为 `main`，Issues 和 Pull Requests 已开启。
+- 未使用的仓库 Wiki 已关闭；公开入口以 GitHub Release、Issues 和源代码目录为准。
 - Dependabot 安全更新、Secret Scanning、Secret Scanning Push Protection 和私密漏洞报告已开启。
 - GitHub Actions 的默认工作流权限为只读；工作流按文件声明最小权限。
 - `main` 要求至少 1 个 Pull Request 审查，过期审查会失效，必须解决审查对话；禁止强制推送和删除分支。
@@ -70,6 +71,7 @@ This is not a limitation on project operations. It prevents common public-reposi
 ### Verified repository settings
 
 - The repository is public, uses `main` as its default branch, and has Issues and Pull Requests enabled.
+- The unused repository Wiki is disabled; GitHub Releases, Issues, and the source tree are the documented public entry points.
 - Dependabot security updates, Secret Scanning, Secret Scanning Push Protection, and private vulnerability reporting are enabled.
 - GitHub Actions defaults to read-only workflow permissions; workflows declare their own minimum permissions.
 - `main` requires at least one Pull Request approval, dismisses stale approvals, and requires review conversations to be resolved. Force pushes and branch deletion are disabled.
