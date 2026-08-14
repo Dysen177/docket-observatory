@@ -1,6 +1,6 @@
 # 发布前安全审计报告
 
-> **状态说明（2026-08-15）：** 本文保留的是发布前安全审计快照；其中关于尚未初始化仓库、尚未生成安装包的历史判断，应以当前源码、工作流和发布说明为准。当前公开版提供完整未签名社区安装包、资料清单、CI、CodeQL、macOS DMG 结构校验和 Windows 原生安装测试。公开 GitHub Release 只上传两个 DMG 和一个 EXE；SBOM、构建来源和安装包哈希仅作为维护者内部发布证据，不作为普通用户的下载步骤。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
+> **状态说明（2026-08-15）：** 本文保留的是发布前安全审计快照；其中关于尚未初始化仓库、尚未生成安装包的历史判断，应以当前源码、工作流和发布说明为准。当前公开版提供完整未签名社区安装包、资料清单、CI、CodeQL、macOS DMG 结构校验和 Windows 原生安装测试。公开 GitHub Release 只上传两个 DMG 和一个 EXE；SBOM、构建来源和安装包内部记录仅作为维护者审计证据，不作为普通用户的下载步骤。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
 
 审计日期：2026-08-14
 范围：React 19 / TypeScript / Vite、Express 5、本地资料处理、Electron 43、设置与密钥、外联、完整数据发行、GitHub Actions 与依赖供应链。
@@ -14,7 +14,7 @@
 结论必须分两层理解：
 
 - **源码公开准备度**：在创建 Git 仓库后再次核对首个提交文件清单，即可进入 GitHub 公开和外部复核阶段。
-- **DMG/EXE 正式发布准备度**：尚未完成。必须先完成 macOS/Windows 原生密钥存储测试、签名、公证、干净账户安装/升级验收、最终哈希和来源到二进制的发布证明。
+- **零成本社区版发布准备度**：已完成并已发布三个明确标注 `-unsigned` 的安装包。正式签名发行层级仍未完成，但不是当前社区版的发布前提。
 
 不存在可以诚实承诺的“100% 永久安全”。依赖供应链、操作系统已被入侵、恶意分叉/二次打包、PDF 解析器缺陷和用户主动开启云端 AI 仍然属于剩余风险。
 
@@ -71,43 +71,43 @@
 - Ollama 地址被限制为 loopback。证据：`server/settings-store.js:276-342`。
 - macOS 凭证写入 AES-256-GCM 加密库，密钥由明确禁止认证界面的原生 Keychain 模块保护；Windows 使用异步 DPAPI `safeStorage`。普通设置与缓存目录使用限制性权限，API 只返回配置状态和末四位掩码。证据：`electron/macos-secret-store.cjs`、`native/macos-keychain-no-ui.mm`、`electron/main.cjs`、`server/settings-store.js`。
 - PACER 自动付费下载服务端强制关闭，当前没有 PACER 登录/付费抓取适配器。证据：`server/settings-store.js:312-314`。
-- 发布资料通过清理脚本移除路径字段和开发机路径，并为现行种子生成逐文件 SHA-256。证据：`scripts/prepare-release-data.mjs:24-76`、`scripts/prepare-release-data.mjs:157-183`。
+- 发布资料通过清理脚本移除路径字段和开发机路径，并为现行种子生成逐文件内部完整性记录。证据：`scripts/prepare-release-data.mjs:24-76`、`scripts/prepare-release-data.mjs:157-183`。
 - `.gitignore` 排除原始下载、运行缓存、输出、临时目录、环境文件、证书和密钥容器。
 
 ## 尚未关闭的发布阻断项
 
-### REL-001：正式安装包尚未签名、公证和建立来源证明
+### REL-001：正式签名发行层级尚未配置
 
 - 严重性：High（安装包发布阻断）
-- 影响：攻击者可以传播同名篡改包；公开源码不能证明第三方 DMG/EXE 与源码一致。
+- 影响：当前社区安装包会触发操作系统的首次运行确认，公开源码也不能替代平台发布者身份签名。
 - 必须完成：Apple Developer ID 签名、公证和 stapling；Windows 代码签名和可信时间戳；受保护 release tag；从官方 Release 重新下载三个安装包并完成原生安装复核。
-- 建议：发布 CI 使用 GitHub Environment 审批、最小权限 secrets 和 artifact attestation/SBOM。签名私钥不得进入仓库或聊天。
+- 建议：未来配置签名发行层级时使用 GitHub Environment 审批、最小权限 secrets 和内部构建证据。签名私钥不得进入仓库或聊天。
 
-### REL-002：原生安全存储与安装升级验收尚未完成
+### REL-002：正式签名发行层级的原生验收仍可扩展
 
 - 严重性：High（安装包发布阻断）
-- 影响：源码级静默钥匙串测试通过不等于签名成品、Windows DPAPI 和升级路径已经完成实机验收。
+- 影响：源码测试和当前社区安装测试不等于未来正式签名成品、Windows DPAPI 和升级路径已经覆盖所有设备组合。
 - 必须完成：签名 macOS 成品验证无认证界面 Keychain、首次安装和覆盖升级；Windows 正式构建机验证 DPAPI、首次安装、覆盖升级、卸载保留策略和凭证不可明文恢复。
 
-### REL-003：仓库级安全设置尚未生效
+### REL-003：仓库级安全设置需要持续维护
 
 - 严重性：Medium
-- 原因：当前目录尚未初始化为 Git 仓库，GitHub 仓库也尚未创建。
-- 必须完成：维护者 2FA、默认分支保护、必需 CI/CodeQL/依赖审查、至少一人审查、禁止强推、私密漏洞报告、限制 Actions 权限和 release environment 审批。
+- 原因：仓库已经公开，但分支规则、Actions 权限和发布审批属于持续维护项，不能只依赖一次发布。
+- 必须完成：持续维护 2FA、默认分支保护、必需 CI/CodeQL/依赖审查、至少一人审查、禁止强推、私密漏洞报告、限制 Actions 权限和 release environment 审批。
 
 ## 剩余风险
 
 ### RISK-001：依赖和构建供应链
 
 - 严重性：Medium
-- 说明：锁文件、完整性哈希、固定 Actions、CodeQL 和审计只能降低风险，不能排除 npm 包、发布账号或构建机被入侵。
+- 说明：锁文件、完整性记录、固定 Actions、CodeQL 和审计只能降低风险，不能排除 npm 包、发布账号或构建机被入侵。
 - 控制：只用 `npm ci`；审查 Dependabot PR；定期生成 SBOM；保护 npm/GitHub/Apple/Windows 签名账号。
 
 ### RISK-002：不可信 PDF 的解析和资源耗尽
 
 - 严重性：Medium
 - 说明：PDF 来自白名单公开来源，但来源或镜像仍可能被攻陷。复杂、损坏或恶意 PDF 可能触发 `pdf-parse`、PDF.js、OCR/WASM 缺陷或造成内存/CPU 消耗。
-- 现有控制：文件大小、页数、字符数、并发、超时、PDF 头、路径和 SHA-256 检查；renderer sandbox；索引 Worker 上限。
+- 现有控制：文件大小、页数、字符数、并发、超时、PDF 头、路径和本地完整性检查；renderer sandbox；索引 Worker 上限。
 - 后续强化：保持解析依赖及时更新；对新来源做人工审核；未来可把正文解析进一步迁移到独立 utility process 并设置操作系统资源上限。
 
 ### RISK-003：同一操作系统账户已被入侵

@@ -49,19 +49,19 @@ Windows 正式 EXE 必须在 Windows 上生成。推荐从可信代码签名服�
 - `WINDOWS_CSC_LINK`: PFX 的 Base64 内容，或 Electron Builder 支持的安全证书位置。
 - `WINDOWS_CSC_KEY_PASSWORD`: PFX 密码。
 
-工作流把它们映射为 `WIN_CSC_LINK` 与 `WIN_CSC_KEY_PASSWORD`，仅在临时 Windows runner 中使用。项目强制 SHA-256 和 RFC 3161 时间戳；`release:verify:win` 要求安装包的 Authenticode 状态为 `Valid`，同时必须存在签名证书和时间戳证书。
+工作流把它们映射为 `WIN_CSC_LINK` 与 `WIN_CSC_KEY_PASSWORD`，仅在临时 Windows runner 中使用。项目要求受信任的 Authenticode 签名和 RFC 3161 时间戳；`release:verify:win` 要求安装包的 Authenticode 状态为 `Valid`，同时必须存在签名证书和时间戳证书。
 
 有效签名会显著降低系统拦截风险，但 Windows SmartScreen 还会结合证书信誉、下载量和文件信誉判断。任何程序都不能诚实保证新证书发布的首个版本绝不会出现 SmartScreen 提示；不得通过关闭 SmartScreen、篡改安全策略或诱导用户忽略警告来处理。
 
 ### 完整版跨平台工作流
 
-`.github/workflows/signed-complete-release.yml` 使用同一份经哈希绑定的完整资料载荷：
+`.github/workflows/signed-complete-release.yml` 使用同一份经过一致性绑定的完整资料载荷：
 
 1. 本地发布项目使用 Node 24 执行 `npm run release:stage-data`。
 2. 自托管 Apple silicon Mac runner 从 `DOCKET_OBSERVATORY_RELEASE_SOURCE_ROOT` 读取已准备的完整资料；该变量只配置在 runner 服务环境，不提交到仓库。
 3. Mac runner 使用本机 Developer ID 和 `APPLE_KEYCHAIN_PROFILE` 构建、验证 DMG，并上传临时完整资料载荷。
 4. GitHub 托管的 `windows-latest` runner 下载同一载荷，在 Windows 上签名构建并验证 EXE。
-5. 最终 job 流式计算大型安装包哈希，生成供维护者使用的 SBOM、构建来源记录和内部安装包校验记录；这些证据不上传为普通用户的 Release 附件。
+5. 最终 job 生成供维护者使用的 SBOM、构建来源记录和内部安装包记录；这些证据不上传为普通用户的 Release 附件。
 
 Mac runner 需要自定义标签 `docket-observatory-release`。发布证书、私钥、PFX、密码、`.p8` 和 Apple 凭据均不得进入 Git 历史或 Actions artifact。
 
@@ -85,6 +85,6 @@ The formally signed distribution path never uses ad-hoc or unsigned installers. 
 
 For macOS, join the Apple Developer Program, create a `Developer ID Application` certificate, keep its private key in the release Mac login Keychain, and configure notarization through a `notarytool` Keychain profile or an App Store Connect API key. The preflight authenticates the credentials with `notarytool history`; post-build verification checks stapling, Gatekeeper, and code signatures.
 
-For Windows, obtain a trusted Authenticode certificate and configure `WINDOWS_CSC_LINK` and `WINDOWS_CSC_KEY_PASSWORD` as GitHub Actions secrets. The Windows-native job maps them to Electron Builder's `WIN_CSC_*` variables, signs with SHA-256 and an RFC 3161 timestamp, and requires a valid signer and timestamp certificate. A valid signature reduces warnings but cannot guarantee immediate SmartScreen reputation for a new certificate or new binary.
+For Windows, obtain a trusted Authenticode certificate and configure `WINDOWS_CSC_LINK` and `WINDOWS_CSC_KEY_PASSWORD` as GitHub Actions secrets. The Windows-native job maps them to Electron Builder's `WIN_CSC_*` variables, applies the platform's trusted signing configuration and an RFC 3161 timestamp, and requires a valid signer and timestamp certificate. A valid signature reduces warnings but cannot guarantee immediate SmartScreen reputation for a new certificate or new binary.
 
-The signed complete-release workflow stages reviewed data from a dedicated self-hosted Apple silicon Mac runner, builds and notarizes both DMGs there, transfers the same hashed data payload to a GitHub-hosted Windows runner, and then produces internal installer-integrity records, an SBOM, and build provenance. These are maintainer evidence, not public installer-download requirements. Keep every certificate and credential outside the repository and build artifacts.
+The signed complete-release workflow stages reviewed data from a dedicated self-hosted Apple silicon Mac runner, builds and notarizes both DMGs there, transfers the same consistent data payload to a GitHub-hosted Windows runner, and then produces internal installer records, an SBOM, and build provenance. These are maintainer evidence, not public installer-download requirements. Keep every certificate and credential outside the repository and build artifacts.

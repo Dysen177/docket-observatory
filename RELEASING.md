@@ -28,7 +28,7 @@ GitHub Release 上传的附件只允许上述三个安装包。GitHub 自动显�
 5. 排除 `app-settings.json`、密钥、诊断、自动化历史、日志和开发机路径。
 6. 生成 `release-metadata/corpus-manifest.json`、`seed-cache-manifest.json` 和内部 `release-seed.json`。
 
-数据准备完成后必须运行 `npm run release:verify-data`。该检查会重新验证 1,578 份有效 PDF 的头尾结构、字节数和 SHA-256，并核对每个种子缓存文件的 SHA-256；任何不一致都会阻止打包。
+数据准备完成后必须运行 `npm run release:verify-data`。该检查会重新验证 1,578 份有效 PDF 的头尾结构、字节数和内部完整性记录，并核对每个种子缓存文件；任何不一致都会阻止打包。
 
 ### 代码检查
 
@@ -76,7 +76,7 @@ npm run desktop:dmg:community
 npm run desktop:exe:community
 ```
 
-文件名包含 `-unsigned`。社区构建仍执行完整资料审计、资料哈希、生产构建和 Electron 硬化检查，但不执行平台签名预检、Apple 公证或 Authenticode 验证。发布说明必须明确披露首次安装可能出现的系统确认，不得把社区包描述为“已签名”“已公证”或“未知发布者提示已消除”。
+文件名包含 `-unsigned`。社区构建仍执行完整资料审计、资料完整性检查、生产构建和 Electron 硬化检查，但不执行平台签名预检、Apple 公证或 Authenticode 验证。发布说明必须明确披露首次安装可能出现的系统确认，不得把社区包描述为“已签名”“已公证”或“未知发布者提示已消除”。
 
 macOS 社区包例外使用 `identity: '-'` 的无开发者身份 ad-hoc 资源签名，用于封装应用资源并避免“签名声明有资源但没有资源封装”的损坏包。`desktop:dmg:community` 构建后会自动运行 `release:verify:mac:community`，对两个 DMG 执行 `hdiutil verify`、挂载检查、`codesign --verify --deep --strict`，并要求 `Signature=adhoc` 且 `TeamIdentifier=not set`。这是包结构完整性签名，不是 Apple Developer ID，也不会消除 Gatekeeper 首次提示。
 
@@ -92,7 +92,7 @@ npm run release:verify:win
 npm run release:finalize
 ```
 
-`desktop:dmg` 和 `desktop:exe` 会先运行签名预检；没有 Developer ID/公证凭据或 Windows 代码签名配置时，在处理完整数据前直接失败。DMG 需要 Apple Developer ID Application 签名、notarization 和 stapling。EXE 需要可信 Windows 代码签名证书和时间戳。`release:verify:mac` 会复核 Gatekeeper、codesign 和 stapling，`release:verify:win` 会复核 Authenticode 和时间戳；`release:finalize` 生成的 SBOM、构建来源和安装包哈希只作为内部发布证据，不上传到公开 Release。签名证书、私钥、Apple issuer/key id 和时间戳服务凭证只能放在发布者的安全密钥库或 CI Secrets 中，不能提交到仓库。
+`desktop:dmg` 和 `desktop:exe` 会先运行签名预检；没有 Developer ID/公证凭据或 Windows 代码签名配置时，在处理完整数据前直接失败。DMG 需要 Apple Developer ID Application 签名、notarization 和 stapling。EXE 需要可信 Windows 代码签名证书和时间戳。`release:verify:mac` 会复核 Gatekeeper、codesign 和 stapling，`release:verify:win` 会复核 Authenticode 和时间戳；`release:finalize` 生成的 SBOM、构建来源和安装包内部记录只作为内部发布证据，不上传到公开 Release。签名证书、私钥、Apple issuer/key id 和时间戳服务凭证只能放在发布者的安全密钥库或 CI Secrets 中，不能提交到仓库。
 
 正式跨平台构建使用 `.github/workflows/signed-complete-release.yml`。Mac 自托管 runner 必须持有 Developer ID 私钥、`APPLE_KEYCHAIN_PROFILE` 和本机完整资料源；Windows 安装包由 GitHub 的 `windows-latest` 原生 runner 使用 `WINDOWS_CSC_LINK` / `WINDOWS_CSC_KEY_PASSWORD` Secrets 构建。详见 [SIGNING.md](SIGNING.md)。
 
@@ -128,7 +128,7 @@ Each public release should upload only both macOS DMGs and the Windows x64 EXE, 
 
 The Git repository continues to ignore raw `downloads/`, `server/cache/`, and `release-data/`. `release:prepare-data` generates sanitized manifests and a package seed, removes developer paths and runtime-private files, keeps only cache files referenced by the current search index, and selects the newest bilingual case dossier for each case/provider.
 
-Run the complete check sequence shown above with Node.js 24 LTS. `release:verify-data` must re-hash every valid PDF and every seed file before packaging.
+Run the complete check sequence shown above with Node.js 24 LTS. `release:verify-data` must recheck every valid PDF and every seed file before packaging.
 
 Build only after development is complete:
 

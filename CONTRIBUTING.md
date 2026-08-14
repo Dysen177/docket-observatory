@@ -30,4 +30,4 @@ Do not commit downloaded court files, extracted text, AI caches, credentials, `.
 
 ## New Network Sources
 
-Every new destination must be added to `server/network-policy.cjs` and documented in `NETWORK.md`. Use the shared safe-fetch boundary, bounded timeouts and response sizes, deterministic filenames, temporary files, PDF validation, SHA-256 recording, and retry limits.
+Every new destination must be added to `server/network-policy.cjs` and documented in `NETWORK.md`. Use the shared safe-fetch boundary, bounded timeouts and response sizes, deterministic filenames, temporary files, PDF validation, local integrity recording, and retry limits.
