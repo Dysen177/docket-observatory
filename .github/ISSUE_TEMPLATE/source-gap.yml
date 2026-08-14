@@ -1,0 +1,38 @@
+name: Source or case gap
+description: Propose a public official docket, filing, entity, or source that may be missing.
+title: "[Source gap] "
+labels: [source-gap]
+body:
+  - type: markdown
+    attributes:
+      value: Submit only lawfully public material. Do not upload sealed, restricted, paywall-bypassed, or private personal records.
+  - type: input
+    id: case
+    attributes:
+      label: Case name and docket number
+    validations:
+      required: true
+  - type: input
+    id: court
+    attributes:
+      label: Court or agency
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Public source URL
+    validations:
+      required: true
+  - type: textarea
+    id: relationship
+    attributes:
+      label: Relevance and relationship evidence
+      description: Explain how the matter connects to a tracked person, entity, asset, or proceeding without assuming liability or control.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification already performed
+      description: State whether PACER, RECAP, an official agency, an archive, or a mirror was checked.

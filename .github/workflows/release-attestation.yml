@@ -1,0 +1,41 @@
+name: Release checksum and attestation
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  verify-and-attest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Download published release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir release-assets
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-assets
+
+      - name: Verify published SHA-256 manifest
+        working-directory: release-assets
+        run: sha256sum --check SHA256SUMS.txt
+
+      - name: Require signed-platform assets and release evidence
+        run: |
+          test -n "$(find release-assets -maxdepth 1 -type f -name '*.dmg' -print -quit)"
+          test -n "$(find release-assets -maxdepth 1 -type f -name '*.exe' -print -quit)"
+          test -s release-assets/SBOM.cdx.json
+          test -s release-assets/BUILD-PROVENANCE.json
+
+      - name: Attest published installers
+        uses: actions/attest-build-provenance@8beda2b7ed98355c0e97c0a63bec38ae472e66c4 # v4
+        with:
+          subject-path: |
+            release-assets/*.dmg
+            release-assets/*.exe

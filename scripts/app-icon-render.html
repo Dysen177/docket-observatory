@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App icon renderer</title>
+    <style>
+      html,
+      body {
+        width: 1024px;
+        height: 1024px;
+        margin: 0;
+        overflow: hidden;
+        background: transparent;
+      }
+
+      img {
+        position: absolute;
+        inset: 48px;
+        display: block;
+        width: 928px;
+        height: 928px;
+        border-radius: 208px;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="../src/assets/brand-logo.png" alt="" />
+  </body>
+</html>

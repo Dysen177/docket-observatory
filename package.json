@@ -1,0 +1,179 @@
+{
+  "name": "guo-intel",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local legal intelligence workbench for Guo-related federal cases and policy monitoring.",
+  "author": "Docket Observatory contributors",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10"
+  },
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "dev:web": "vite --host 127.0.0.1",
+    "dev:api": "node server/index.js",
+    "dev:all": "concurrently -k \"npm:dev:api\" \"npm:dev:web\"",
+    "desktop:dev": "npm run build:native:mac && concurrently -k \"npm:dev:web\" \"wait-on http://127.0.0.1:5173 && GUO_INTEL_ELECTRON_DEV_URL=http://127.0.0.1:5173 electron electron/main.cjs\"",
+    "build:native:mac": "node scripts/build-macos-keychain-addon.mjs",
+    "release:prepare-data": "node scripts/prepare-release-data.mjs",
+    "release:audit-research": "node scripts/research-audit.mjs",
+    "release:audit-corpus-risk": "node scripts/corpus-risk-audit.mjs",
+    "release:verify-corpus-review": "node scripts/verify-corpus-review.mjs",
+    "release:verify-data": "node scripts/verify-release-data.mjs",
+    "release:test-seed-install": "node scripts/release-seed-install-check.mjs",
+    "release:preflight:environment": "node scripts/release-environment-preflight.mjs",
+    "release:preflight:mac": "node scripts/release-signing-preflight.mjs mac",
+    "release:preflight:win": "node scripts/release-signing-preflight.mjs win",
+    "release:create-input-manifest": "node scripts/release-input-manifest.mjs create",
+    "release:verify-input-manifest": "node scripts/release-input-manifest.mjs verify",
+    "release:stage-data": "npm run release:audit-corpus-risk && npm run release:verify-corpus-review && npm run release:prepare-data && npm run release:verify-data && npm run release:create-input-manifest",
+    "release:verify-staged-data": "npm run release:verify-corpus-review && npm run release:verify-input-manifest && npm run release:verify-data",
+    "release:stage-input": "node scripts/stage-release-input.mjs stage",
+    "release:cleanup-input": "node scripts/stage-release-input.mjs cleanup",
+    "release:verify:mac": "node scripts/verify-macos-release.mjs release",
+    "release:verify:win": "powershell -ExecutionPolicy Bypass -File scripts/verify-windows-release.ps1 release",
+    "release:finalize": "node scripts/finalize-release-assets.mjs release",
+    "test:settings": "node scripts/settings-persistence-check.mjs",
+    "test:cloud-ai": "node scripts/cloud-ai-adapter-check.mjs",
+    "test:safe-storage": "electron scripts/electron-safe-storage-check.cjs",
+    "test:safe-storage:native": "electron scripts/electron-safe-storage-check.cjs --native",
+    "test:keychain:no-ui": "npm run build:native:mac && electron scripts/macos-keychain-addon-check.cjs",
+    "test:credential-vault": "npm run build:native:mac && electron scripts/macos-secret-store-check.cjs",
+    "test:electron-worker": "electron scripts/electron-search-worker-check.cjs",
+    "desktop:dmg": "npm run release:preflight:environment && npm run release:preflight:mac && npm run release:stage-data && npm run build:native:mac && npm run build && electron-builder --mac dmg --arm64 --x64",
+    "desktop:dmg:staged": "npm run release:preflight:mac && npm run release:verify-staged-data && npm run build:native:mac && npm run build && electron-builder --mac dmg --arm64 --x64",
+    "desktop:exe": "npm run release:preflight:environment && npm run release:preflight:win && npm run release:stage-data && npm run build && electron-builder --win nsis",
+    "desktop:exe:staged": "npm run release:preflight:win && npm run release:verify-staged-data && npm run build && electron-builder --win nsis",
+    "download:docs": "node server/download-documents.js",
+    "security:check": "node scripts/security-check.mjs && npm audit --audit-level=high",
+    "test:zero-key": "node scripts/zero-key-defaults-check.mjs",
+    "test:search:fixture": "node scripts/document-search-fixture-check.mjs",
+    "test:search:corpus": "node scripts/document-search-check.mjs",
+    "test:search": "node scripts/document-search-fixture-check.mjs && node scripts/document-search-check.mjs",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "build": {
+    "appId": "org.docketobservatory.app",
+    "productName": "案卷观察台",
+    "forceCodeSigning": true,
+    "asar": true,
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
+    },
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "server/**/*",
+      "!server/cache/**",
+      "!server/**/*.log",
+      "electron/**/*",
+      "package.json",
+      "build/icon.icns",
+      "build/icon.png"
+    ],
+    "extraResources": [
+      {
+        "from": "downloads/court-files-complete",
+        "to": "court-files",
+        "filter": [
+          "**/*.pdf",
+          "integrity-history.jsonl"
+        ]
+      },
+      {
+        "from": "release-metadata/corpus-manifest.json",
+        "to": "court-files/manifest.json"
+      },
+      {
+        "from": "release-data/seed-cache",
+        "to": "seed-cache",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "release-metadata/seed-cache-manifest.json",
+        "to": "seed-cache-manifest.json"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.reference",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": true,
+      "notarize": true,
+      "extraResources": [
+        {
+          "from": "build/native/${arch}/docket-observatory-keychain.node",
+          "to": "native/docket-observatory-keychain.node"
+        }
+      ],
+      "artifactName": "Docket-Observatory-${version}-macOS-${arch}.${ext}",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "artifactName": "Docket-Observatory-${version}-Windows-${arch}.${ext}",
+      "signtoolOptions": {
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
+        "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      },
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "案卷观察台"
+    }
+  },
+  "dependencies": {
+    "@tesseract.js-data/chi_sim": "^1.0.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1",
+    "lucide-react": "^1.31.0",
+    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^5.4.296",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tesseract.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.5",
+    "concurrently": "^9.2.4",
+    "electron": "43.4.0",
+    "electron-builder": "^26.15.3",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0",
+    "wait-on": "^9.1.0"
+  }
+}

@@ -1,0 +1,195 @@
+name: Signed complete desktop release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing reviewed release tag to build, for example v0.1.0
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: signed-release-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  macos-and-payload:
+    runs-on: [self-hosted, macOS, ARM64, docket-observatory-release]
+    timeout-minutes: 360
+    steps:
+      - name: Check out reviewed release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          clean: true
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify clean release environment
+        run: npm run release:preflight:environment
+
+      - name: Stage reviewed complete-data payload
+        run: npm run release:stage-input
+
+      - name: Build signed and notarized macOS DMGs
+        run: npm run desktop:dmg:staged
+
+      - name: Verify Gatekeeper, signatures, and notarization staples
+        run: npm run release:verify:mac
+
+      - name: Upload complete-data payload for the Windows-native build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: complete-release-input
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            downloads/court-files-complete/**/*.pdf
+            downloads/court-files-complete/integrity-history.jsonl
+            release-data/seed-cache/**
+            output/release-review/corpus-risk-audit.json
+            release-metadata/corpus-review-decisions.json
+            release-metadata/corpus-manifest.json
+            release-metadata/seed-cache-manifest.json
+            release-metadata/release-input-manifest.json
+
+      - name: Upload signed macOS installers
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: signed-macos-installers
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+          path: release/*.dmg
+
+      - name: Upload release evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-evidence
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            release-metadata/corpus-manifest.json
+            release-metadata/seed-cache-manifest.json
+
+      - name: Remove staged private build data from the runner workspace
+        if: always()
+        run: npm run release:cleanup-input
+
+  windows:
+    needs: macos-and-payload
+    runs-on: windows-latest
+    timeout-minutes: 360
+    env:
+      WIN_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+      WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+    steps:
+      - name: Check out the same reviewed release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          clean: true
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Verify clean Windows release environment
+        run: npm run release:preflight:environment
+
+      - name: Download the reviewed complete-data payload
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: complete-release-input
+          path: .
+
+      - name: Build signed Windows installer on Windows
+        run: npm run desktop:exe:staged
+
+      - name: Verify Authenticode signature and trusted timestamp
+        shell: pwsh
+        run: npm run release:verify:win
+
+      - name: Upload signed Windows installer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: signed-windows-installer
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+          path: release/*.exe
+
+  finalize:
+    needs: [macos-and-payload, windows]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out the reviewed release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.release_tag }}
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Record the checked-out release commit
+        run: echo "RELEASE_SOURCE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Download signed macOS installers
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: signed-macos-installers
+          path: release
+
+      - name: Download signed Windows installer
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: signed-windows-installer
+          path: release
+
+      - name: Download release evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-evidence
+          path: release-metadata
+
+      - name: Generate streaming checksums, SBOM, and provenance record
+        env:
+          GITHUB_REF: refs/tags/${{ inputs.release_tag }}
+        run: npm run release:finalize
+
+      - name: Upload complete signed release set
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: complete-signed-release
+          retention-days: 14
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            release/*.dmg
+            release/*.exe
+            release/SHA256SUMS.txt
+            release/SBOM.cdx.json
+            release/BUILD-PROVENANCE.json

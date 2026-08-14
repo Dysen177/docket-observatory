@@ -1,0 +1,60 @@
+name: Cross-platform source readiness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop-source:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run release checks
+        run: |
+          npm run lint
+          npm run build
+          npm run test:zero-key
+          npm run test:settings
+          npm run release:test-seed-install
+          npm run test:search:fixture
+          npm run security:check
+
+      - name: Verify Electron secret encryption round trip
+        run: npm run test:safe-storage
+
+      - name: Verify non-interactive macOS Keychain and encrypted vault
+        if: runner.os == 'macOS'
+        run: |
+          npm run test:keychain:no-ui
+          npm run test:credential-vault
+
+      - name: Verify native Windows DPAPI safeStorage
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:DOCKET_OBSERVATORY_NATIVE_STORAGE_TEST = 'release-artifact'
+          npm run test:safe-storage:native
+
+      - name: Verify Electron search-index Worker
+        run: npm run test:electron-worker
+
+      - name: Explain complete-package boundary
+        run: node -e "console.log('DMG/EXE packaging requires the separately staged and fully hashed release corpus; source CI intentionally does not fabricate or download private build inputs.')"

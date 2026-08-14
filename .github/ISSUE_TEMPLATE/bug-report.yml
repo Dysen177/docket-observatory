@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible application, UI, download, translation, analysis, or search failure.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not paste API keys, PACER credentials, private local paths, or sealed/restricted material.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: Operating system and architecture
+      placeholder: macOS 15.x Apple silicon, or Windows 11 x64
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Processing mode
+      options:
+        - No-key local mode
+        - Local Ollama
+        - OpenAI
+        - CourtListener token configured
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and non-sensitive logs
+    validations:
+      required: true
