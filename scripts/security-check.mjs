@@ -113,6 +113,17 @@ function approvedRiskPattern(ruleId, file, content) {
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
+  if (relative === path.join('scripts', 'verify-macos-community-release.mjs')) {
+    return content.includes("import { spawnSync } from 'node:child_process'")
+      && content.includes("run('/usr/bin/hdiutil', ['verify', filePath]")
+      && content.includes("run('/usr/bin/hdiutil', ['attach', filePath, '-nobrowse', '-readonly', '-mountpoint', mountDirectory]")
+      && content.includes("run('/usr/bin/codesign', ['--verify', '--deep', '--strict', '--verbose=4', appPath]")
+      && content.includes("run('/usr/bin/codesign', ['-dvvv', appPath]")
+      && content.includes("spawnSync('/usr/bin/hdiutil', ['detach', mountDirectory, '-force']")
+      && (content.match(/\bspawnSync\s*\(/g) ?? []).length === 2
+      && !content.includes('shell: true')
+      && !content.includes('...process.env')
+  }
   return false
 }
 

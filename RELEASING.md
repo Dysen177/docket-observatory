@@ -78,6 +78,8 @@ npm run desktop:exe:community
 
 文件名包含 `-unsigned`。社区构建仍执行完整资料审计、资料哈希、生产构建和 Electron 硬化检查，但不执行平台签名预检、Apple 公证或 Authenticode 验证。发布说明必须明确披露首次安装可能出现的系统确认，不得把社区包描述为“已签名”“已公证”或“未知发布者提示已消除”。
 
+macOS 社区包例外使用 `identity: '-'` 的无开发者身份 ad-hoc 资源签名，用于封装应用资源并避免“签名声明有资源但没有资源封装”的损坏包。`desktop:dmg:community` 构建后会自动运行 `release:verify:mac:community`，对两个 DMG 执行 `hdiutil verify`、挂载检查、`codesign --verify --deep --strict`，并要求 `Signature=adhoc` 且 `TeamIdentifier=not set`。这是包结构完整性签名，不是 Apple Developer ID，也不会消除 Gatekeeper 首次提示。
+
 #### 正式签名安装包
 
 最终开发完成后再执行：
@@ -137,7 +139,7 @@ npm run desktop:exe
 
 Sign and notarize the DMGs with Apple Developer ID. Sign the EXE with a trusted Windows code-signing certificate. Never commit signing material or provider credentials.
 
-For zero-budget distribution, `npm run desktop:dmg:community` on macOS and `npm run desktop:exe:community` on Windows produce explicitly `-unsigned` installers. They retain the complete-data and Electron-hardening checks but require the operating system's first-run confirmation and must never be described as signed or notarized.
+For zero-budget distribution, `npm run desktop:dmg:community` on macOS and `npm run desktop:exe:community` on Windows produce explicitly `-unsigned` installers. They retain the complete-data and Electron-hardening checks but require the operating system's first-run confirmation and must never be described as Developer ID signed, notarized, or Authenticode signed. The macOS command applies an identity-free ad-hoc resource signature and then automatically verifies both DMGs with `hdiutil`, strict/deep `codesign`, `Signature=adhoc`, and `TeamIdentifier=not set`. This seals the bundle structure; it does not establish an Apple publisher identity or remove Gatekeeper confirmation.
 
 ### Acceptance And Disclosure
 

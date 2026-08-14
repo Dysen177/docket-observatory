@@ -21,6 +21,7 @@
 
 <p align="center">
   <a href="#quick-download"><strong>Download v0.1.0</strong></a> &middot;
+  <a href="./DOWNLOADS.md"><strong>Illustrated Chinese/English install guide</strong></a> &middot;
   <a href="#core-capabilities">Capabilities</a> &middot;
   <a href="#evidence-sources-and-boundaries">Evidence boundaries</a> &middot;
   <a href="#local-first-and-security">Security</a> &middot;
@@ -44,6 +45,8 @@
 3. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. GitHub's automatically generated source archives are not the complete application.
 
 > **Before installing:** All three installers are explicitly labeled free unsigned builds. macOS may require **Open Anyway** in Privacy & Security; Windows may require **More info** in SmartScreen. Do not disable operating-system security controls. Confirm the filename and SHA-256 first.
+
+> **First installation:** Follow the [step-by-step Chinese and English illustrated guide](DOWNLOADS.md) from downloading the DMG/EXE through successful launch. It covers macOS Privacy & Security, Touch ID/password authorization, Windows SmartScreen, and UAC. The guide images contain no real user's desktop, account name, or files.
 
 ## Core Capabilities
 

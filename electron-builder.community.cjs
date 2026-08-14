@@ -5,7 +5,7 @@ const communityBuild = JSON.parse(JSON.stringify(build))
 communityBuild.forceCodeSigning = false
 communityBuild.mac = {
   ...communityBuild.mac,
-  identity: null,
+  identity: '-',
   notarize: false,
   artifactName: 'Docket-Observatory-${version}-macOS-${arch}-unsigned.${ext}',
 }

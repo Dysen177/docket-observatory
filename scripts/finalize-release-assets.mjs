@@ -15,6 +15,25 @@ const publicEvidenceNames = [
   'seed-cache-manifest.json',
 ]
 
+function parseArtifactSourceCommits(value) {
+  if (!value) return {}
+  let parsed
+  try {
+    parsed = JSON.parse(value)
+  } catch {
+    throw new Error('RELEASE_ARTIFACT_SOURCE_COMMITS must be a JSON object keyed by artifact filename.')
+  }
+  if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') {
+    throw new Error('RELEASE_ARTIFACT_SOURCE_COMMITS must be a JSON object keyed by artifact filename.')
+  }
+  for (const [name, commit] of Object.entries(parsed)) {
+    if (!artifactPattern.test(name) || typeof commit !== 'string' || !/^[0-9a-f]{7,40}$/i.test(commit)) {
+      throw new Error(`Invalid artifact source-commit entry for ${name}.`)
+    }
+  }
+  return parsed
+}
+
 async function sha256(filePath) {
   const hash = createHash('sha256')
   for await (const chunk of createReadStream(filePath)) hash.update(chunk)
@@ -49,6 +68,11 @@ const sbomPath = path.join(releaseDirectory, 'SBOM.cdx.json')
 await writeFile(sbomPath, `${sbomResult.stdout.trim()}\n`, { mode: 0o600 })
 
 const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'))
+const defaultSourceCommit = process.env.RELEASE_SOURCE_COMMIT || process.env.GITHUB_SHA || null
+const artifactSourceCommitOverrides = parseArtifactSourceCommits(process.env.RELEASE_ARTIFACT_SOURCE_COMMITS)
+for (const name of Object.keys(artifactSourceCommitOverrides)) {
+  if (!artifactNames.includes(name)) throw new Error(`Artifact source-commit entry does not match a release file: ${name}`)
+}
 const evidenceFiles = [
   'package-lock.json',
   'release-metadata/corpus-manifest.json',
@@ -63,8 +87,16 @@ const artifacts = []
 for (const name of artifactNames) {
   const filePath = path.join(releaseDirectory, name)
   const info = await stat(filePath)
-  artifacts.push({ name, bytes: info.size, sha256: await sha256(filePath) })
+  artifacts.push({
+    name,
+    bytes: info.size,
+    sha256: await sha256(filePath),
+    sourceCommit: artifactSourceCommitOverrides[name] || defaultSourceCommit,
+  })
 }
+
+const artifactSourceCommits = Object.fromEntries(artifacts.map(({ name, sourceCommit }) => [name, sourceCommit]))
+const distinctSourceCommits = [...new Set(Object.values(artifactSourceCommits).filter(Boolean))]
 
 const provenancePath = path.join(releaseDirectory, 'BUILD-PROVENANCE.json')
 await writeFile(provenancePath, `${JSON.stringify({
@@ -75,9 +107,10 @@ await writeFile(provenancePath, `${JSON.stringify({
   version: packageJson.version,
   releaseMode,
   signingStatus: releaseMode === 'community_unsigned'
-    ? 'Installers are explicitly unsigned and not notarized. Verify SHA-256 and follow the operating-system confirmation flow.'
+    ? 'Installers have no trusted publisher identity and are not notarized. macOS app bundles use identity-free ad-hoc signatures for structural integrity. Verify SHA-256 and follow the operating-system confirmation flow.'
     : 'Installers are expected to carry platform-trusted signatures verified by the formal release pipeline.',
-  sourceCommit: process.env.RELEASE_SOURCE_COMMIT || process.env.GITHUB_SHA || null,
+  sourceCommit: distinctSourceCommits.length === 1 ? distinctSourceCommits[0] : null,
+  artifactSourceCommits,
   sourceReference: process.env.GITHUB_REF || null,
   runtime: { node: process.version, platform: process.platform, arch: process.arch },
   evidence,

@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Verify community release configuration
+        run: npm run release:preflight:community
+
       - name: Build renderer
         run: npm run build
 

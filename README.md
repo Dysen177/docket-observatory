@@ -21,6 +21,7 @@
 
 <p align="center">
   <a href="#快速下载"><strong>下载 v0.1.0</strong></a> ·
+  <a href="./DOWNLOADS.md"><strong>中英文图文安装教程</strong></a> ·
   <a href="#核心能力">核心能力</a> ·
   <a href="#证据来源与边界">证据边界</a> ·
   <a href="#本地优先与安全">安全</a> ·
@@ -44,6 +45,8 @@
 3. 只从 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest) 或上述直达链接下载，不要把 GitHub 自动生成的源代码压缩包当成完整应用。
 
 > **安装前知道：** 三个安装包都明确标注为免费未签名版。首次打开时，macOS 可能需要在“隐私与安全性”中点击“仍要打开”，Windows 可能需要在 SmartScreen 中选择“更多信息”。不要关闭系统安全机制；先确认文件名和 SHA-256。
+
+> **第一次安装请看：** [从下载 DMG/EXE 到成功打开的中英文逐步图文教程](DOWNLOADS.md)，包括 Mac 的“隐私与安全性”、Touch ID/密码授权和 Windows SmartScreen/UAC。教程图不包含真实用户的桌面、账户名或文件。
 
 ## 核心能力
 

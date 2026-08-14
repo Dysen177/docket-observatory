@@ -34,7 +34,7 @@
 
 GitHub Actions 已固定到完整提交 SHA，并配置 Dependabot、CodeQL、依赖变更审查、锁文件和 `npm audit`。仓库启用后还应设置维护者双重验证、分支保护、合并审查、私密漏洞报告和最小权限发布密钥。
 
-当前社区版已经完成公开源码、完整资料载荷、哈希、构建来源、macOS DMG 结构和 Windows 原生安装流程等发布验证，但它明确不声称具备 Apple Developer ID、公证或 Windows 可信发布者签名。未来签名发行层级仍需完成相应平台签名、公证和签名成品复核，不能把“社区版验证通过”等同于“已经获得平台商业身份签名”。
+当前社区版已经完成公开源码、完整资料载荷、哈希、构建来源、macOS DMG 结构和 Windows 原生安装流程等发布验证。macOS 社区 DMG 还必须通过 `hdiutil verify`、挂载、严格/深度 `codesign` 和 `Signature=adhoc` / `TeamIdentifier=not set` 元数据检查。这只证明应用资源已封装，不是 Apple Developer ID 身份或公证。当前版本明确不声称具备 Apple Developer ID、公证或 Windows 可信发布者签名。未来签名发行层级仍需完成相应平台签名、公证和签名成品复核，不能把“社区版验证通过”等同于“已经获得平台商业身份签名”。不包含个人桌面、账户名或本机文件的中英文图文安装流程见 [DOWNLOADS.md](DOWNLOADS.md)。
 
 ## 仍然存在的风险
 

@@ -94,7 +94,7 @@ Publishing source code does not prove that an arbitrary DMG/EXE was built from t
 
 Users should download binaries only from the official GitHub Release, verify the checksum, verify a platform signature only when an artifact claims to be signed, and avoid unreviewed forks or third-party repackaging. The repository owner should require two-factor authentication, branch protection, reviewed pull requests, private vulnerability reporting, and least-privilege release secrets.
 
-The macOS no-authentication-UI Keychain tests, Windows native DPAPI tests, and installer tests remain release gates. Platform signing and notarization tests are additional gates for a future signed tier; the current community artifacts do not claim signed-installer status.
+The macOS no-authentication-UI Keychain tests, Windows native DPAPI tests, and installer tests remain release gates. Community macOS DMGs must additionally pass `hdiutil verify`, mounting, strict/deep `codesign`, and metadata checks proving `Signature=adhoc` and `TeamIdentifier=not set`; this is bundle sealing, not Developer ID identity or notarization. Platform publisher-signing and notarization tests are additional gates for a future signed tier. The current community artifacts do not claim signed-installer status. The privacy-safe bilingual first-run instructions are in [DOWNLOADS.md](DOWNLOADS.md).
 
 ## Residual Risk
 
