@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Check out reviewed release tag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ inputs.release_tag }}
           clean: true
@@ -96,7 +96,7 @@ jobs:
       WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
     steps:
       - name: Check out the same reviewed release tag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ inputs.release_tag }}
           clean: true
@@ -141,7 +141,7 @@ jobs:
     timeout-minutes: 120
     steps:
       - name: Check out the reviewed release tag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ inputs.release_tag }}
 
