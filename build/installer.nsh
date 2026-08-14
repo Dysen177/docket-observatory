@@ -2,7 +2,6 @@
 ; by electron-builder's default app-running check. Use the bundled NSIS process
 ; plugin so an assisted installer can finish an upgrade without a deadlock.
 !macro customCheckAppRunning
-  !include "nsProcess.nsh"
   nsProcess::FindProcess "${APP_EXECUTABLE_FILENAME}"
   Pop $R0
   ${If} $R0 == 0
