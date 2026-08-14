@@ -1,6 +1,6 @@
 # 发布前安全审计报告
 
-> **状态说明（2026-08-15）：** 本文保留的是发布前安全审计快照；其中关于尚未初始化仓库、尚未生成安装包的历史判断，应以当前源码、工作流和发布说明为准。当前公开版提供完整未签名社区安装包、资料清单、CI、CodeQL、macOS DMG 结构校验和 Windows 原生安装测试。公开 GitHub Release 只上传两个 DMG 和一个 EXE；SBOM、构建来源和安装包内部记录仅作为维护者审计证据，不作为普通用户的下载步骤。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
+> **状态说明（2026-08-15）：** 本文保留的是发布前安全审计快照；其中关于尚未初始化仓库、尚未生成安装包的历史判断，应以当前源码、工作流和发布说明为准。当前公开版提供完整未签名社区安装包、资料清单、CI、CodeQL、macOS DMG 结构检查以及 Windows 原生安装测试。公开 GitHub Release 只上传两个 DMG 和一个 EXE；SBOM、构建来源和安装包内部记录仅作为维护者审计证据，不作为普通用户的下载步骤。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
 
 审计日期：2026-08-14
 范围：React 19 / TypeScript / Vite、Express 5、本地资料处理、Electron 43、设置与密钥、外联、完整数据发行、GitHub Actions 与依赖供应链。
