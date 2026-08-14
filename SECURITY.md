@@ -90,11 +90,11 @@ Connection diagnostics persist only status, timestamp, latency, item count, and 
 
 ## Publication And Binary Trust
 
-Publishing source code does not prove that an arbitrary DMG/EXE was built from that source. Official releases must be signed, notarized where applicable, accompanied by `SHA256SUMS.txt`, `SBOM.cdx.json`, and `BUILD-PROVENANCE.json`, and built from a protected release tag. A release-published GitHub workflow verifies the checksum manifest and creates GitHub artifact attestations for the DMG/EXE files. GitHub Actions are pinned to full commit SHAs; Dependabot, CodeQL, dependency review, the lockfile, and `npm audit` reduce supply-chain risk but cannot eliminate it.
+Publishing source code does not prove that an arbitrary DMG/EXE was built from that source. The current zero-cost community release is explicitly labeled `unsigned` and is accompanied by `SHA256SUMS.txt`, `SBOM.cdx.json`, `BUILD-PROVENANCE.json`, corpus manifests, and release verification evidence. A future formally signed tier additionally requires Apple Developer ID signing and notarization for macOS and trusted timestamped Authenticode for Windows. GitHub Actions are pinned to full commit SHAs; Dependabot, CodeQL, dependency review, the lockfile, and `npm audit` reduce supply-chain risk but cannot eliminate it.
 
-Users should download binaries only from the official GitHub Release, verify the signature and checksum, and avoid unreviewed forks or third-party repackaging. The repository owner should require two-factor authentication, branch protection, reviewed pull requests, private vulnerability reporting, and least-privilege release secrets.
+Users should download binaries only from the official GitHub Release, verify the checksum, verify a platform signature only when an artifact claims to be signed, and avoid unreviewed forks or third-party repackaging. The repository owner should require two-factor authentication, branch protection, reviewed pull requests, private vulnerability reporting, and least-privilege release secrets.
 
-The macOS no-authentication-UI Keychain tests, Windows native DPAPI tests, installer-upgrade tests, and signing tests remain release-machine gates. Source readiness is not the same as signed-installer readiness.
+The macOS no-authentication-UI Keychain tests, Windows native DPAPI tests, and installer tests remain release gates. Platform signing and notarization tests are additional gates for a future signed tier; the current community artifacts do not claim signed-installer status.
 
 ## Residual Risk
 

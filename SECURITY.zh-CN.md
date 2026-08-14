@@ -30,11 +30,11 @@
 
 ## GitHub 与安装包可信度
 
-公开源码本身不能证明任意一个 DMG/EXE 一定由该源码构建。正式发布必须使用受保护的版本标签，macOS 包需要签名、公证和 stapling，Windows 包需要代码签名，并同时发布 `SHA256SUMS.txt`、`SBOM.cdx.json` 和 `BUILD-PROVENANCE.json`。Release 发布后，GitHub Actions 会重新核对哈希并给 DMG/EXE 生成 GitHub artifact attestation。用户应只从项目官方 GitHub Release 下载，核对签名和哈希，不应信任来源不明的二次打包或未经审查的分叉版本。
+公开源码本身不能证明任意一个 DMG/EXE 一定由该源码构建。当前零成本社区版明确标注为 `unsigned`，并同时发布 `SHA256SUMS.txt`、`SBOM.cdx.json`、`BUILD-PROVENANCE.json`、资料清单和发布验证证据。未来如果提供正式签名发行层级，macOS 包还必须使用 Apple Developer ID 签名并完成公证，Windows 包还必须使用带可信时间戳的 Authenticode 签名。用户应只从项目官方 GitHub Release 下载，核对哈希；只有文件明确声称已签名时才核对平台签名，不应信任来源不明的二次打包或未经审查的分叉版本。
 
 GitHub Actions 已固定到完整提交 SHA，并配置 Dependabot、CodeQL、依赖变更审查、锁文件和 `npm audit`。仓库启用后还应设置维护者双重验证、分支保护、合并审查、私密漏洞报告和最小权限发布密钥。
 
-当前源码可以进入公开前审计阶段，但签名安装包仍有两项发布机门槛：macOS 签名成品的无认证界面 Keychain 测试，以及 Windows 正式机器上的 DPAPI、安装/升级和代码签名验证。不能把“源码检查通过”等同于“安装包已经完成最终安全验收”。
+当前社区版已经完成公开源码、完整资料载荷、哈希、构建来源、macOS DMG 结构和 Windows 原生安装流程等发布验证，但它明确不声称具备 Apple Developer ID、公证或 Windows 可信发布者签名。未来签名发行层级仍需完成相应平台签名、公证和签名成品复核，不能把“社区版验证通过”等同于“已经获得平台商业身份签名”。
 
 ## 仍然存在的风险
 

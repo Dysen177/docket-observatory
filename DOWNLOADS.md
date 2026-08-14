@@ -34,9 +34,8 @@ Get-FileHash .\Docket-Observatory-*.exe -Algorithm SHA256
 
 ### 系统安全提示
 
-- 正式公开 DMG 应使用 Apple Developer ID 签名并完成 notarization。
-- 正式公开 EXE 应使用可信代码签名证书签名。
-- 明确标注 `-unsigned` 的社区构建可以安装使用，但首次打开可能需要使用 macOS 的“打开/仍要打开”或 Windows SmartScreen 的“更多信息/仍要运行”。不要关闭系统安全功能。
+- 当前 `v0.1.0` 是明确标注 `-unsigned` 的零成本社区构建，可以安装使用，但首次打开可能需要使用 macOS 的“打开/仍要打开”或 Windows SmartScreen 的“更多信息/仍要运行”。不要关闭系统安全功能。
+- 如果未来提供正式签名发行层级，DMG 将使用 Apple Developer ID 签名并完成 notarization，EXE 将使用可信代码签名证书和时间戳；该层级与当前社区构建使用不同文件名和验证规则。
 - 如果系统显示“未知发布者”或签名与 Release 说明不一致，不要绕过警告安装。
 - 只从本项目 GitHub Releases 下载，不要从来源不明的网盘、聊天附件或二次打包网站获取。
 - 详见 [代码签名政策](CODE_SIGNING_POLICY.md)。
@@ -73,9 +72,8 @@ The complete edition is not an empty library. Its release baseline contains 1,57
 
 ### Platform Warnings
 
-- Public DMGs are required to be signed with Apple Developer ID, notarized, and stapled; the release build fails instead of producing an unsigned fallback.
-- Public EXEs are required to be built on Windows and carry a trusted, timestamped Authenticode signature.
-- Explicitly labeled `-unsigned` community builds remain installable, but first launch can require the macOS Open/Open Anyway or Windows SmartScreen More info/Run anyway confirmation. Do not disable system security controls.
+- The current `v0.1.0` artifacts are explicitly labeled `-unsigned` zero-cost community builds. They are installable, but first launch can require macOS Open/Open Anyway or Windows SmartScreen More info/Run anyway confirmation. Do not disable system security controls.
+- If a formally signed distribution tier is offered later, its DMGs will use Apple Developer ID signing and notarization, and its EXE will use trusted timestamped Authenticode. That tier will use distinct filenames and verification rules.
 - Do not bypass an unexpected publisher or signature warning.
 - Download only from this project's GitHub Releases, not from repackaged third-party mirrors.
 - See the [Code Signing Policy](CODE_SIGNING_POLICY.md).

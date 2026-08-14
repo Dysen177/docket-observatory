@@ -18,7 +18,7 @@ npm run desktop:exe:community
 
 Apple 不向普通个人开源项目免费提供 Developer ID。开源本身不符合免年费条件；Apple 官方免年费仅面向符合条件的非营利法人、受认可教育机构和政府实体。Windows 在项目公开发布并达到资格后可申请 SignPath Foundation 免费开源签名，但批准权属于 SignPath，不能在获批前承诺。详见 [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md)。
 
-正式公开版本不允许使用临时签名、ad-hoc 签名或未签名安装包。项目的 `forceCodeSigning`、发布预检和安装包验证均采用失败即停止策略。
+正式签名发行通道不允许使用临时签名、ad-hoc 签名或未签名安装包。该通道的 `forceCodeSigning`、发布预检和安装包验证均采用失败即停止策略；它与前述文件名包含 `-unsigned` 的社区发行通道相互独立。
 
 ### macOS Developer ID 与公证
 
@@ -81,7 +81,7 @@ npm run desktop:exe:community
 
 Apple does not provide free Developer ID certificates to ordinary individual open-source developers. Open-source status alone does not qualify for Apple's fee waiver. After a public release and eligibility review, the Windows build can apply for free SignPath Foundation open-source signing, but approval cannot be promised in advance. See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md).
 
-Public releases must never use ad-hoc or unsigned installers. `forceCodeSigning`, release preflights, and post-build verification all fail closed.
+The formally signed distribution path never uses ad-hoc or unsigned installers. Its `forceCodeSigning`, release preflights, and post-build verification fail closed; it is separate from the explicitly `-unsigned` community distribution path described above.
 
 For macOS, join the Apple Developer Program, create a `Developer ID Application` certificate, keep its private key in the release Mac login Keychain, and configure notarization through a `notarytool` Keychain profile or an App Store Connect API key. The preflight authenticates the credentials with `notarytool history`; post-build verification checks stapling, Gatekeeper, and code signatures.
 
