@@ -30,6 +30,8 @@ These images are captured from the current running application.
 
 ## Download The Complete Edition
 
+> **Release status (August 14, 2026):** No DMG or EXE has been uploaded to the GitHub Releases page yet. The complete installer is waiting for the corpus publication review; seeing no installer assets there is expected and does not indicate a problem with your computer or account.
+
 ### The simple download path
 
 1. Open the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest).
@@ -130,7 +132,7 @@ npm run test:search:fixture     # search fixture
 
 This is a local-first open-source desktop application. It has no user-account system, advertising SDK, analytics SDK, telemetry SDK, remote database, or hidden update channel. Electron uses context isolation, sandboxing, strict external-link validation, loopback API allowlisting, ASAR integrity, and Electron Fuses hardening. macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. The UI receives masked status only.
 
-The source, lockfile, network allowlist, corpus manifest, cache hashes, and release verification files are public for inspection. Open source does not prove that a third-party repackaged binary is trustworthy: download binaries only from this project's GitHub Releases and verify the signature and `SHA256SUMS.txt`. See [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network allowlist](NETWORK.md), and [open-source audit](OPEN_SOURCE_AUDIT.md).
+The source, lockfile, network allowlist, corpus manifest, cache hashes, and release verification files are public for inspection. Open source does not prove that a third-party repackaged binary is trustworthy: download binaries only from this project's GitHub Releases and verify the signature and `SHA256SUMS.txt`. See [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network allowlist](NETWORK.md), [open-source audit](OPEN_SOURCE_AUDIT.md), and [GitHub operations](GITHUB_OPERATIONS.md).
 
 The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party distribution. Report security issues according to [SECURITY.md]; never paste API keys, PACER passwords, private files, or local paths into public issues.
 

@@ -30,6 +30,8 @@
 
 ## 下载完整版
 
+> **当前发布状态（2026 年 8 月 14 日）：** GitHub 版本页目前还没有上传 DMG 或 EXE。完整安装包正在等待资料发布审查完成；因此现在点“最新版本”看不到安装文件是正常的，不是你的电脑或账号出错。
+
 ### 最简单的下载方法
 
 1. 打开 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest)。
@@ -132,7 +134,7 @@ npm run test:search:fixture     # 搜索功能检查
 
 这是本地优先的开源桌面程序：没有用户账号系统、广告 SDK、分析 SDK、遥测 SDK、远程数据库或隐藏更新通道。Electron 使用上下文隔离、沙箱、严格外链校验、回环地址 API 白名单、ASAR 完整性和 Electron Fuses 硬化。macOS 密钥使用本机钥匙串保护的加密保险库，Windows 使用 DPAPI 支持的 `safeStorage`；界面只显示脱敏状态。
 
-源代码、依赖锁文件、网络白名单、资料清单、缓存哈希和发布校验文件都公开，便于自行审计。公开源代码本身不能证明某个第三方重新打包的安装包可信，因此只从本项目的 GitHub 版本页下载，并核对签名和 `SHA256SUMS.txt`。完整安全边界见 [安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md) 和 [开源审计说明](OPEN_SOURCE_AUDIT.md)。
+源代码、依赖锁文件、网络白名单、资料清单、缓存哈希和发布校验文件都公开，便于自行审计。公开源代码本身不能证明某个第三方重新打包的安装包可信，因此只从本项目的 GitHub 版本页下载，并核对签名和 `SHA256SUMS.txt`。完整安全边界见 [安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md)、[开源审计说明](OPEN_SOURCE_AUDIT.md) 和 [GitHub 运营说明](GITHUB_OPERATIONS.md)。
 
 当前审计没有发现已知后门或隐藏信息收集路径；这不是对未来依赖、操作系统、构建环境或恶意第三方分发的绝对保证。安全问题请按 [安全政策](SECURITY.zh-CN.md) 提交，不要在公开 Issue 中粘贴 API Key、PACER 密码、私密文件或本机路径。
 
