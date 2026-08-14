@@ -8,10 +8,10 @@
 
 1. 打开 [GitHub 最新版本页面](../../releases/latest)。
 2. 在 `Assets` 区域选择系统对应的安装包：
-   - Apple 芯片 Mac：`Docket-Observatory-<版本>-macOS-arm64.dmg`
-   - Intel Mac：`Docket-Observatory-<版本>-macOS-x64.dmg`
-   - Windows 10/11 x64：`Docket-Observatory-<版本>-Windows-x64.exe`
-   - 零成本社区构建会在扩展名前增加 `-unsigned`，不会冒充正式签名版本。
+   - Apple 芯片 Mac：`Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
+   - Intel Mac：`Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
+   - Windows 10/11 x64：`Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
+   - `v0.1.0` 是明确标注的零成本未签名社区构建，不会冒充正式签名版本。
 3. 同时下载 `SHA256SUMS.txt`，核对安装包是否与发布者生成的文件完全一致。
 
 macOS 终端校验：
@@ -47,10 +47,10 @@ Get-FileHash .\Docket-Observatory-*.exe -Algorithm SHA256
 
 1. Open the [latest GitHub Release](../../releases/latest).
 2. Under `Assets`, choose the installer for your system:
-   - Apple silicon Mac: `Docket-Observatory-<version>-macOS-arm64.dmg`
-   - Intel Mac: `Docket-Observatory-<version>-macOS-x64.dmg`
-   - Windows 10/11 x64: `Docket-Observatory-<version>-Windows-x64.exe`
-   - Zero-cost community builds add `-unsigned` before the extension and never impersonate formally signed releases.
+   - Apple silicon Mac: `Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
+   - Intel Mac: `Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
+   - Windows 10/11 x64: `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
+   - `v0.1.0` is an explicitly labeled zero-cost unsigned community build and never impersonates a formally signed release.
 3. Download `SHA256SUMS.txt` and verify the installer.
 
 macOS:

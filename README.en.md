@@ -30,20 +30,17 @@ These images are captured from the current running application.
 
 ## Download The Complete Edition
 
-> **Release status (August 14, 2026):** No DMG or EXE has been uploaded to the GitHub Releases page yet. The complete installer is waiting for the corpus publication review; seeing no installer assets there is expected and does not indicate a problem with your computer or account.
+> **Release status (August 14, 2026):** The `v0.1.0` complete community edition is published. All three installers are explicitly labeled as zero-cost unsigned builds and include the complete baseline. All 213 review-flagged files remain included; none was hidden, redacted, replaced, or excluded.
 
 ### The simple download path
 
-1. Open the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest).
-2. Scroll to **Assets**. Do not download the automatically generated source archives if you need the application: source archives do not contain the bundled legal corpus.
-3. Choose one installer:
-   - Apple-silicon Mac (M1, M2, M3, or M4): download the `.dmg` containing `macOS-arm64`.
-   - Intel Mac: download the `.dmg` containing `macOS-x64`.
-   - 64-bit Windows: download the `.exe` containing `Windows-x64`.
-4. Download the matching `SHA256SUMS.txt` and follow [Download, install, and verify](DOWNLOADS.md).
-5. Open the installer. On macOS, drag the application to **Applications**. On Windows, follow the installer wizard.
-
-If the latest Release page says that no release has been published, installers are not available yet. The source repository cannot provide the complete application by itself. Check the [all releases page](https://github.com/Dysen177/docket-observatory/releases) or run from source using the instructions below. The project does not present an empty shell as a complete edition.
+1. Choose one installer for your computer:
+   - Apple-silicon Mac (M1, M2, M3, or M4): [direct DMG download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg).
+   - Intel Mac: [direct DMG download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg).
+   - 64-bit Windows 10/11: [direct EXE download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe).
+2. Download [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt) and follow [Download, install, and verify](DOWNLOADS.md).
+3. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. Do not download the automatically generated source archives if you need the application; those archives do not contain the bundled legal corpus.
+4. Open the installer. On macOS, drag the application to **Applications**. On Windows, follow the installer wizard.
 
 ### Why the package is large
 
@@ -132,7 +129,7 @@ npm run test:search:fixture     # search fixture
 
 This is a local-first open-source desktop application. It has no user-account system, advertising SDK, analytics SDK, telemetry SDK, remote database, or hidden update channel. Electron uses context isolation, sandboxing, strict external-link validation, loopback API allowlisting, ASAR integrity, and Electron Fuses hardening. macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. The UI receives masked status only.
 
-The source, lockfile, network allowlist, corpus manifest, cache hashes, and release verification files are public for inspection. Open source does not prove that a third-party repackaged binary is trustworthy: download binaries only from this project's GitHub Releases and verify the signature and `SHA256SUMS.txt`. See [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network allowlist](NETWORK.md), [open-source audit](OPEN_SOURCE_AUDIT.md), and [GitHub operations](GITHUB_OPERATIONS.md).
+The source, lockfile, network allowlist, corpus manifest, cache hashes, and release verification files are public for inspection. Open source does not prove that a third-party repackaged binary is trustworthy: download binaries only from this project's GitHub Releases, confirm the explicit `-unsigned` filename, and verify `SHA256SUMS.txt`. See [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network allowlist](NETWORK.md), [open-source audit](OPEN_SOURCE_AUDIT.md), and [GitHub operations](GITHUB_OPERATIONS.md).
 
 The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party distribution. Report security issues according to [SECURITY.md]; never paste API keys, PACER passwords, private files, or local paths into public issues.
 

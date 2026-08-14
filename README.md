@@ -30,20 +30,17 @@
 
 ## 下载完整版
 
-> **当前发布状态（2026 年 8 月 14 日）：** GitHub 版本页目前还没有上传 DMG 或 EXE。完整安装包正在等待资料发布审查完成；因此现在点“最新版本”看不到安装文件是正常的，不是你的电脑或账号出错。
+> **当前发布状态（2026 年 8 月 14 日）：** `v0.1.0` 完整社区版已发布。三个安装包都明确标注为免费未签名版，内置完整资料基线；213 份审查标记文件全部保留，没有隐藏、删减、替换或排除。
 
 ### 最简单的下载方法
 
-1. 打开 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest)。
-2. 向下找到“附件”区域。不要下载页面自动生成的源代码压缩包；源代码压缩包不包含完整法院资料库。
-3. 根据电脑选择一个安装包：
-   - Apple 芯片 Mac（M1、M2、M3、M4）：下载文件名中带 `macOS-arm64` 的 `.dmg`。
-   - Intel Mac：下载文件名中带 `macOS-x64` 的 `.dmg`。
-   - Windows 64 位：下载文件名中带 `Windows-x64` 的 `.exe`。
-4. 下载同一个版本的 `SHA256SUMS.txt`，按照 [下载、安装与校验说明](DOWNLOADS.md) 检查文件完整性。
-5. 双击安装包：Mac 将程序拖入“应用程序”文件夹；Windows 按安装向导操作。
-
-如果最新版本页面显示“没有发布版本”，说明安装包还没有上传，不能从源代码页面直接得到完整安装版。此时可从 [全部版本页面](https://github.com/Dysen177/docket-observatory/releases) 查看发布状态，或按照下面的源码运行方式使用程序。项目不会用一个不包含资料库的空壳安装包冒充完整版。
+1. 根据电脑直接下载一个安装包：
+   - Apple 芯片 Mac（M1、M2、M3、M4）：[DMG 直接下载](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg)。
+   - Intel Mac：[DMG 直接下载](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg)。
+   - Windows 10/11 64 位：[EXE 直接下载](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe)。
+2. 同时下载 [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt)，按照 [下载、安装与校验说明](DOWNLOADS.md) 检查文件完整性。
+3. 只从 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest) 或上述直达链接下载。不要下载页面自动生成的源代码压缩包；它们不包含完整法院资料库。
+4. 双击安装包：Mac 将程序拖入“应用程序”文件夹；Windows 按安装向导操作。
 
 ### 为什么文件这么大
 
@@ -134,7 +131,7 @@ npm run test:search:fixture     # 搜索功能检查
 
 这是本地优先的开源桌面程序：没有用户账号系统、广告 SDK、分析 SDK、遥测 SDK、远程数据库或隐藏更新通道。Electron 使用上下文隔离、沙箱、严格外链校验、回环地址 API 白名单、ASAR 完整性和 Electron Fuses 硬化。macOS 密钥使用本机钥匙串保护的加密保险库，Windows 使用 DPAPI 支持的 `safeStorage`；界面只显示脱敏状态。
 
-源代码、依赖锁文件、网络白名单、资料清单、缓存哈希和发布校验文件都公开，便于自行审计。公开源代码本身不能证明某个第三方重新打包的安装包可信，因此只从本项目的 GitHub 版本页下载，并核对签名和 `SHA256SUMS.txt`。完整安全边界见 [安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md)、[开源审计说明](OPEN_SOURCE_AUDIT.md) 和 [GitHub 运营说明](GITHUB_OPERATIONS.md)。
+源代码、依赖锁文件、网络白名单、资料清单、缓存哈希和发布校验文件都公开，便于自行审计。公开源代码本身不能证明某个第三方重新打包的安装包可信，因此只从本项目的 GitHub 版本页下载，确认文件名明确标注 `-unsigned`，并核对 `SHA256SUMS.txt`。完整安全边界见 [安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md)、[开源审计说明](OPEN_SOURCE_AUDIT.md) 和 [GitHub 运营说明](GITHUB_OPERATIONS.md)。
 
 当前审计没有发现已知后门或隐藏信息收集路径；这不是对未来依赖、操作系统、构建环境或恶意第三方分发的绝对保证。安全问题请按 [安全政策](SECURITY.zh-CN.md) 提交，不要在公开 Issue 中粘贴 API Key、PACER 密码、私密文件或本机路径。
 
