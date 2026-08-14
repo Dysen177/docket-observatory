@@ -61,7 +61,7 @@ Windows 正式 EXE 必须在 Windows 上生成。推荐从可信代码签名服�
 2. 自托管 Apple silicon Mac runner 从 `DOCKET_OBSERVATORY_RELEASE_SOURCE_ROOT` 读取已准备的完整资料；该变量只配置在 runner 服务环境，不提交到仓库。
 3. Mac runner 使用本机 Developer ID 和 `APPLE_KEYCHAIN_PROFILE` 构建、验证 DMG，并上传临时完整资料载荷。
 4. GitHub 托管的 `windows-latest` runner 下载同一载荷，在 Windows 上签名构建并验证 EXE。
-5. 最终 job 流式计算大型安装包哈希，生成 SBOM、构建来源记录和 `SHA256SUMS.txt`。
+5. 最终 job 流式计算大型安装包哈希，生成供维护者使用的 SBOM、构建来源记录和内部安装包校验记录；这些证据不上传为普通用户的 Release 附件。
 
 Mac runner 需要自定义标签 `docket-observatory-release`。发布证书、私钥、PFX、密码、`.p8` 和 Apple 凭据均不得进入 Git 历史或 Actions artifact。
 
@@ -87,4 +87,4 @@ For macOS, join the Apple Developer Program, create a `Developer ID Application`
 
 For Windows, obtain a trusted Authenticode certificate and configure `WINDOWS_CSC_LINK` and `WINDOWS_CSC_KEY_PASSWORD` as GitHub Actions secrets. The Windows-native job maps them to Electron Builder's `WIN_CSC_*` variables, signs with SHA-256 and an RFC 3161 timestamp, and requires a valid signer and timestamp certificate. A valid signature reduces warnings but cannot guarantee immediate SmartScreen reputation for a new certificate or new binary.
 
-The signed complete-release workflow stages reviewed data from a dedicated self-hosted Apple silicon Mac runner, builds and notarizes both DMGs there, transfers the same hashed data payload to a GitHub-hosted Windows runner, and then produces checksums, an SBOM, and build provenance. Keep every certificate and credential outside the repository and build artifacts.
+The signed complete-release workflow stages reviewed data from a dedicated self-hosted Apple silicon Mac runner, builds and notarizes both DMGs there, transfers the same hashed data payload to a GitHub-hosted Windows runner, and then produces internal installer-integrity records, an SBOM, and build provenance. These are maintainer evidence, not public installer-download requirements. Keep every certificate and credential outside the repository and build artifacts.

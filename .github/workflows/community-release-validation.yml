@@ -17,7 +17,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 90
     steps:
-      - name: Download Windows installer and checksums
+      - name: Download Windows installer
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.release_tag }}
@@ -28,28 +28,11 @@ jobs:
           $release = $releases | Where-Object { $_.tag_name -eq $env:RELEASE_TAG } | Select-Object -First 1
           if (-not $release) { throw "Release $env:RELEASE_TAG was not found, including drafts." }
 
-          $assetNames = @(
-            ($release.assets | Where-Object { $_.name -like '*Windows-x64-unsigned.exe' } | Select-Object -First 1).name
-            ($release.assets | Where-Object { $_.name -eq 'SHA256SUMS.txt' } | Select-Object -First 1).name
-          )
-          foreach ($assetName in $assetNames) {
-            if (-not $assetName) { throw "A required Windows release asset is missing from $env:RELEASE_TAG." }
-            $asset = $release.assets | Where-Object { $_.name -eq $assetName } | Select-Object -First 1
-            $destination = Join-Path 'release-assets' $asset.name
-            gh api "repos/$env:GITHUB_REPOSITORY/releases/assets/$($asset.id)" -H 'Accept: application/octet-stream' > $destination
-            if ($LASTEXITCODE -ne 0) { throw "Failed to download $($asset.name)." }
-          }
-
-      - name: Verify published Windows SHA-256
-        shell: pwsh
-        run: |
-          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
-          if (-not $installer) { throw 'Windows x64 installer is missing.' }
-          $line = Get-Content release-assets\SHA256SUMS.txt | Where-Object { $_ -match [regex]::Escape($installer.Name) } | Select-Object -First 1
-          if (-not $line) { throw 'SHA256SUMS.txt does not list the Windows installer.' }
-          $expected = ($line -split '\s+')[0].ToLowerInvariant()
-          $actual = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-          if ($actual -ne $expected) { throw "Windows installer SHA-256 mismatch: $actual" }
+          $asset = $release.assets | Where-Object { $_.name -like '*Windows-x64-unsigned.exe' } | Select-Object -First 1
+          if (-not $asset) { throw "The Windows installer is missing from $env:RELEASE_TAG." }
+          $destination = Join-Path 'release-assets' $asset.name
+          gh api "repos/$env:GITHUB_REPOSITORY/releases/assets/$($asset.id)" -H 'Accept: application/octet-stream' > $destination
+          if ($LASTEXITCODE -ne 0) { throw "Failed to download $($asset.name)." }
 
       - name: Test NSIS archive
         shell: pwsh

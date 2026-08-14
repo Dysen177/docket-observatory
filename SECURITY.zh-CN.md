@@ -22,19 +22,19 @@
 
 完整版 DMG/EXE 包含法院 PDF 和预计算研究缓存，但不会直接打包开发机原始缓存。发布脚本会排除设置、密钥、诊断、自动化历史、日志和开发机路径，只保留经过清理的正文提取、现有译文/阅读辅助、法律解读、案件总览、审计和检索数据。发布版首次启动会逐文件核对研究种子的大小和 SHA-256；校验失败会停止启动，不会静默退回空资料库或低层级历史重建。
 
-发布前生成：
+发布过程会生成供维护者和源码审查者使用的内部资料清单：
 
 - `release-metadata/corpus-manifest.json`：资料来源、文件坐标、大小和 SHA-256。
 - `release-metadata/seed-cache-manifest.json`：解读/翻译/索引种子文件清单和 SHA-256。
-- `SHA256SUMS.txt`：最终 DMG/EXE 哈希。
+- 这些内部清单用于构建和资料完整性检查，不是普通用户的安装步骤，也不作为公开 Release 下载附件。
 
 ## GitHub 与安装包可信度
 
-公开源码本身不能证明任意一个 DMG/EXE 一定由该源码构建。当前零成本社区版明确标注为 `unsigned`，并同时发布 `SHA256SUMS.txt`、`SBOM.cdx.json`、`BUILD-PROVENANCE.json`、资料清单和发布验证证据。未来如果提供正式签名发行层级，macOS 包还必须使用 Apple Developer ID 签名并完成公证，Windows 包还必须使用带可信时间戳的 Authenticode 签名。用户应只从项目官方 GitHub Release 下载，核对哈希；只有文件明确声称已签名时才核对平台签名，不应信任来源不明的二次打包或未经审查的分叉版本。
+公开源码本身不能证明任意一个 DMG/EXE 一定由该源码构建。当前零成本社区版明确标注为 `unsigned`；源码、构建工作流、资料清单和内部发布验证均保留在仓库中。未来如果提供正式签名发行层级，macOS 包还必须使用 Apple Developer ID 签名并完成公证，Windows 包还必须使用带可信时间戳的 Authenticode 签名。用户应只从项目官方 GitHub Release 下载，不应信任来源不明的二次打包或未经审查的分叉版本。
 
 GitHub Actions 已固定到完整提交 SHA，并配置 Dependabot、CodeQL、依赖变更审查、锁文件和 `npm audit`。仓库启用后还应设置维护者双重验证、分支保护、合并审查、私密漏洞报告和最小权限发布密钥。
 
-当前社区版已经完成公开源码、完整资料载荷、哈希、构建来源、macOS DMG 结构和 Windows 原生安装流程等发布验证。macOS 社区 DMG 还必须通过 `hdiutil verify`、挂载、严格/深度 `codesign` 和 `Signature=adhoc` / `TeamIdentifier=not set` 元数据检查。这只证明应用资源已封装，不是 Apple Developer ID 身份或公证。当前版本明确不声称具备 Apple Developer ID、公证或 Windows 可信发布者签名。未来签名发行层级仍需完成相应平台签名、公证和签名成品复核，不能把“社区版验证通过”等同于“已经获得平台商业身份签名”。不包含个人桌面、账户名或本机文件的中英文图文安装流程见 [DOWNLOADS.md](DOWNLOADS.md)。
+当前社区版已经完成公开源码、完整资料载荷、内部资料完整性、macOS DMG 结构和 Windows 原生安装流程等发布验证。macOS 社区 DMG 还必须通过 `hdiutil verify`、挂载、严格/深度 `codesign` 和 `Signature=adhoc` / `TeamIdentifier=not set` 元数据检查。这只证明应用资源已封装，不是 Apple Developer ID 身份或公证。当前版本明确不声称具备 Apple Developer ID、公证或 Windows 可信发布者签名。未来签名发行层级仍需完成相应平台签名、公证和签名成品复核，不能把“社区版验证通过”等同于“已经获得平台商业身份签名”。不包含个人桌面、账户名或本机文件的中英文图文安装流程见 [DOWNLOADS.md](DOWNLOADS.md)。
 
 ## 仍然存在的风险
 

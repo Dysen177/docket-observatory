@@ -7,7 +7,6 @@
 - macOS Apple 芯片：`Docket-Observatory-X.Y.Z-macOS-arm64.dmg`
 - macOS Intel：`Docket-Observatory-X.Y.Z-macOS-x64.dmg`
 - Windows x64：`Docket-Observatory-X.Y.Z-Windows-x64.exe`
-- 完整性：`SHA256SUMS.txt`
 
 ### 完整版资料基线
 
@@ -32,7 +31,7 @@
 
 ### 安全与透明
 
-当前源码和发布资料审计未发现已知后门、遥测、远程数据库或隐藏更新通道。请通过源码、`NETWORK.md`、`OPEN_SOURCE_AUDIT.md`、corpus/seed manifests 和 `SHA256SUMS.txt` 独立复核。AI 输出仅作研究辅助，不是法律意见；PACER 仍是正式案卷，不能承诺资料绝对完整。
+当前源码和发布资料审计未发现已知后门、遥测、远程数据库或隐藏更新通道。请通过源码、`NETWORK.md`、`OPEN_SOURCE_AUDIT.md`、corpus/seed manifests 和构建工作流独立复核。AI 输出仅作研究辅助，不是法律意见；PACER 仍是正式案卷，不能承诺资料绝对完整。
 
 ## English
 
@@ -41,7 +40,6 @@
 - macOS Apple silicon: `Docket-Observatory-X.Y.Z-macOS-arm64.dmg`
 - macOS Intel: `Docket-Observatory-X.Y.Z-macOS-x64.dmg`
 - Windows x64: `Docket-Observatory-X.Y.Z-Windows-x64.exe`
-- Integrity file: `SHA256SUMS.txt`
 
 ### Complete Data Baseline
 
@@ -62,4 +60,4 @@ No-key users start with the complete bundled baseline and receive incrementally 
 
 ### Security And Transparency
 
-The current source and release-data audit found no known backdoor, telemetry, remote database, or hidden updater. Independently review the source, network allowlist, open-source audit, corpus/seed manifests, and installer checksums. AI output is research assistance, not legal advice, and PACER remains the docket of record.
+The current source and release-data audit found no known backdoor, telemetry, remote database, or hidden updater. Independently review the source, network allowlist, open-source audit, corpus/seed manifests, and build workflows. AI output is research assistance, not legal advice, and PACER remains the docket of record.

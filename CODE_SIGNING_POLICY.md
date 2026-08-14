@@ -6,12 +6,12 @@
 
 ### 当前零成本发行
 
-本项目允许发布明确标注为 `unsigned` 的零成本社区构建。社区构建不会伪造、自签名或冒充受信任发布者，也不会关闭用户操作系统的安全功能。安装包继续包含与正式构建相同的应用硬化、完整资料载荷、哈希清单和构建来源记录；区别仅是没有平台商业身份签名与公证。
+本项目允许发布明确标注为 `unsigned` 的零成本社区构建。社区构建不会伪造、自签名或冒充受信任发布者，也不会关闭用户操作系统的安全功能。安装包继续包含与正式构建相同的应用硬化、完整资料载荷和内部发布验证；区别仅是没有平台商业身份签名与公证。
 
 - macOS 文件名包含 `-unsigned.dmg`。其中的 `.app` 使用无开发者身份的 ad-hoc 签名封装资源，以便 macOS 检查应用包结构完整性；这不是 Apple Developer ID 签名，也不代表已经公证。首次打开时由用户通过 macOS 提供的“打开”或“仍要打开”流程确认。
 - Windows 文件名包含 `-unsigned.exe`。首次运行时可能由用户通过 SmartScreen 的“更多信息”与“仍要运行”流程确认。
 - 用户不应关闭 Gatekeeper、SmartScreen、防病毒软件或系统安全策略。
-- 每个安装包必须从项目官方 GitHub Release 下载，并使用同一 Release 的 `SHA256SUMS.txt` 校验。
+- 每个安装包必须从项目官方 GitHub Release 下载。公开 Release 只提供两个 macOS DMG 和一个 Windows EXE；GitHub 自动生成的源代码压缩包不是安装包。
 
 ### 免费可信签名路线
 
@@ -31,12 +31,12 @@ Apple 没有面向普通个人开源项目的免费 Developer ID。Apple 的免�
 
 ### Current zero-cost distribution
 
-The project may publish zero-cost community builds that are explicitly labeled `unsigned`. These builds do not use fake or self-signed publisher identities and do not disable operating-system security controls. They retain the same Electron hardening, complete-data payload, checksums, and build-provenance records as formal builds; only platform identity signing and notarization are absent.
+The project may publish zero-cost community builds that are explicitly labeled `unsigned`. These builds do not use fake or self-signed publisher identities and do not disable operating-system security controls. They retain the same Electron hardening, complete-data payload, and internal release validation as formal builds; only platform identity signing and notarization are absent.
 
 - macOS artifacts include `-unsigned.dmg`. The contained `.app` uses an identity-free ad-hoc signature to seal bundle resources so macOS can validate structural integrity. This is not Apple Developer ID signing or notarization. The user confirms first launch through the macOS-provided Open or Open Anyway flow.
 - Windows artifacts include `-unsigned.exe`. The user may need to use SmartScreen's More info and Run anyway flow.
 - Users should not disable Gatekeeper, SmartScreen, antivirus software, or system security policy.
-- Installers must be downloaded from the official GitHub Release and verified against that Release's `SHA256SUMS.txt`.
+- Installers must be downloaded from the official GitHub Release. A public Release provides only the two macOS DMGs and one Windows EXE; GitHub's automatically generated source archives are not installers.
 
 ### Free trusted-signing route
 

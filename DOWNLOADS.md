@@ -1,10 +1,10 @@
-# 下载、安装与校验 / Download, Install, And Verify
+# 下载、安装 / Download And Install
 
 [**中文安装教程**](#中文安装教程) | [**English Installation Guide**](#english-installation-guide)
 
-> `v0.1.0` 是免费、未经商业证书签名的完整社区版。请只从本项目 GitHub Releases 下载，先核对文件名和 SHA-256，再按下面的系统官方流程确认运行。不要关闭 Gatekeeper、SmartScreen 或其他系统安全功能。
+> `v0.1.0` 是免费、未经商业证书签名的完整社区版。请只从本项目 GitHub Releases 下载对应系统的安装包，再按下面的系统官方流程确认运行。不要关闭 Gatekeeper、SmartScreen 或其他系统安全功能。
 >
-> `v0.1.0` is the free complete community build without a commercial code-signing identity. Download only from this project's GitHub Releases, verify the filename and SHA-256, and then use the operating system's documented confirmation flow below. Do not disable Gatekeeper, SmartScreen, or other system security controls.
+> `v0.1.0` is the free complete community build without a commercial code-signing identity. Download only the installer for your operating system from this project's GitHub Release, then use the operating system's documented confirmation flow below. Do not disable Gatekeeper, SmartScreen, or other system security controls.
 
 ## 中文安装教程
 
@@ -12,7 +12,7 @@
 
 1. 打开 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest)。
 2. 向下找到 `Assets`，根据电脑选择：
-   - Apple 芯片 Mac（M1、M2、M3、M4）：`Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
+   - Apple 芯片 Mac（Apple silicon）：`Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
    - Intel Mac：`Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
    - Windows 10/11 x64：`Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
 3. GitHub 自动生成的 `Source code (zip)` 和 `Source code (tar.gz)` 是源码，不是内置完整资料库的安装包。
@@ -21,38 +21,7 @@
 
 不知道 Mac 是哪种芯片：打开屏幕左上角 **苹果菜单 → 关于本机**，查看“芯片”或“处理器”。
 
-### 2. 可选但推荐：用 SHA-256 核对安装包
-
-`SHA256SUMS.txt` 不是安装文件，不需要放进应用程序，也不会被案卷观察台读取。它是一个普通文本清单，列出同一 Release 中每个 DMG/EXE 应有的 SHA-256“数字指纹”。专业用户可以直接计算并在线查看预期值；新手下载这个清单后更容易把预期值和实际值放在一起比较。校验完成后可以删除它。
-
-比较的目的：
-
-- **完全一致：** 当前 DMG/EXE 与项目发布的对应文件逐字节相同，可排除常见的下载不完整、传输损坏、误用旧安装包或文件内容被改动。
-- **任何一个字符不同：** 不要安装，删除 DMG/EXE 和 `SHA256SUMS.txt`，再从本项目 GitHub Release 重新下载。
-- **校验边界：** 一致不等于“已经证明绝对安全”。SHA-256 只核对文件是否与发布版本相同，不能代替源码审查、代码签名、SBOM、安全扫描或对发布账户的信任判断。
-
-具体操作：
-
-1. 把安装包和同一 Release 的 `SHA256SUMS.txt` 都下载到“下载”文件夹。
-2. 打开 `SHA256SUMS.txt`，找到与你下载的安装包**文件名完全相同**的那一行；行首 64 个十六进制字符是预期指纹。
-3. 用下面的系统命令计算已下载文件的实际指纹。
-4. 将命令输出的 64 个字符与清单中的 64 个字符逐字比较。文件名和指纹都必须对应，不能拿 arm64 的指纹核对 x64 文件。
-
-macOS“终端”：
-
-```bash
-shasum -a 256 ~/Downloads/Docket-Observatory-*.dmg
-```
-
-Windows PowerShell：
-
-```powershell
-Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
-```
-
-命令只计算指纹，不会安装、打开或修改程序。输出一致后继续下一步；不一致就停止安装。
-
-### 3. macOS：把应用拖入“应用程序”
+### 2. macOS：把应用拖入“应用程序”
 
 1. 双击下载的 DMG。
 2. 把“案卷观察台”图标拖到“应用程序”文件夹。
@@ -60,7 +29,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 <p align="center"><img src="./docs/install/macos-dmg-install-zh.png" width="760" alt="把案卷观察台拖入应用程序文件夹"></p>
 
-### 4. macOS：首次打开时先点“完成”
+### 3. macOS：首次打开时先点“完成”
 
 首次双击应用时，macOS 可能显示“Apple 无法验证”。这表示当前社区版没有 Apple Developer ID 和公证，不是“程序已经被 Apple 证实包含恶意软件”。
 
@@ -68,7 +37,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 <p align="center"><img src="./docs/install/macos-alert-zh-apple.png" width="420" alt="Apple 无法验证应用的中文提示"></p>
 
-### 5. macOS：进入“隐私与安全性”
+### 4. macOS：进入“隐私与安全性”
 
 1. 打开 **系统设置**。
 2. 点击 **隐私与安全性**。
@@ -79,7 +48,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 如果没有“仍要打开”：先回到“应用程序”再尝试打开一次，然后立即回到这个页面。该按钮只会在尝试运行被阻止的应用后显示一段时间。
 
-### 6. macOS：用 Touch ID 或登录密码授权
+### 5. macOS：用 Touch ID 或登录密码授权
 
 点击“仍要打开”后，macOS 可能要求管理员授权。两种方式二选一：
 
@@ -90,7 +59,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 > 上面两张是无个人信息的流程示意图。实际样式会因 macOS 版本、Mac 型号和是否启用 Touch ID 而不同。
 
-### 7. macOS：在最后确认框点“仍要打开”
+### 6. macOS：在最后确认框点“仍要打开”
 
 授权后会再出现一次最终确认。核对应用名称是“案卷观察台”，然后点 **仍要打开**。下图只保留了实际提示框，没有桌面、文件、菜单栏或 Dock。
 
@@ -98,7 +67,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 完成一次例外确认后，后续通常可以像其他应用一样从“应用程序”或 Launchpad 打开。
 
-### 8. Windows：运行安装程序
+### 7. Windows：运行安装程序
 
 1. 双击 `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`。
 2. 如果 SmartScreen 显示“Windows 已保护你的电脑”，先点 **更多信息**，核对应用名和文件来源后再点 **仍要运行**。
@@ -119,15 +88,14 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 ### 为什么安装包很大
 
-完整版不是空资料库。发布基线包含 1,578 份有效法院/机构/历史公开 PDF（约 1.3 GB）、完整性记录，以及约 0.5 GB 的正文提取、现有译文/阅读辅助、文件解读、案件整体解读、关系审计和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积。建议至少预留 5 GB 空间。
+完整版不是空资料库。发布基线包含 1,578 份有效法院、机构和历史公开 PDF（约 1.3 GB），以及约 0.5 GB 的正文提取、现有译文与阅读辅助、文件解读、案件整体解读、关系数据和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积。建议至少预留 5 GB 空间。
 
 ### 常见问题
 
-- **显示“应用已损坏”：** 不要继续使用早期下载的 macOS 安装包。删除旧 DMG，从 GitHub Release 重新下载，并核对 `SHA256SUMS.txt`。
+- **显示“应用已损坏”：** 不要继续使用早期下载的 macOS 安装包。删除旧 DMG，从 GitHub Release 重新下载当前版本，并确认下载链接来自本项目官方仓库。
 - **只看到“移到废纸篓”：** 先点“完成”，然后按本文进入“隐私与安全性”。
 - **没有 Touch ID：** 选择“改用密码”，输入 Mac 登录密码。
 - **Windows 没有显示 SmartScreen 或 UAC：** 不是故障，Windows 版本、安全策略和安装方式不同时，某些确认步骤可能不出现。
-- **校验值不一致：** 不要运行；重新下载并在 GitHub Issue 报告。
 
 ## English Installation Guide
 
@@ -135,7 +103,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 1. Open the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest).
 2. Under `Assets`, choose:
-   - Apple-silicon Mac (M1, M2, M3, or M4): `Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
+   - Apple-silicon Mac: `Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
    - Intel-based Mac: `Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
    - Windows 10/11 x64: `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
 3. GitHub's automatically generated source-code archives are not the complete application bundle.
@@ -144,38 +112,7 @@ Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
 
 To identify your Mac, open **Apple menu > About This Mac** and check **Chip** or **Processor**.
 
-### 2. Optional but recommended: verify the installer with SHA-256
-
-`SHA256SUMS.txt` is not an installer, does not belong in Applications, and is never read by Docket Observatory. It is a plain-text manifest listing the expected SHA-256 "digital fingerprint" of every DMG/EXE in the same Release. An experienced user can calculate a hash and inspect the expected value online; downloading the manifest simply makes the comparison clearer for a new user. You may delete it after verification.
-
-What the comparison means:
-
-- **Exact match:** the DMG/EXE is byte-for-byte identical to the corresponding file published by this project. This detects common incomplete downloads, transfer corruption, an outdated installer, or changed bytes.
-- **Any character differs:** do not install it. Delete both the installer and `SHA256SUMS.txt`, then download them again from this project's GitHub Release.
-- **Limit of the check:** a match does not prove that software is absolutely safe. SHA-256 confirms equality with the published file; it does not replace source review, code signing, an SBOM, security scanning, or trust in the publishing account.
-
-Steps:
-
-1. Download the installer and `SHA256SUMS.txt` from the same Release into Downloads.
-2. Open `SHA256SUMS.txt` and find the line whose **filename exactly matches** your installer. The first 64 hexadecimal characters are the expected fingerprint.
-3. Calculate the downloaded file's actual fingerprint with the appropriate command below.
-4. Compare all 64 characters. Both the filename and fingerprint must correspond; do not compare an arm64 installer with the x64 line.
-
-macOS Terminal:
-
-```bash
-shasum -a 256 ~/Downloads/Docket-Observatory-*.dmg
-```
-
-Windows PowerShell:
-
-```powershell
-Get-FileHash "$HOME\Downloads\Docket-Observatory-*.exe" -Algorithm SHA256
-```
-
-These commands only calculate a fingerprint. They do not install, open, or modify the application. Continue only after the values match; stop if they differ.
-
-### 3. macOS: drag the application into Applications
+### 2. macOS: drag the application into Applications
 
 1. Double-click the downloaded DMG.
 2. Drag Docket Observatory into the Applications folder.
@@ -183,7 +120,7 @@ These commands only calculate a fingerprint. They do not install, open, or modif
 
 <p align="center"><img src="./docs/install/macos-dmg-install-en.png" width="760" alt="Drag Docket Observatory into Applications"></p>
 
-### 4. macOS: select Done on the first alert
+### 3. macOS: select Done on the first alert
 
 On first launch, macOS can display an alert that Apple could not verify the app. This means the free community build has no Apple Developer ID and notarization. It does not mean that Apple has confirmed the application contains malware.
 
@@ -191,7 +128,7 @@ Select **Done**, not **Move to Trash**. Apple's official screenshot uses "Exampl
 
 <p align="center"><img src="./docs/install/macos-alert-en-apple.png" width="420" alt="Apple could not verify Example App alert"></p>
 
-### 5. macOS: use Privacy & Security
+### 4. macOS: use Privacy & Security
 
 1. Open **System Settings**.
 2. Select **Privacy & Security**.
@@ -202,7 +139,7 @@ Select **Done**, not **Move to Trash**. Apple's official screenshot uses "Exampl
 
 If Open Anyway is missing, try to launch the app from Applications once more and immediately return to this page. macOS shows this option only for a limited time after a blocked launch attempt.
 
-### 6. macOS: authorize with Touch ID or the Mac login password
+### 5. macOS: authorize with Touch ID or the Mac login password
 
 macOS can request administrator authorization after you select Open Anyway. Use either method offered by your Mac:
 
@@ -213,7 +150,7 @@ macOS can request administrator authorization after you select Open Anyway. Use 
 
 > These two images are privacy-safe workflow illustrations. The actual prompt varies by macOS version, Mac model, and Touch ID availability.
 
-### 7. macOS: confirm the final prompt
+### 6. macOS: confirm the final prompt
 
 After authorization, macOS asks one final time. Confirm that the app name is Docket Observatory and select **Open Anyway** or **Open**, depending on the macOS version.
 
@@ -221,7 +158,7 @@ After authorization, macOS asks one final time. Confirm that the app name is Doc
 
 The image above is a clean English illustration of the final confirmation layout. Once this exception is approved, later launches normally work from Applications or Launchpad without repeating the entire flow.
 
-### 8. Windows: run the installer
+### 7. Windows: run the installer
 
 1. Double-click `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`.
 2. If SmartScreen displays **Windows protected your PC**, select **More info**, verify the application name and download source, and then select **Run anyway**.
@@ -242,15 +179,14 @@ The image above is a clean English illustration of the final confirmation layout
 
 ### Why the installers are large
 
-The complete edition is not an empty library. Its baseline contains 1,578 valid public court, agency, and historical PDFs (about 1.3 GB), integrity records, and about 0.5 GB of extracted text, existing translation and reading assistance, document-level readings, case dossiers, relationship audits, and full-text indexes. Electron, OCR language models, and runtime dependencies add more. Keep at least 5 GB free.
+The complete edition is not an empty library. Its baseline contains 1,578 valid public court, agency, and historical PDFs (about 1.3 GB), plus about 0.5 GB of extracted text, existing translations and reading assistance, document-level readings, case dossiers, relationship data, and full-text indexes. Electron, OCR language models, and runtime dependencies add more. Keep at least 5 GB free.
 
 ### Troubleshooting
 
-- **macOS says the app is damaged:** Do not continue using an early macOS asset. Delete the old DMG, download the current Release asset again, and compare it with `SHA256SUMS.txt`.
+- **macOS says the app is damaged:** Do not continue using an early macOS asset. Delete the old DMG and download the current installer from this project's official GitHub Release.
 - **The first alert only offers Move to Trash:** Select Done, then follow the Privacy & Security steps above.
 - **No Touch ID:** Select Use Password and enter the Mac login password.
 - **No SmartScreen or UAC prompt:** This is not an error. Windows version, security policy, and installation scope can change which confirmation steps appear.
-- **Hash mismatch:** Do not run the file. Download it again and report the mismatch in a GitHub Issue.
 
 ## Image Sources And Privacy
 

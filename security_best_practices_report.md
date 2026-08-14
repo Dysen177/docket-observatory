@@ -1,6 +1,6 @@
 # 发布前安全审计报告
 
-> **状态说明（2026-08-14）：** 本文保留的是 GitHub 仓库创建和 `v0.1.0` 发布前的审计快照，因此后文部分“尚未初始化仓库”“尚未生成安装包”“缺少哈希或来源证明”等描述已经由后续工作整改。当前公开版已提供完整未签名社区安装包、`SHA256SUMS.txt`、SBOM、构建来源、资料清单、CI、CodeQL、macOS DMG 校验和 Windows 原生安装测试。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
+> **状态说明（2026-08-15）：** 本文保留的是发布前安全审计快照；其中关于尚未初始化仓库、尚未生成安装包的历史判断，应以当前源码、工作流和发布说明为准。当前公开版提供完整未签名社区安装包、资料清单、CI、CodeQL、macOS DMG 结构校验和 Windows 原生安装测试。公开 GitHub Release 只上传两个 DMG 和一个 EXE；SBOM、构建来源和安装包哈希仅作为维护者内部发布证据，不作为普通用户的下载步骤。仍未完成的是 Apple Developer ID、公证和 Windows 可信发布者签名；这些属于未来正式签名发行层级，不影响当前文件名明确标注 `-unsigned` 的零成本社区版按披露方式发布。当前状态以 [README](README.md)、[安全政策](SECURITY.zh-CN.md) 和 [代码签名政策](CODE_SIGNING_POLICY.md) 为准。
 
 审计日期：2026-08-14
 范围：React 19 / TypeScript / Vite、Express 5、本地资料处理、Electron 43、设置与密钥、外联、完整数据发行、GitHub Actions 与依赖供应链。
@@ -80,7 +80,7 @@
 
 - 严重性：High（安装包发布阻断）
 - 影响：攻击者可以传播同名篡改包；公开源码不能证明第三方 DMG/EXE 与源码一致。
-- 必须完成：Apple Developer ID 签名、公证和 stapling；Windows 代码签名和可信时间戳；受保护 release tag；最终 `SHA256SUMS.txt`；从官方 Release 重新下载并复核。
+- 必须完成：Apple Developer ID 签名、公证和 stapling；Windows 代码签名和可信时间戳；受保护 release tag；从官方 Release 重新下载三个安装包并完成原生安装复核。
 - 建议：发布 CI 使用 GitHub Environment 审批、最小权限 secrets 和 artifact attestation/SBOM。签名私钥不得进入仓库或聊天。
 
 ### REL-002：原生安全存储与安装升级验收尚未完成
@@ -142,7 +142,7 @@
 2. 运行 `npm ci`、`npm run lint`、`npm run build`、`npm run test:settings`、`npm run test:safe-storage`、`npm run test:electron-worker`、`npm run test:zero-key`、`npm run test:search`、`npm run security:check`、`npm run release:verify-data`。
 3. 生成并发布 production SBOM，例如 `npm sbom --omit=dev --sbom-format=cyclonedx`，并保留构建日志和依赖锁文件。
 4. 在干净 macOS/Windows 用户账户进行离线首次启动、联网增量更新、外链、PDF、密钥保存/删除、升级和卸载验收。
-5. 签名并公证 DMG；签名 EXE；生成 `SHA256SUMS.txt`；从 GitHub Release 重新下载验证。
+5. 签名并公证 DMG；签名 EXE；从 GitHub Release 重新下载三个安装包，验证安装、启动、完整资料载荷和卸载。
 6. 用户只应从官方 GitHub Release 下载；不要把 GitHub Token、签名证书、PACER 凭证或 API Key 粘贴到聊天、Issue、源码或 Release Notes。
 
 ## 本轮验证结果

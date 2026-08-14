@@ -11,9 +11,9 @@
 - `Docket-Observatory-<版本>-macOS-arm64.dmg`
 - `Docket-Observatory-<版本>-macOS-x64.dmg`
 - `Docket-Observatory-<版本>-Windows-x64.exe`
-- `SHA256SUMS.txt`
-- GitHub 自动生成的 Source code (`zip` / `tar.gz`)
 - 中英文 Release Notes，写明资料基线日期、文件数、来源覆盖、已知缺口和安全变更
+
+GitHub Release 上传的附件只允许上述三个安装包。GitHub 自动显示的 Source code (`zip` / `tar.gz`) 由平台生成，无法删除；它们是源码归档，不是安装包，也不包含完整版资料库。
 
 程序采用完整版发行：内置经审计的法院 PDF 基线和当前有效研究缓存。源代码仓库继续忽略 `downloads/`、`server/cache/` 和 `release-data/`，避免把开发机原始数据、日志或设置直接推送到 GitHub。
 
@@ -58,7 +58,7 @@ npm run release:create-input-manifest
 npm sbom --omit=dev --sbom-format=cyclonedx > SBOM.cdx.json
 ```
 
-`release:audit-research` 会把人工深度研究、本地规则解读、正文提取、翻译层级和未解决缺口写入 `output/research-audit/`。发布说明必须使用这份结果区分“已收录”“已有双语解读”“完整生成式全文翻译”和“人工律师级深度研究”，不能把这些层级合并成同一个完成度承诺。`SBOM.cdx.json` 应作为 Release 资产发布，便于外部复核生产依赖。
+`release:audit-research` 会把人工深度研究、本地规则解读、正文提取、翻译层级和未解决缺口写入 `output/research-audit/`。发布说明必须使用这份结果区分“已收录”“已有双语解读”“完整生成式全文翻译”和“人工律师级深度研究”，不能把这些层级合并成同一个完成度承诺。SBOM、构建来源和其他资料证据只供维护者与源码审查者使用，不上传为普通用户的 Release 附件。
 
 `release:audit-corpus-risk` 会扫描现行全文索引中的密封/限制措辞、可能未遮蔽的身份或账户信息、未成年人/医疗记录提示和批量 HID 标识，只输出风险类别与文件坐标，不复制命中正文。人工复核结果必须写入 `release-metadata/corpus-review-decisions.json`；`release:verify-corpus-review` 要求每个命中项都有审核人、时间、法律依据、理由和 `approved_public` / `exclude` / `redacted_public` 决定，否则禁止打包。
 
@@ -92,7 +92,7 @@ npm run release:verify:win
 npm run release:finalize
 ```
 
-`desktop:dmg` 和 `desktop:exe` 会先运行签名预检；没有 Developer ID/公证凭据或 Windows 代码签名配置时，在处理完整数据前直接失败。DMG 需要 Apple Developer ID Application 签名、notarization 和 stapling。EXE 需要可信 Windows 代码签名证书和时间戳。`release:verify:mac` 会复核 Gatekeeper、codesign 和 stapling，`release:verify:win` 会复核 Authenticode 和时间戳；`release:finalize` 只有在 DMG 和 EXE 同时存在时才生成 `SBOM.cdx.json`、`BUILD-PROVENANCE.json` 和 `SHA256SUMS.txt`。签名证书、私钥、Apple issuer/key id 和时间戳服务凭证只能放在发布者的安全密钥库或 CI Secrets 中，不能提交到仓库。
+`desktop:dmg` 和 `desktop:exe` 会先运行签名预检；没有 Developer ID/公证凭据或 Windows 代码签名配置时，在处理完整数据前直接失败。DMG 需要 Apple Developer ID Application 签名、notarization 和 stapling。EXE 需要可信 Windows 代码签名证书和时间戳。`release:verify:mac` 会复核 Gatekeeper、codesign 和 stapling，`release:verify:win` 会复核 Authenticode 和时间戳；`release:finalize` 生成的 SBOM、构建来源和安装包哈希只作为内部发布证据，不上传到公开 Release。签名证书、私钥、Apple issuer/key id 和时间戳服务凭证只能放在发布者的安全密钥库或 CI Secrets 中，不能提交到仓库。
 
 正式跨平台构建使用 `.github/workflows/signed-complete-release.yml`。Mac 自托管 runner 必须持有 Developer ID 私钥、`APPLE_KEYCHAIN_PROFILE` 和本机完整资料源；Windows 安装包由 GitHub 的 `windows-latest` 原生 runner 使用 `WINDOWS_CSC_LINK` / `WINDOWS_CSC_KEY_PASSWORD` Secrets 构建。详见 [SIGNING.md](SIGNING.md)。
 
@@ -109,7 +109,7 @@ npm run release:finalize
 7. 确认原始 PDF、本地路径和 OCR 图像未发送到任何 AI 提供商；OpenAI 官方 Responses 请求必须带 `store:false`。
 8. 验证外部链接、内置 PDF 阅读、中文/英文切换、深色/浅色模式和 1080 最小窗口。
 9. 重启程序，确认种子缓存不会重复复制，自动任务不会在配置间隔内重复立即运行。
-10. 在 GitHub Release 上传后重新下载 DMG/EXE，并用公开 `SHA256SUMS.txt` 复核。
+10. 在 GitHub Release 上传后重新下载三个安装包，确认公开附件中没有多余的维护者辅助文件，并复核安装、启动和完整资料载荷。
 
 ### 发布说明必须包含
 
@@ -118,13 +118,13 @@ npm run release:finalize
 - 无 Key、CourtListener、Ollama、官方/兼容云端 AI、PACER 各自真实能力，并明确协议兼容不代表模型质量相同。
 - PACER 仍是正式案卷，不能承诺绝对完整。
 - 无遥测、无远程数据库、无隐藏更新通道；当前审计未发现已知后门。
-- 源码、网络白名单、依赖锁、资料哈希、种子哈希和安装包哈希的复核位置。
+- 源码、网络白名单、依赖锁、资料清单、内部发布验证和安装教程的位置。
 
 ## English Release Process
 
 ### Release Assets
 
-Each public release should provide both macOS DMGs, the Windows x64 EXE, `SHA256SUMS.txt`, `SBOM.cdx.json`, GitHub source archives, and bilingual release notes. This is a complete-data release: it includes the audited PDF baseline and active research seed rather than an empty first-run library.
+Each public release should upload only both macOS DMGs and the Windows x64 EXE, together with bilingual release notes. GitHub automatically shows source archives; those are source downloads, not installers and not the complete-data application. This is a complete-data release: it includes the audited PDF baseline and active research seed rather than an empty first-run library.
 
 The Git repository continues to ignore raw `downloads/`, `server/cache/`, and `release-data/`. `release:prepare-data` generates sanitized manifests and a package seed, removes developer paths and runtime-private files, keeps only cache files referenced by the current search index, and selects the newest bilingual case dossier for each case/provider.
 
@@ -143,4 +143,4 @@ For zero-budget distribution, `npm run desktop:dmg:community` on macOS and `npm 
 
 ### Acceptance And Disclosure
 
-Test offline first launch on clean macOS and Windows accounts, then test online incremental updates and each optional provider. The release notes must disclose the baseline date and counts, capability limits, PACER incompleteness boundary, package-size reason, security architecture, and checksum locations. State that the current audit found no known backdoor or hidden collection path; do not replace verifiable controls with an unprovable absolute guarantee.
+Test offline first launch on clean macOS and Windows accounts, then test online incremental updates and each optional provider. The release notes must disclose the baseline date and counts, capability limits, PACER incompleteness boundary, package-size reason, and security architecture. State that the current audit found no known backdoor or hidden collection path; do not replace verifiable controls with an unprovable absolute guarantee.
