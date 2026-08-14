@@ -114,6 +114,19 @@
       {
         "from": "release-metadata/seed-cache-manifest.json",
         "to": "seed-cache-manifest.json"
+      },
+      {
+        "from": "electron",
+        "to": "startup",
+        "filter": [
+          "startup.html",
+          "startup-error.html",
+          "startup-error.js"
+        ]
+      },
+      {
+        "from": "build/icon.png",
+        "to": "build/icon.png"
       }
     ],
     "mac": {

@@ -37,8 +37,24 @@ for (const name of dmgs) {
     const appPath = path.join(mountDirectory, appNames[0])
     run('/usr/bin/codesign', ['--verify', '--deep', '--strict', '--verbose=4', appPath], `${name} application signature`)
     const signature = run('/usr/bin/codesign', ['-dvvv', appPath], `${name} signature metadata`)
+    const codeResourcesPath = path.join(appPath, 'Contents', '_CodeSignature', 'CodeResources')
+    const codeResources = await readdir(path.dirname(codeResourcesPath)).catch(() => [])
+    if (!codeResources.includes('CodeResources')) throw new Error(`${name} is missing its sealed application resource manifest.`)
+    if (!signature.includes('Identifier=org.docketobservatory.app')) throw new Error(`${name} has an unexpected application identifier.`)
     if (!signature.includes('Signature=adhoc')) throw new Error(`${name} must carry an ad-hoc bundle-integrity signature.`)
     if (!signature.includes('TeamIdentifier=not set')) throw new Error(`${name} unexpectedly claims a platform signing team.`)
+    const requiredResources = [
+      'startup/startup.html',
+      'startup/startup-error.html',
+      'startup/startup-error.js',
+      'build/icon.png',
+    ]
+    const resourceRoot = path.join(appPath, 'Contents', 'Resources')
+    for (const relativeResource of requiredResources) {
+      const segments = relativeResource.split('/')
+      const parentEntries = await readdir(path.join(resourceRoot, ...segments.slice(0, -1))).catch(() => [])
+      if (!parentEntries.includes(segments.at(-1))) throw new Error(`${name} is missing packaged resource ${relativeResource}.`)
+    }
   } finally {
     if (attached) spawnSync('/usr/bin/hdiutil', ['detach', mountDirectory, '-force'], { encoding: 'utf8', timeout: 120000 })
     await rm(mountDirectory, { recursive: true, force: true })

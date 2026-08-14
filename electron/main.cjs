@@ -49,6 +49,7 @@ async function startLocalServer() {
   process.env.GUO_INTEL_API_PORT = apiPort
   process.env.GUO_INTEL_LOCAL_API_TOKEN = localApiToken
   process.env.GUO_INTEL_CACHE_DIR = process.env.GUO_INTEL_CACHE_DIR || path.join(app.getPath('userData'), 'cache')
+  process.env.GUO_INTEL_AUDIT_OUTPUT_DIR = process.env.GUO_INTEL_AUDIT_OUTPUT_DIR || path.join(app.getPath('userData'), 'audit')
   process.env.GUO_INTEL_DOWNLOAD_DIR = downloadsRoot
   if (app.isPackaged) {
     process.env.GUO_INTEL_BUNDLED_DOWNLOAD_DIR = path.join(process.resourcesPath, 'court-files')
@@ -139,7 +140,13 @@ function createStartupWindow() {
     },
   })
   startupWindow.once('ready-to-show', () => startupWindow?.show())
-  void startupWindow.loadFile(path.join(__dirname, 'startup.html'))
+  void startupWindow.loadFile(startupAssetPath('startup.html'))
+}
+
+function startupAssetPath(fileName) {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, 'startup', fileName)
+    : path.join(__dirname, fileName)
 }
 
 function isLocalAppRequest(value) {
@@ -307,7 +314,7 @@ app.whenReady().then(async () => {
     console.error(error)
     if (startupWindow && !startupWindow.isDestroyed()) {
       startupWindow.once('closed', () => app.quit())
-      await startupWindow.loadFile(path.join(__dirname, 'startup-error.html')).catch(() => undefined)
+      await startupWindow.loadFile(startupAssetPath('startup-error.html')).catch(() => undefined)
       startupWindow.show()
     } else {
       app.quit()
