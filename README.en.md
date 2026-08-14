@@ -1,108 +1,151 @@
+<p align="right"><a href="./README.md">中文</a> | <strong>English</strong></p>
+
+<p align="center">
+  <img src="./src/assets/brand-logo.png" width="112" alt="Docket Observatory logo">
+</p>
+
 # Docket Observatory
 
-A local legal-research workbench for macOS and Windows. It brings public court records, agency materials, case timelines, full-text PDF search, bilingual reading, source verification, and cross-case relationships into one desktop application.
+<p align="center"><strong>案卷观察台</strong></p>
 
-The application is source-neutral. Court rulings, government allegations, party positions, trustee filings, regulatory records, public mirrors, and media material are labeled separately. A party's allegation is never silently presented as a judicial finding.
+<p align="center">
+  A local-first legal research workbench for macOS and Windows. Track public dockets, verify sources, search PDFs, read bilingual material, and understand relationships across cases.
+</p>
 
-## Screenshots
+<p align="center">
+  <a href="https://github.com/Dysen177/docket-observatory/releases/latest"><img src="https://img.shields.io/github/v/release/Dysen177/docket-observatory?label=latest%20release" alt="latest release"></a>
+  <a href="https://github.com/Dysen177/docket-observatory/actions/workflows/ci.yml"><img src="https://github.com/Dysen177/docket-observatory/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status"></a>
+  <a href="https://github.com/Dysen177/docket-observatory/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-1f8a70.svg" alt="MIT License"></a>
+  <a href="https://github.com/Dysen177/docket-observatory"><img src="https://img.shields.io/badge/mode-local--first-4d7cff.svg" alt="local-first"></a>
+</p>
 
-These images are captured from the current running application.
+<p align="center">
+  <a href="#quick-download"><strong>Download v0.1.0</strong></a> &middot;
+  <a href="#core-capabilities">Capabilities</a> &middot;
+  <a href="#evidence-sources-and-boundaries">Evidence boundaries</a> &middot;
+  <a href="#local-first-and-security">Security</a> &middot;
+  <a href="#run-from-source">Run from source</a>
+</p>
 
-### Case overview
+> **Neutrality statement:** Court rulings, government or prosecution allegations, party positions, trustee filings, regulatory material, public mirrors, and policy context are labeled separately. No party's position is silently written as a judicial finding. AI output is research assistance, not attorney representation or formal legal advice.
 
-![Case overview](docs/screenshots/home.png)
+## Quick Download
 
-### Case portfolio and case-level reading
+`v0.1.0` is the complete community edition. It bundles the release-baseline legal corpus, search indexes, and existing bilingual research assistance. It is not a small client that downloads the historical library after first launch.
 
-![Case portfolio](docs/screenshots/cases.png)
+| Computer | Download | Size |
+| --- | --- | ---: |
+| Apple-silicon Mac (M1, M2, M3, or M4) | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg) | about 1.58 GB |
+| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg) | about 1.58 GB |
+| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe) | about 1.47 GB |
 
-### Evidence library and full-text search
+1. If you are unsure which Mac installer to use, open **About This Mac** and check whether the chip is Apple or Intel.
+2. Download the matching [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt) and follow [Download, install, and verify](DOWNLOADS.md).
+3. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. GitHub's automatically generated source archives are not the complete application.
 
-![Evidence library](docs/screenshots/documents.png)
+> **Before installing:** All three installers are explicitly labeled free unsigned builds. macOS may require **Open Anyway** in Privacy & Security; Windows may require **More info** in SmartScreen. Do not disable operating-system security controls. Confirm the filename and SHA-256 first.
 
-### People, entities, and case relationships
+## Core Capabilities
 
-![Case relationship graph](docs/screenshots/entities.png)
+| Workflow | What it provides |
+| --- | --- |
+| Docket monitoring | Refreshes allowlisted public feeds while online, discovers new or changed public material, and preserves source URLs, filing dates, and local hashes. |
+| PDF library | Bundles 1,578 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
+| Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, and evidence posture in one document view. |
+| Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
+| Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
+| Local-first operation | No account, forced cloud service, advertising, telemetry, or hidden update channel. User credentials are encrypted locally. |
 
-### Local settings and credential management
+## Two Reading Layers
 
-![Local settings](docs/screenshots/settings.png)
+The same filing serves both general readers and legal or investigative professionals:
 
-## Download The Complete Edition
+| General readers | Legal and investigative professionals |
+| --- | --- |
+| Start with what happened, why it matters, and what is uncertain. Complex procedure is explained in ordinary language, while analogies remain clearly explanatory rather than evidentiary. | Return directly to the original PDF, filing date, docket number, document number, source URL, and hash. Court findings, allegations, party claims, and mirrors remain distinct. |
 
-> **Release status (August 14, 2026):** The `v0.1.0` complete community edition is published. All three installers are explicitly labeled as zero-cost unsigned builds and include the complete baseline. All 213 review-flagged files remain included; none was hidden, redacted, replaced, or excluded.
+## Interface Preview
 
-### The simple download path
+These screenshots are from the current application build.
 
-1. Choose one installer for your computer:
-   - Apple-silicon Mac (M1, M2, M3, or M4): [direct DMG download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg).
-   - Intel Mac: [direct DMG download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg).
-   - 64-bit Windows 10/11: [direct EXE download](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe).
-2. Download [`SHA256SUMS.txt`](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/SHA256SUMS.txt) and follow [Download, install, and verify](DOWNLOADS.md).
-3. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. Do not download the automatically generated source archives if you need the application; those archives do not contain the bundled legal corpus.
-4. Open the installer. On macOS, drag the application to **Applications**. On Windows, follow the installer wizard.
+<table>
+  <tr>
+    <td width="50%" valign="top"><strong>Case overview</strong><br><img src="./docs/screenshots/home.png" alt="Case overview" width="100%"></td>
+    <td width="50%" valign="top"><strong>Evidence library and full-text search</strong><br><img src="./docs/screenshots/documents.png" alt="Evidence library" width="100%"></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><strong>Case portfolio and case-level reading</strong><br><img src="./docs/screenshots/cases.png" alt="Case portfolio" width="100%"></td>
+    <td width="50%" valign="top"><strong>People, companies, and case relationships</strong><br><img src="./docs/screenshots/entities.png" alt="Case relationships" width="100%"></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><strong>Local settings and credential management</strong><br><img src="./docs/screenshots/settings.png" alt="Local settings" width="100%"></td>
+    <td width="50%" valign="top"><br></td>
+  </tr>
+</table>
 
-### Why the package is large
+## Complete Data Baseline
 
-This is a complete-data release, not a small client that downloads the historical library after first launch. The package includes the reviewed baseline available on the release date:
+`v0.1.0` includes:
 
 - 1,605 material records;
-- 1,578 valid local PDFs, approximately 1.3 GB;
-- SHA-256 file manifests and the integrity history chain;
-- extracted text, full-text search indexes, and available Chinese and English reading aids;
-- document-level legal readings, case-level dossiers, relationship data, and source-verification data;
-- the Electron runtime and bundled English and Simplified Chinese OCR models.
+- 1,578 valid PDFs totaling 1,345,988,147 bytes;
+- 1,559 unique PDF content hashes and full-text index coverage;
+- 12,259 research-seed files totaling 500,592,021 bytes;
+- 1,559 bilingual document-level legal readings and 58 bilingual case-level dossiers.
 
-The installer and installed application therefore require substantially more space than an ordinary notes or search tool. Keep at least 5 GB free before installing; the exact size is shown on the Release page. On first launch, the app verifies the bundled seed hashes. A failed verification stops startup and asks for a fresh download instead of silently falling back to an empty or lower-quality corpus.
+All 213 publication-review-flagged files remain included. None was hidden, redacted, replaced, or excluded. The review rechecked each file's PDF structure, byte size, SHA-256, managed path, public HTTPS source, and source posture. It does not claim that the development heuristic was a page-by-page manual legal review. See the [publication review](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/corpus-publication-review.md) and [per-file decisions](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/corpus-review-decisions.json).
 
-## What Works Without A Key
+## No Key And Custom Keys
 
-The first launch needs no account, API key, or paid PACER credential. With no configuration, users can:
+| Capability | No key configured | User-provided key or Ollama |
+| --- | --- | --- |
+| Bundled corpus, search, and existing readings | Immediately available offline, including full-text search and case dossiers. | Remains available; adding a key never overwrites the bundled baseline. |
+| New source refresh and downloads | Uses limited public feeds and search without a token; it cannot replace PACER. | A CourtListener/RECAP token can expand public docket pagination and PDF discovery. |
+| Text extraction, OCR, and indexing | Runs locally with no cloud charge. | Still runs locally; new files can optionally be sent to the selected model after consent. |
+| Generative translation and AI reads for new files | No-key mode does not pretend to be cloud AI; it uses local assistive output. | Use a local Ollama model or an approved cloud model. Quality depends on the selected model. |
+| Official PACER docket | Login, paid retrieval, and automatic charges are not implemented in this version. | PACER fields are reserved in Settings; the application does not initiate paid requests. |
 
-- read the complete bundled baseline, existing translations, document readings, and case-level dossiers;
-- search docket numbers, document numbers, people, companies, cases, and keywords inside indexed PDF text;
-- while online, read public updates from CourtListener/RECAP, the U.S. Department of Justice, the Securities and Exchange Commission, the Federal Register, archived public pages, and other allowlisted public sources;
-- download only new or changed public files, retaining source URLs, source posture, dates, and local hashes;
-- extract text, run local OCR, build indexes, and create deterministic preliminary organization for new files;
-- keep the bundled release-baseline analysis intact instead of regenerating weaker output when no key is configured.
+### AI Support And Quality Boundaries
 
-The no-key mode does not create cloud AI charges. Local preliminary output for new files is labeled as preliminary reading assistance; it is not generative AI and is not legal advice.
+Settings supports OpenAI Responses, Anthropic Messages, Google Gemini, Ollama, and an OpenAI-compatible gateway at a user-selected HTTPS Origin. Translation and legal analysis can use separate providers and model IDs. Protocol compatibility does not make model quality equivalent: legal terminology, long-document coverage, citation stability, speed, and cost depend on the selected model, context window, reasoning settings, provider implementation, and account limits.
 
-## What Keys Add
+Cloud body transmission is off by default and must be enabled explicitly in Settings. Original PDFs, local paths, and keys are not uploaded by default. Ollama connects only to the user's configured local loopback address.
 
-Settings supports official APIs and OpenAI-compatible protocols. Users control their own configuration and can enter, replace, delete, and test their own credentials. The project does not ship a developer key and never commits credentials to the repository:
+## Automatic Updates And Processing
 
-- OpenAI Responses API;
-- Anthropic Messages API;
-- Google Gemini `generateContent`;
-- any OpenAI-compatible gateway with a user-selected Base URL, including services such as OpenRouter, xAI, DeepSeek, Qwen, Moonshot, SiliconFlow, or a self-hosted endpoint;
-- local Ollama for generative translation and analysis without sending document text to a cloud provider;
-- a CourtListener/RECAP token for broader public docket pagination and discovery;
-- PACER fields reserved for a future official, fee-aware adapter. The current version does not log in, charge, or bypass PACER.
+1. When online, the app refreshes allowlisted public sources on the configured schedule. Automatic refresh is enabled by default and can be disabled or rescheduled in Settings.
+2. It downloads only new or changed public files, validates the PDF signature, records the source URL, filing date, and SHA-256, and does not overwrite the published baseline.
+3. With no key, it performs local extraction, OCR, indexing, and deterministic preliminary organization. Generative translation and AI reads for new files require Ollama or the user's cloud configuration.
+4. Background processing can target priority files or all public files and can produce Chinese, English, or bilingual output. Full mode may take longer and use more API quota.
 
-Translation and legal analysis can use separate providers and model IDs. Protocol compatibility does not make model quality equivalent: fidelity, legal terminology, long-document coverage, citation stability, speed, and cost depend on the selected model, context window, reasoning settings, provider implementation, and account limits. Stronger models generally provide more complete translations and more stable document- and case-level analysis, but every AI result must be checked against the source filing and is not formal legal advice.
+## Evidence Sources And Boundaries
 
-Cloud body transmission is opt-in in Settings. PDFs, local developer paths, and secrets are not uploaded to AI providers by default. Ollama is restricted to the configured loopback address.
+| Source | Role in the application | How to interpret it |
+| --- | --- | --- |
+| PACER | Official federal court docket of record. | The record of docket; paid login and automatic retrieval are not implemented in this version. |
+| CourtListener / RECAP | Primary no-fee public substitute when a filing is mirrored. | Public dockets and PDFs synchronized by PACER users; a filing may be absent if nobody has contributed it. |
+| DOJ, SEC, and Federal Register | Official agency and policy material. | Useful for releases, complaints, orders, and policy context; not necessarily a court docket. |
+| Historical Himalaya Restoration pages and web archives | Historical public context and document leads. | Public pages or mirrors, not the official docket of record. |
+| NFSC | Backup public mirror. | Not the record of docket; important material should be compared with PACER or RECAP. |
 
-## Sources And Evidence Posture
-
-| Source | Role in the application |
-| --- | --- |
-| PACER | Official federal court docket of record; paid login and automatic retrieval are not implemented in this version |
-| CourtListener/RECAP | Free public docket and PDF mirror; anonymous public updates work without a token, while a token expands pagination |
-| DOJ, SEC, and Federal Register | Official agency announcements, complaints, orders, and policy material |
-| Historical Himalaya Restoration pages and web archives | Public historical context and document leads; not the official docket of record |
-| NFSC | Backup public mirror; never treated as the docket of record and never preferred over official or RECAP evidence |
-
-Each item exposes an external link, filing date, docket number, document number, source type, confidence, and verification note. A public mirror does not become a judicial finding merely because it is available. PACER, sealed or restricted filings, removed files, and records outside anonymous search results can create coverage gaps, so the application does not claim absolute completeness.
+Each item should expose an external link, filing date, docket number, document number, source type, and verification note. A mirror does not become a judicial finding merely because it is available. PACER, sealed or restricted filings, removed files, unmirrored PDFs, and records outside anonymous search windows can create coverage gaps, so the app makes no claim of absolute completeness.
 
 ## Case Scope
 
-The current baseline covers Guo-related criminal, civil, appellate, securities, GTV/Fair Fund, bankruptcy-estate, forfeiture, related-person, entity, company, fund, and policy-monitoring tracks. The relationship graph records associations found in public materials and distinguishes verified public relationships, probable relationships, and items needing manual verification. It does not infer ownership, control, conspiracy, or liability.
+The current baseline covers Guo-related criminal, civil, appellate, securities, GTV/Fair Fund, bankruptcy-estate, forfeiture, related-person, entity, company, fund, and policy-monitoring tracks. The relationship graph records associations found in public material and distinguishes verified public relationships, probable relationships, and items requiring human verification. It does not infer ownership, control, conspiracy, or liability.
+
+## Local-First And Security
+
+- No user-account system, advertising SDK, analytics SDK, telemetry SDK, remote database, or hidden update channel.
+- Electron context isolation, sandboxing, external-link validation, loopback API allowlisting, ASAR integrity, and Electron Fuses hardening.
+- macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. Full secrets are never returned to the UI.
+- Source code, lockfile, network allowlist, corpus manifests, SBOM, build provenance, checksums, and publication-review evidence are public.
+
+The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party repackaging. See [open-source audit notes](OPEN_SOURCE_AUDIT.md), [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network manifest](NETWORK.md), and [download verification](DOWNLOADS.md).
 
 ## Run From Source
 
-Source development requires Node.js 22.12 or newer; Node.js 24 is recommended and recorded in `.nvmrc`. Packaged users do not need Node.js.
+Packaged users do not need Node.js. Source development requires Node.js 22.12 or newer; Node.js 24 is recommended.
 
 ```bash
 nvm use
@@ -110,29 +153,24 @@ npm install
 npm run dev:all
 ```
 
-Open `http://127.0.0.1:5173`.
-
-Useful commands:
+Open `http://127.0.0.1:5173`. Useful checks:
 
 ```bash
-npm run dev:web                 # frontend only
-npm run dev:api                 # local API only
-npm run dev:all                 # frontend and local API
-npm run lint                    # source linting
-npm run build                   # production build
-npm run security:check          # security and dependency checks
-npm run test:zero-key           # no-key defaults
-npm run test:search:fixture     # search fixture
+npm run lint
+npm run build
+npm run security:check
+npm run test:zero-key
+npm run test:search
 ```
 
-## Privacy And Security
+## Documentation And Release Evidence
 
-This is a local-first open-source desktop application. It has no user-account system, advertising SDK, analytics SDK, telemetry SDK, remote database, or hidden update channel. Electron uses context isolation, sandboxing, strict external-link validation, loopback API allowlisting, ASAR integrity, and Electron Fuses hardening. macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. The UI receives masked status only.
-
-The source, lockfile, network allowlist, corpus manifest, cache hashes, and release verification files are public for inspection. Open source does not prove that a third-party repackaged binary is trustworthy: download binaries only from this project's GitHub Releases, confirm the explicit `-unsigned` filename, and verify `SHA256SUMS.txt`. See [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network allowlist](NETWORK.md), [open-source audit](OPEN_SOURCE_AUDIT.md), and [GitHub operations](GITHUB_OPERATIONS.md).
-
-The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party distribution. Report security issues according to [SECURITY.md]; never paste API keys, PACER passwords, private files, or local paths into public issues.
+- [Download, install, and SHA-256 verification](DOWNLOADS.md)
+- [Open-source audit notes](OPEN_SOURCE_AUDIT.md)
+- [Security policy](SECURITY.md), [privacy notice](PRIVACY.md), and [network manifest](NETWORK.md)
+- [Code-signing policy](CODE_SIGNING_POLICY.md) and [GitHub operations](GITHUB_OPERATIONS.md)
+- [v0.1.0 release notes](release-notes/v0.1.0.md) and [GitHub Release assets and evidence](https://github.com/Dysen177/docket-observatory/releases/tag/v0.1.0)
 
 ## License
 
-MIT License. Browse the [GitHub repository](https://github.com/Dysen177/docket-observatory). The Chinese documentation is [README.md](README.md).
+MIT License. Contributions, audits, and issue reports are welcome. The Chinese documentation is [README.md](README.md).
