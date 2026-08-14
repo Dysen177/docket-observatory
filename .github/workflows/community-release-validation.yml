@@ -69,12 +69,48 @@ jobs:
           }
           if ($machine -ne 0x8664) { throw "Installed application is not x86-64; PE machine is 0x$($machine.ToString('x4'))" }
           $pdfCount = (Get-ChildItem (Join-Path $resources 'court-files') -Recurse -Filter '*.pdf').Count
-          if ($pdfCount -ne 1578) { throw "Installed corpus contains $pdfCount PDFs instead of 1578." }
+          if ($pdfCount -ne 1834) { throw "Installed corpus contains $pdfCount PDFs instead of 1834." }
           $corpus = Get-Content (Join-Path $resources 'court-files\manifest.json') -Raw | ConvertFrom-Json
           $seed = Get-Content (Join-Path $resources 'seed-cache-manifest.json') -Raw | ConvertFrom-Json
-          if ($corpus.files.Count -ne 1605) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of 1605." }
-          if ($seed.seedFiles -ne 12259) { throw "Installed seed contains $($seed.seedFiles) files instead of 12259." }
+          if ($corpus.files.Count -ne 1864) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of 1864." }
+          if ($seed.seedFiles -ne 14244) { throw "Installed seed contains $($seed.seedFiles) files instead of 14244." }
+          $versionInfo = (Get-Item $app).VersionInfo
+          if ([string]::IsNullOrWhiteSpace($versionInfo.ProductName)) { throw 'Windows executable is missing product metadata and icon resource editing did not run.' }
           Write-Host "Validated Windows x64 install with $pdfCount PDFs and $($seed.seedFiles) seed files."
+
+      - name: Verify renderer startup and running-app upgrade
+        shell: pwsh
+        run: |
+          $app = Join-Path $env:INSTALL_DIR '案卷观察台.exe'
+          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
+          $profile = Join-Path $env:RUNNER_TEMP 'docket-observatory-render-test'
+          $ready = Join-Path $profile 'startup-ready.json'
+
+          function Wait-ForRenderer($process, $marker) {
+            $deadline = (Get-Date).AddMinutes(4)
+            while ((Get-Date) -lt $deadline) {
+              if (Test-Path $marker) { return Get-Content $marker -Raw | ConvertFrom-Json }
+              if ($process.HasExited) { throw "Application exited before renderer startup with code $($process.ExitCode)." }
+              Start-Sleep -Seconds 2
+            }
+            throw 'Renderer did not create startup-ready.json within four minutes.'
+          }
+
+          $first = Start-Process -FilePath $app -ArgumentList "--user-data-dir=$profile" -PassThru
+          $firstReady = Wait-ForRenderer $first $ready
+          if ($firstReady.platform -ne 'win32' -or $firstReady.arch -ne 'x64') { throw 'Renderer startup marker has unexpected platform metadata.' }
+
+          $upgrade = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$env:INSTALL_DIR" -Wait -PassThru
+          if ($upgrade.ExitCode -ne 0) { throw "Running-app upgrade failed with exit code $($upgrade.ExitCode)." }
+          Start-Sleep -Seconds 2
+          if (-not $first.HasExited) { throw 'Installer completed without closing the running application.' }
+
+          Remove-Item $ready -Force
+          $second = Start-Process -FilePath $app -ArgumentList "--user-data-dir=$profile" -PassThru
+          $secondReady = Wait-ForRenderer $second $ready
+          if ($secondReady.version -ne '0.1.1') { throw "Post-upgrade renderer reported version $($secondReady.version) instead of 0.1.1." }
+          Stop-Process -Id $second.Id -Force
+          Write-Host 'Validated first launch, rendered UI readiness, running-app upgrade, and post-upgrade launch.'
 
       - name: Uninstall test application
         if: always()

@@ -7,7 +7,7 @@ import { Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { pathToFileURL } from 'node:url'
 import { atomicWriteJson } from './atomic-write.js'
-import { scanPublicRecapFeeds, scanPublicRecapPortfolio, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
+import { scanPublicRecapFeeds, scanPublicRecapPortfolio, scanPublicRecapRelatedPortfolio, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
 import { safeFetch } from './safe-fetch.js'
 import { readTextWithLimit } from './safe-fetch.js'
 import { sourceRegistry } from './seed.js'
@@ -708,16 +708,21 @@ export async function runDocumentDownload(options = {}) {
     }
   } else {
     try {
-      const [archive, searchArchive, portfolioArchive] = await Promise.all([
+      const [archive, searchArchive, portfolioArchive, relatedArchive] = await Promise.all([
         scanPublicRecapFeeds(),
         scanPublicRecapSearch({ pageLimit: 1 }),
         scanPublicRecapPortfolio({ query: '"22-50073"', courtId: 'ctb', pageLimit: portfolioPageLimit }),
+        scanPublicRecapRelatedPortfolio({ pageLimit: 1 }),
       ])
       const discoveredDocuments = portfolioArchive.documents.map((document) => ({
         ...document,
         relationStatus: String(document.caseId).startsWith('discovered-') ? 'pending_review' : 'tracked',
       }))
-      collected.push(...searchArchive.documents, ...discoveredDocuments)
+      const relatedDocuments = relatedArchive.documents.map((document) => ({
+        ...document,
+        relationStatus: document.relationStatus ?? (String(document.caseId).startsWith('discovered-') ? 'pending_review' : 'tracked'),
+      }))
+      collected.push(...searchArchive.documents, ...discoveredDocuments, ...relatedDocuments)
       pageResults.push({
         sourceId: 'courtlistener-recap',
         caseId: 'tracked-case-portfolio',
@@ -730,10 +735,13 @@ export async function runDocumentDownload(options = {}) {
         structuredEventCount: searchArchive.events.length,
         discoveredDocketCount: portfolioArchive.targets.length,
         portfolioPagesScanned: portfolioArchive.pagesScanned,
-        docketCount: searchArchive.targets.filter((target) => !target.error).length,
+        docketCount: searchArchive.targets.filter((target) => !target.error).length + relatedArchive.acceptedDocketCount,
+        relatedDocketCount: relatedArchive.acceptedDocketCount,
+        relatedObservedDocketCount: relatedArchive.observedDocketCount,
+        relatedSearchFailures: relatedArchive.failures,
         limitation: 'No-token public search exposes a limited result window and available RECAP PDFs. A token adds full docket-entry pagination.',
       })
-      log(`courtlistener-recap: public feeds observed ${archive.events.length} recent record(s); fixed and portfolio searches collected ${searchArchive.documents.length + portfolioArchive.documents.length} public PDF link(s) before de-duplication`)
+      log(`courtlistener-recap: public feeds observed ${archive.events.length} recent record(s); fixed, portfolio, and related-name searches collected ${searchArchive.documents.length + portfolioArchive.documents.length + relatedArchive.documents.length} public PDF link(s) before de-duplication across ${relatedArchive.acceptedDocketCount} accepted related docket(s)`)
     } catch (error) {
       pageResults.push({
         sourceId: 'courtlistener-recap',

@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="#快速下载"><strong>下载 v0.1.0</strong></a> ·
+  <a href="#快速下载"><strong>下载 v0.1.1</strong></a> ·
   <a href="./DOWNLOADS.md"><strong>中英文图文安装教程</strong></a> ·
   <a href="#核心能力">核心能力</a> ·
   <a href="#证据来源与边界">证据边界</a> ·
@@ -32,13 +32,13 @@
 
 ## 快速下载
 
-`v0.1.0` 是完整社区版：安装包内置当前发布基线的完整法律资料库、搜索索引和既有双语研究辅助，不是首次启动后再慢慢下载历史资料的轻量客户端。当前提供 macOS 和 Windows 桌面版，不提供 iPhone、iPad 或 Android 版本。
+`v0.1.1` 是完整社区版：安装包内置当前发布基线的完整法律资料库、搜索索引和既有双语研究辅助，不是首次启动后再慢慢下载历史资料的轻量客户端。当前提供 macOS 和 Windows 桌面版，不提供 iPhone、iPad 或 Android 版本。
 
 | 电脑 | 下载文件 | 大小 |
 | --- | --- | ---: |
-| Apple 芯片 Mac（Apple silicon） | [下载 macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg) | 约 1.58 GB |
-| Intel Mac | [下载 macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg) | 约 1.58 GB |
-| Windows 10/11 64 位 | [下载 Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe) | 约 1.47 GB |
+| Apple 芯片 Mac（Apple silicon） | [下载 macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | 约 1.58 GB |
+| Intel Mac | [下载 macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | 约 1.58 GB |
+| Windows 10/11 64 位 | [下载 Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | 约 1.47 GB |
 
 1. 不确定 Mac 芯片：打开“关于本机”，看“芯片”是 Apple 还是 Intel。
 2. 只从 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest) 或上述直达链接下载。公开 Release 上传的附件只有三个安装包；GitHub 自动生成的 Source code 压缩包是源码归档，不是完整应用。
@@ -52,7 +52,7 @@
 | 工作 | 你能得到什么 |
 | --- | --- |
 | 案卷监测 | 联网后按来源策略刷新公开 Feed、发现新增或变更的公开材料，保留原始外部链接、法院提交日和更新状态。 |
-| PDF 文件库 | 内置 1,578 份有效 PDF，支持案号、Doc 文件号、人物、公司和 PDF 正文全文搜索。 |
+| PDF 文件库 | 内置 1,834 份有效 PDF，支持案号、Doc 文件号、人物、公司和 PDF 正文全文搜索。 |
 | 双语阅读 | 将原文、既有中英文阅读辅助、来源链接、来源类型和核验状态放在同一个文件视图中。 |
 | 通俗与专业解读 | 面向普通读者提供结论、背景和影响；为专业研究保留法院、案号、文件号、提交日、原始文件和限制说明。 |
 | 案件整体与关联 | 按案件、诉讼方、人物、公司、基金和破产财产组织时间线与关系，并将“公开资料显示的关联”与“待核验推定”分开。 |
@@ -86,15 +86,15 @@
 
 ## 完整资料基线
 
-`v0.1.0` 包含：
+`v0.1.1` 包含：
 
-- 1,605 条资料记录；
-- 1,578 份有效 PDF，共 1,345,988,147 字节；
-- 1,559 份去重后的 PDF 文档已纳入全文索引；
-- 12,259 个本地研究缓存文件，共 500,592,021 字节，包含正文提取、既有翻译与解读、关系数据和搜索索引；
-- 1,559 份中英文逐文件法律阅读，58 份中英文案件整体案情。
+- 1,864 条资料记录；
+- 1,834 份有效 PDF，共 1,562,946,164 字节；
+- 1,791 份去重后的 PDF 文档已纳入全文索引；
+- 14,244 个本地研究缓存文件，共 645,323,762 字节，包含正文提取、既有翻译与解读、关系数据和搜索索引；
+- 1,791 份中英文逐文件法律阅读，131 份中英文案件整体案情。
 
-自动发布检查曾标记 213 份可能含隐私、密封字样或其他风险特征的文件；这些公开文件仍全部收录，没有隐藏、删减、替换或排除。检查重新核验了文件结构、字节数、受管路径、公开 HTTPS 来源和来源类型，但不等同于逐页人工法律审阅。详细记录见仓库中的 [审查报告](release-metadata/corpus-publication-review.md) 与 [逐文件决定](release-metadata/corpus-review-decisions.json)。
+自动发布检查曾标记 240 份可能含隐私、密封字样或其他风险特征的文件；这些公开文件仍全部收录，没有隐藏、删减、替换或排除。检查重新核验了文件结构、字节数、受管路径、公开 HTTPS 来源和来源类型，但不等同于逐页人工法律审阅。详细记录见仓库中的 [审查报告](release-metadata/corpus-publication-review.md) 与 [逐文件决定](release-metadata/corpus-review-decisions.json)。
 
 ## 无 Key 与自定义 Key
 
@@ -172,7 +172,7 @@ npm run test:search
 - [开源审计说明](OPEN_SOURCE_AUDIT.md)
 - [安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md)
 - [代码签名政策](CODE_SIGNING_POLICY.md)、[GitHub 运营说明](GITHUB_OPERATIONS.md)
-- [v0.1.0 发布说明](release-notes/v0.1.0.md)、[GitHub Release 安装包](https://github.com/Dysen177/docket-observatory/releases/tag/v0.1.0)
+- [v0.1.1 发布说明](release-notes/v0.1.1.md)、[GitHub Release 安装包](https://github.com/Dysen177/docket-observatory/releases/tag/v0.1.1)
 
 ## 开源许可证
 

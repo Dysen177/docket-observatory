@@ -11,7 +11,9 @@ communityBuild.mac = {
 }
 communityBuild.win = {
   ...communityBuild.win,
-  signAndEditExecutable: false,
+  // Resource editing writes the bundled icon and version metadata. It does not
+  // sign the binary and remains compatible with a free unsigned release.
+  signAndEditExecutable: true,
   artifactName: 'Docket-Observatory-${version}-Windows-${arch}-unsigned.${ext}',
 }
 

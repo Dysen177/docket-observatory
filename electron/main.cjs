@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, safeStorage, session, shell } = require('electron')
 const { randomBytes } = require('node:crypto')
-const { chmod, mkdir, readFile, writeFile } = require('node:fs/promises')
+const { appendFile, chmod, mkdir, readFile, writeFile } = require('node:fs/promises')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
 const { APPLICATION_NAME } = require('./app-identity.cjs')
@@ -10,6 +10,7 @@ const { installBundledSeedCache } = require('./seed-installer.cjs')
 
 app.setName(APPLICATION_NAME)
 if (process.platform === 'darwin') app.commandLine.appendSwitch('use-mock-keychain')
+if (process.platform === 'win32') app.disableHardwareAcceleration()
 
 const apiPort = process.env.GUO_INTEL_API_PORT || '4177'
 const devUrl = process.env.GUO_INTEL_ELECTRON_DEV_URL
@@ -19,6 +20,17 @@ const localApiToken = randomBytes(32).toString('base64url')
 
 let mainWindow = null
 let startupWindow = null
+let startupFailureShown = false
+
+function diagnosticPath() {
+  return path.join(app.getPath('userData'), 'startup.log')
+}
+
+function recordDiagnostic(message, error = null) {
+  const detail = error instanceof Error ? `${message}: ${error.stack || error.message}` : `${message}: ${String(error ?? '')}`
+  console.error(detail)
+  void appendFile(diagnosticPath(), `[${new Date().toISOString()}] ${detail}\n`).catch(() => undefined)
+}
 
 async function waitForLocalApi(timeoutMs = 30000) {
   const deadline = Date.now() + timeoutMs
@@ -84,10 +96,8 @@ function createWindow() {
     },
   })
 
-  mainWindow.once('ready-to-show', () => {
-    startupWindow?.close()
-    startupWindow = null
-    mainWindow?.show()
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
@@ -115,7 +125,55 @@ function createWindow() {
   })
 
   const targetUrl = devUrl || `http://127.0.0.1:${apiPort}`
-  void mainWindow.loadURL(targetUrl)
+  let mainFrameFailure = null
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    if (!isMainFrame) return
+    mainFrameFailure = new Error(`Renderer failed to load (${errorCode}): ${errorDescription} [${validatedURL}]`)
+    recordDiagnostic('Renderer main-frame load failed', mainFrameFailure)
+  })
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    const error = new Error(`Renderer process exited (${details.reason || 'unknown'}${details.exitCode != null ? `, code ${details.exitCode}` : ''}).`)
+    recordDiagnostic('Renderer process exited', error)
+    void showStartupError(error)
+  })
+  mainWindow.webContents.on('console-message', (_event, details) => {
+    if (!['warning', 'error'].includes(details.level)) return
+    recordDiagnostic(`Renderer console ${details.level} at ${details.sourceId}:${details.lineNumber}`, details.message)
+  })
+  return mainWindow.loadURL(targetUrl).then(async () => {
+    if (mainFrameFailure) throw mainFrameFailure
+    await waitForRenderer(mainWindow)
+    await writeFile(path.join(app.getPath('userData'), 'startup-ready.json'), `${JSON.stringify({
+      readyAt: new Date().toISOString(),
+      version: app.getVersion(),
+      platform: process.platform,
+      arch: process.arch,
+    }, null, 2)}\n`, { mode: 0o600 }).catch((error) => recordDiagnostic('Startup-ready marker could not be written', error))
+    startupWindow?.close()
+    startupWindow = null
+    mainWindow?.show()
+  }).catch((error) => {
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.destroy()
+    throw error
+  })
+}
+
+async function waitForRenderer(window, timeoutMs = 30000) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    if (!window || window.isDestroyed()) throw new Error('The main window was destroyed before the workspace rendered.')
+    try {
+      const rendered = await window.webContents.executeJavaScript(
+        "Boolean(document.querySelector('#root')?.childElementCount)",
+        true,
+      )
+      if (rendered) return
+    } catch {
+      // The renderer may still be initializing. The timeout below turns this into a visible diagnostic.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 150))
+  }
+  throw new Error('The local workspace loaded without rendering its React root. Check startup.log for renderer details.')
 }
 
 function createStartupWindow() {
@@ -147,6 +205,24 @@ function startupAssetPath(fileName) {
   return app.isPackaged
     ? path.join(process.resourcesPath, 'startup', fileName)
     : path.join(__dirname, fileName)
+}
+
+async function showStartupError(error) {
+  const detail = error instanceof Error ? error.message : String(error)
+  recordDiagnostic('Application startup failed', error)
+  if (startupFailureShown) return
+  startupFailureShown = true
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.destroy()
+  if (!startupWindow || startupWindow.isDestroyed()) createStartupWindow()
+  if (!startupWindow || startupWindow.isDestroyed()) {
+    app.quit()
+    return
+  }
+  startupWindow.once('closed', () => app.quit())
+  await startupWindow.loadFile(startupAssetPath('startup-error.html'), {
+    query: { detail: detail.slice(0, 700) },
+  }).catch((loadError) => recordDiagnostic('Startup error page failed to load', loadError))
+  startupWindow.show()
 }
 
 function isLocalAppRequest(value) {
@@ -309,20 +385,15 @@ app.whenReady().then(async () => {
   }))
   try {
     await startLocalServer()
-    createWindow()
+    await createWindow()
   } catch (error) {
-    console.error(error)
-    if (startupWindow && !startupWindow.isDestroyed()) {
-      startupWindow.once('closed', () => app.quit())
-      await startupWindow.loadFile(startupAssetPath('startup-error.html')).catch(() => undefined)
-      startupWindow.show()
-    } else {
-      app.quit()
-    }
+    await showStartupError(error)
   }
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) {
+      void createWindow().catch((error) => showStartupError(error))
+    }
   })
 })
 

@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="#quick-download"><strong>Download v0.1.0</strong></a> &middot;
+  <a href="#quick-download"><strong>Download v0.1.1</strong></a> &middot;
   <a href="./DOWNLOADS.md"><strong>Illustrated Chinese/English install guide</strong></a> &middot;
   <a href="#core-capabilities">Capabilities</a> &middot;
   <a href="#evidence-sources-and-boundaries">Evidence boundaries</a> &middot;
@@ -32,13 +32,13 @@
 
 ## Quick Download
 
-`v0.1.0` is the complete community edition. It bundles the complete legal corpus in the current release baseline, search indexes, and existing bilingual research assistance. It is not a small client that downloads the historical library after first launch. It currently ships for macOS and Windows desktop; there is no iPhone, iPad, or Android edition.
+`v0.1.1` is the complete community edition. It bundles the complete legal corpus in the current release baseline, search indexes, and existing bilingual research assistance. It is not a small client that downloads the historical library after first launch. It currently ships for macOS and Windows desktop; there is no iPhone, iPad, or Android edition.
 
 | Computer | Download | Size |
 | --- | --- | ---: |
-| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg) | about 1.58 GB |
-| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg) | about 1.58 GB |
-| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.0/Docket-Observatory-0.1.0-Windows-x64-unsigned.exe) | about 1.47 GB |
+| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | about 1.58 GB |
+| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | about 1.58 GB |
+| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | about 1.47 GB |
 
 1. If you are unsure which Mac installer to use, open **About This Mac** and check whether the chip is Apple or Intel.
 2. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. The public Release uploads only three installers; GitHub's automatically generated Source code archives are source downloads, not the complete application.
@@ -52,7 +52,7 @@
 | Workflow | What it provides |
 | --- | --- |
 | Docket monitoring | Refreshes allowlisted public feeds while online, discovers new or changed public material, and preserves source URLs, filing dates, and update status. |
-| PDF library | Bundles 1,578 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
+| PDF library | Bundles 1,834 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
 | Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, source type, and verification status in one document view. |
 | Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
 | Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
@@ -86,15 +86,15 @@ These screenshots are from the current application build.
 
 ## Complete Data Baseline
 
-`v0.1.0` includes:
+`v0.1.1` includes:
 
-- 1,605 material records;
-- 1,578 valid PDFs totaling 1,345,988,147 bytes;
-- 1,559 deduplicated PDF documents indexed for full-text search;
-- 12,259 local research-cache files totaling 500,592,021 bytes, including extracted text, existing translations and readings, relationship data, and search indexes;
-- 1,559 bilingual document-level legal readings and 58 bilingual case-level dossiers.
+- 1,864 material records;
+- 1,834 valid PDFs totaling 1,562,946,164 bytes;
+- 1,791 deduplicated PDF documents indexed for full-text search;
+- 14,244 local research-cache files totaling 645,323,762 bytes, including extracted text, existing translations and readings, relationship data, and search indexes;
+- 1,791 bilingual document-level legal readings and 131 bilingual case-level dossiers.
 
-Automated publication checks flagged 213 files for possible privacy, sealing-language, or other risk indicators. All of those public files remain included; none was hidden, redacted, replaced, or excluded. The checks revalidated file structure, byte size, managed path, public HTTPS source, and source type, but they do not constitute page-by-page manual legal review. See the repository's [publication review](release-metadata/corpus-publication-review.md) and [per-file decisions](release-metadata/corpus-review-decisions.json).
+Automated publication checks flagged 240 files for possible privacy, sealing-language, or other risk indicators. All of those public files remain included; none was hidden, redacted, replaced, or excluded. The checks revalidated file structure, byte size, managed path, public HTTPS source, and source type, but they do not constitute page-by-page manual legal review. See the repository's [publication review](release-metadata/corpus-publication-review.md) and [per-file decisions](release-metadata/corpus-review-decisions.json).
 
 ## No Key And Custom Keys
 
@@ -172,7 +172,7 @@ npm run test:search
 - [Open-source audit notes](OPEN_SOURCE_AUDIT.md)
 - [Security policy](SECURITY.md), [privacy notice](PRIVACY.md), and [network manifest](NETWORK.md)
 - [Code-signing policy](CODE_SIGNING_POLICY.md) and [GitHub operations](GITHUB_OPERATIONS.md)
-- [v0.1.0 release notes](release-notes/v0.1.0.md) and [GitHub Release installers](https://github.com/Dysen177/docket-observatory/releases/tag/v0.1.0)
+- [v0.1.1 release notes](release-notes/v0.1.1.md) and [GitHub Release installers](https://github.com/Dysen177/docket-observatory/releases/tag/v0.1.1)
 
 ## License
 

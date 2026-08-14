@@ -1,7 +1,7 @@
 # Corpus Publication Review
 
-Generated: 2026-08-14T12:34:48.561Z
-Reviewer / publisher: Dysen177 publisher decision with Codex-assisted provenance review
+Generated: 2026-08-14T23:19:55.117Z
+Reviewer / publisher: Dysen177
 
 ## Decision
 
@@ -11,19 +11,26 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 
 ## Summary
 
-- Reviewed documents: 213
-- High-severity heuristic findings: 198
-- Medium-severity heuristic findings: 15
-- Source distribution: courtlistener-recap 45, himalaya-restoration-archive 6, nfsc-criminal-mirror 162
-- Risk categories: account-or-routing-number 68, bulk-hid-identifiers 3, explicit-seal-banner 119, minor-or-medical-record 1, passport-or-license-number 21, protective-order-material 14, social-security-number 1
+- Reviewed documents: 240
+- High-severity heuristic findings: 221
+- Medium-severity heuristic findings: 19
+- Source distribution: courtlistener-recap 69, himalaya-restoration-archive 7, nfsc-criminal-mirror 164
+- Risk categories: account-or-routing-number 78, bulk-hid-identifiers 4, date-of-birth 1, explicit-seal-banner 130, minor-or-medical-record 1, passport-or-license-number 27, protective-order-material 21, social-security-number 1
 
 ## Per-Document Record
 
 | SHA-256 | Source | Case | Doc | Severity | Screening categories | Decision |
 | --- | --- | --- | ---: | --- | --- | --- |
+| ca5628593ac24b2f008bc97d3b67af86e8da42da8efbc81d7cf7e0de5d74a77b | courtlistener-recap | bkd-24-05006-aws | 42 | high | explicit-seal-banner (5) | approved_public |
+| 4c0b26f11922e0c735ab82de8f85074d483962c31a68b508665ae7a9b870b408 | courtlistener-recap | bkd-24-05006-aws | 51 | high | explicit-seal-banner (2) | approved_public |
+| ae0d04cea94cb70e2b63184bb925dd9406de850bd61aa719c5e5a5c017508fc6 | courtlistener-recap | bkd-24-05057-amazon | 22 | high | explicit-seal-banner (9), protective-order-material (9) | approved_public |
+| 81c8c72f75977b39a279932a581d7524d70b9d0c8ed17b9629d3caae54adc4b1 | courtlistener-recap | bkd-24-05057-amazon | 65 | high | explicit-seal-banner (5) | approved_public |
 | 7a14da070efbf96677a4dba811cecbd21dbaabb7e9e932d0a5052c0cc6b29a97 | courtlistener-recap | bkd-24-05246-wa-hf | 52 | high | explicit-seal-banner (1) | approved_public |
 | a2800906f7cd7ae60c9d6a8a74ad7be3921ad58a6d1de50396d52efd38e0a395 | courtlistener-recap | bkd-24-05275-lamp | 1 | high | explicit-seal-banner (1) | approved_public |
-| 555d9b36cb8835d0fdf2389d09e03dc0b7aa0780f2d1a9880804eee38b5a2b3b | courtlistener-recap | discovered-ctb-67397837 | 176 | high | explicit-seal-banner (2), protective-order-material (1) | approved_public |
+| 0ea1e4c9b11e6a42f186efa71c4e417fb7c106ed5db31357892e7a1812a7106d | courtlistener-recap | dconn-22-50073 | 2924 | high | explicit-seal-banner (2) | approved_public |
+| 92d216e1806f8af86e9a00ad1b7302ee75cc64fd97516251dd9fa2cd4975e7a9 | courtlistener-recap | discovered-cacd-7231208 | 1 | high | passport-or-license-number (2) | approved_public |
+| 555d9b36cb8835d0fdf2389d09e03dc0b7aa0780f2d1a9880804eee38b5a2b3b | courtlistener-recap | discovered-ctb-67397837 | 176 | high | explicit-seal-banner (8), protective-order-material (4) | approved_public |
+| d3c2f607d3d72dac87ea190f0581f0ed679aaff04d69440989f76c7b61758549 | courtlistener-recap | discovered-ctb-67500817 | 120-1 | high | account-or-routing-number (13) | approved_public |
 | df5b7902baf7c9acba52f0641f5b7c6aa6f07b83f99c1f41b2aad1ce87dc9f82 | courtlistener-recap | discovered-ctb-68240130 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 62a49b3a696359a7f46982d7d93e4e772bbc3dd47c61aeb67933ef4ebe20798d | courtlistener-recap | discovered-ctb-68240518 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 8da920d07634893bee536f762ccfceb15533039118c6f3c5feee788810137ea4 | courtlistener-recap | discovered-ctb-68240523 | 1 | high | explicit-seal-banner (1) | approved_public |
@@ -34,10 +41,11 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 79739f7d11b8b3a3f755c22e01809f058eba07ad021df6b1508b6474616615df | courtlistener-recap | discovered-ctb-68241937 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 42d74e177278e6bbfbf3c597467894cde8f265fec2614eedf432ca7ddd5ffe31 | courtlistener-recap | discovered-ctb-68241987 | 1 | high | explicit-seal-banner (2) | approved_public |
 | 5319ddb02cd3d333b40bd1c2e7dd665b364f14c9fa7e4747e080bf306279a081 | courtlistener-recap | discovered-ctb-68242012 | 1 | high | explicit-seal-banner (2) | approved_public |
-| 12a0776f7ce3db8b3d6931b93567ffec3c1fb595b93a9d4ff7f72bbe62330b0f | courtlistener-recap | discovered-ctb-68242026 | 28 | high | explicit-seal-banner (14) | approved_public |
+| 12a0776f7ce3db8b3d6931b93567ffec3c1fb595b93a9d4ff7f72bbe62330b0f | courtlistener-recap | discovered-ctb-68242026 | 28 | high | explicit-seal-banner (21) | approved_public |
 | 55af21b91458b34e90453c4d2fd856023d44d189d56998086617c7942c66a7fa | courtlistener-recap | discovered-ctb-68242028 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 934b34fcafe943ffb740b53402da24b2e0fb78c7ca9cf56d0d5d82bb2d334464 | courtlistener-recap | discovered-ctb-68242172 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 3f2e27a52673146267b6b8c2d9171bc3df2366dd33584946632d33163f965a49 | courtlistener-recap | discovered-ctb-68242172 | 3 | high | explicit-seal-banner (2) | approved_public |
+| 40f3d07024129e65ef1c2fbc494bd22c91fdc931ba7d889d38f88b82cf0838b7 | courtlistener-recap | discovered-ctb-68242172 | 11 | high | explicit-seal-banner (9), protective-order-material (9) | approved_public |
 | 5361eec15911589c2069b181fc5e2cc730badaba923cddd429e5535a97fd2851 | courtlistener-recap | discovered-ctb-68242174 | 1 | high | explicit-seal-banner (2) | approved_public |
 | 636dc08eecd53b69c85ff5b75f22af3d1d2c69b2e183536ef4abe16be77eed36 | courtlistener-recap | discovered-ctb-68242175 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 0088b7e50c2b8a79c8b646597c7aa4f277ecbe970979185cf94346e0a7ead0d5 | courtlistener-recap | discovered-ctb-68242184 | 1 | high | explicit-seal-banner (2) | approved_public |
@@ -46,15 +54,26 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 353f6b4beff677744db1e96aedcd446811afb189c6ae23ffd3befc6918a0a85c | courtlistener-recap | discovered-ctb-68242735 | 1 | high | explicit-seal-banner (1) | approved_public |
 | c5a1456d3d45c77888eecad9375133188be4eed6675c7670a053fb2c16332ff2 | courtlistener-recap | discovered-ctb-68243879 | 1 | high | explicit-seal-banner (1) | approved_public |
 | f1d35bc951e9c6d902076dd029482c8b05bd4e56ca23aa06cfe6436adcb8befd | courtlistener-recap | discovered-ctb-68243881 | 1 | high | explicit-seal-banner (1) | approved_public |
+| 5c95849b063db23dab88495e6a1c4577aaa12c5674cffa5250588395a3db4301 | courtlistener-recap | discovered-ctb-68243881 | 7 | high | explicit-seal-banner (2), protective-order-material (6) | approved_public |
+| ae33e6c35084d6fbe39f2a848ea026358dd7c9c5d740750ea4e0685672d8c7ec | courtlistener-recap | discovered-ctb-68243881 | 11 | high | explicit-seal-banner (9), protective-order-material (9) | approved_public |
 | cc3b9767cc00ed3f1968e227f0845a01e71f0607f5ae1da3a8539d439701f8a7 | courtlistener-recap | discovered-ctb-68244040 | 1 | high | explicit-seal-banner (1) | approved_public |
 | eaa5c2b0a40e95ebac5de2bca86a772f049a6509c1f70214eaa39d7ef0f6be4c | courtlistener-recap | discovered-ctb-68245984 | 1 | high | explicit-seal-banner (1) | approved_public |
 | 84b54139b6d1999c97f61cf00e56ef285b0fd9d96613c4ca71735c18e7085fc8 | courtlistener-recap | discovered-ctb-68247983 | 1 | high | explicit-seal-banner (2) | approved_public |
 | d723a86829410f1c77c8289fb814ddfd2af5eaa938309150e50422d59899fd83 | courtlistener-recap | discovered-ctb-68248635 | 12 | high | explicit-seal-banner (1) | approved_public |
 | c6d5757d38549089bbf3997bbc7bd6dc2c702981d61a43ec570b0b396845df65 | courtlistener-recap | discovered-ctb-68250683 | 1 | high | explicit-seal-banner (1) | approved_public |
+| b12ad1a66e5a81ae35fbd206034d0560026abba1caf787d1a10414cdf0baac90 | courtlistener-recap | discovered-ctb-68251362 | 8 | high | explicit-seal-banner (2), protective-order-material (6) | approved_public |
 | da373ee9a3fa44035595e715e2c783febdd36b2b02380c9466712c31bc745d38 | courtlistener-recap | discovered-ctb-68251551 | 1 | high | explicit-seal-banner (2) | approved_public |
 | 641cd6bc5bf1e30de985c55681938a124a5bb1b899fad67a2656f77ca0d3309d | courtlistener-recap | discovered-ctb-68255946 | 1 | high | explicit-seal-banner (1) | approved_public |
 | cd70e5a349a0c30a68f2f26128e5847d04df52d3ca481fb28f8ee4e0cdf21b20 | courtlistener-recap | discovered-ctb-69634772 | 1 | high | explicit-seal-banner (1) | approved_public |
 | d5a1d7159845bef1b35bf0809324331d74f2829994e5daf48b6b4dd316c54036 | courtlistener-recap | discovered-ctb-69635060 | 1 | high | explicit-seal-banner (1) | approved_public |
+| cc7f0ba7bf5f133419ab96526658fe6da423dcd3911d2c6c26e2ae97cdf15d99 | courtlistener-recap | discovered-dcd-15506078 | 233-1 | high | account-or-routing-number (13) | approved_public |
+| a7d36283482182b820d36f696b5eef246dd51beadddf19fea634f0233daf1255 | courtlistener-recap | discovered-mdd-15710108 | 1 | high | passport-or-license-number (2) | approved_public |
+| fa14e0649e0d155ae60a7c6b034c75e7d230084facebdeb93f8fafffbdff7686 | courtlistener-recap | discovered-nysd-67012234 | 790-2 | high | explicit-seal-banner (5), account-or-routing-number (45) | approved_public |
+| 4793c5d39091994bce56f9d9110b49426f67f3b52dc3d184c19b9bf6e3d640fe | courtlistener-recap | discovered-nysd-67012234 | 790-3 | high | explicit-seal-banner (6), account-or-routing-number (49) | approved_public |
+| ba05782aabf9e2d20cac9a65e65a1cb58377980511e0ae3fbefe4f068032b689 | courtlistener-recap | discovered-nysd-67013048 | 2 | high | account-or-routing-number (13) | approved_public |
+| 4d9d3bc68caa5165a3049438d9841e0c04e7b45ca4b926794d0f1feaf417a5e8 | courtlistener-recap | discovered-nysd-67107157 | 38 | high | account-or-routing-number (14) | approved_public |
+| c9be4adf6334fc5e97c72b486a6af8239f3d6a8bef7326224d82221e712df8a1 | courtlistener-recap | discovered-vaed-8469006 | 1 | high | passport-or-license-number (1) | approved_public |
+| 388537c4c035e2633b61e5ccbcc49d3c7c42a903532ff1f11414f6ed3e93625e | courtlistener-recap | discovered-vaed-8469006 | 13 | high | passport-or-license-number (2) | approved_public |
 | 6aba9e692429ef936477cd690bffb475e9993ade111f56fee63481695ec7a64e | nfsc-criminal-mirror | sdny-23-cr-118 | 2 | high | account-or-routing-number (13) | approved_public |
 | 38aaed7528115aa0cf7f18e0f273ba1e0bc06b2850303ea4901f792073468f47 | nfsc-criminal-mirror | sdny-23-cr-118 | 19 | high | account-or-routing-number (13) | approved_public |
 | e38fe082523f269af909d45807f8c795e9ab1658858da919966179a4a3c2d80d | nfsc-criminal-mirror | sdny-23-cr-118 | 22 | high | passport-or-license-number (1) | approved_public |
@@ -95,9 +114,11 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 4d9f7b479948597ee70e40010c0cdb52e0ef75761687c48614499bd071c18ab4 | nfsc-criminal-mirror | sdny-23-cr-118 | 178 | high | passport-or-license-number (2) | approved_public |
 | 1857384339aae79f9ec03621b4b41cb491788ee422f5dc843bf47b01357e7e50 | nfsc-criminal-mirror | sdny-23-cr-118 | 186-1 | high | account-or-routing-number (3) | approved_public |
 | f5a4562e3f6e1045852444223a0dbea8cb5b5cb64e22c1697de117d258b212da | nfsc-criminal-mirror | sdny-23-cr-118 | 197 | high | explicit-seal-banner (4) | approved_public |
-| 3cae93385c5eb3884cb4e7b13104f525112edf9baf81960b3a6b7cb484e6298a | courtlistener-recap | sdny-23-cr-118 | 198-6 | high | account-or-routing-number (2) | approved_public |
+| 3cae93385c5eb3884cb4e7b13104f525112edf9baf81960b3a6b7cb484e6298a | courtlistener-recap | sdny-23-cr-118 | 198-6 | high | account-or-routing-number (60) | approved_public |
 | 6a0d09352478df613dd8019ab564a9b823e8013f604aaab4e9f06656853ade3b | courtlistener-recap | sdny-23-cr-118 | 198-8 | high | account-or-routing-number (14) | approved_public |
 | 37d1857df632d61ec75ca6b85d51cd2f3511347dd1776b9bb874280ec828e092 | himalaya-restoration-archive | sdny-23-cr-118 | 198-8 | high | account-or-routing-number (14) | approved_public |
+| 13cd454cbe368c304f04be1568e6fb3c7423ca6c903c1ede136f04137ca67701 | courtlistener-recap | sdny-23-cr-118 | 198-10 | high | account-or-routing-number (60) | approved_public |
+| ccd5fe96acba930d30e3d4633cebd9ccdbf2ee1ac49c7b750e7df810d2c15cd8 | himalaya-restoration-archive | sdny-23-cr-118 | 198-10 | high | account-or-routing-number (60) | approved_public |
 | d87b9e852e56c2826f006ba9107abf94e8ce175bb6c591e2dbf9a76c20c177ef | nfsc-criminal-mirror | sdny-23-cr-118 | 199 | high | explicit-seal-banner (5) | approved_public |
 | e08fca9fed26741d932ea4ca8313a0cb87e812bff03390356339fd7f799cc1b2 | nfsc-criminal-mirror | sdny-23-cr-118 | 213 | high | explicit-seal-banner (1) | approved_public |
 | fecea0ddcdfa2df4648940086e9e9e675e56927a20badf4b2bc94277f608bc88 | nfsc-criminal-mirror | sdny-23-cr-118 | 220-2 | high | explicit-seal-banner (1) | approved_public |
@@ -135,6 +156,7 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | a1f344ccfe1be55601204fcdc0a24b868ebf859912267f2ffecca88c724ce7eb | nfsc-criminal-mirror | sdny-23-cr-118 | 469-1 | high | explicit-seal-banner (1) | approved_public |
 | dba4281fffa457ee9fa6adff013be56670269332ddea82c805a014b8b40275d4 | nfsc-criminal-mirror | sdny-23-cr-118 | 469-3 | high | explicit-seal-banner (1) | approved_public |
 | 263a7dcb6e7e57bf81c30df76688686d7d54fb8e1ce3c41a81477c07e28db794 | nfsc-criminal-mirror | sdny-23-cr-118 | 477 | high | explicit-seal-banner (1) | approved_public |
+| 5de6f81ac8b9462ca3c27167605d4ab7e496482007c6733ccdc484ce0b660f1b | nfsc-criminal-mirror | sdny-23-cr-118 | 477-3 | high | passport-or-license-number (1) | approved_public |
 | 4d8bf8dbfcfe4a8fe28072a9aa7c5845afa3a14f10b8d92b6fdb838d96f16668 | nfsc-criminal-mirror | sdny-23-cr-118 | 488 | high | account-or-routing-number (15) | approved_public |
 | 6fe18343b2511109bf492179ab3ab51f3471930c27e611362d9ce0974f036cb2 | nfsc-criminal-mirror | sdny-23-cr-118 | 515 | high | account-or-routing-number (1) | approved_public |
 | 5c121df018d357a714ffb737c9c27b86b1b673fc4dae81371634d0b59ef48cbc | nfsc-criminal-mirror | sdny-23-cr-118 | 516 | high | account-or-routing-number (1) | approved_public |
@@ -176,6 +198,7 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 8bdf409e973224318e7119208d1fe250a9ef1e20eb89f07e0e2c0b0314fac137 | courtlistener-recap | sdny-23-cr-118 | 612-2 | high | account-or-routing-number (17) | approved_public |
 | dc2a59bb1ce7365aed6e8a5491a129e020245a3287c1163a27aa03bd49debf89 | himalaya-restoration-archive | sdny-23-cr-118 | 612-2 | high | account-or-routing-number (17) | approved_public |
 | 0025f873b12d41b413ca98f1ac20bdf9a300bd398ecf17e34af8acf967ff1c23 | courtlistener-recap | sdny-23-cr-118 | 643-1 | high | explicit-seal-banner (1) | approved_public |
+| a396a91378c244d4359ebf0a5c8f733f071a0c8345d3e1a0309a9250cb34746c | courtlistener-recap | sdny-23-cr-118 | 678 | high | account-or-routing-number (3) | approved_public |
 | 6a99c5dc25b95c348f2a8db46fe4dbedc6d79743fe4017610149e2774ad493ac | nfsc-criminal-mirror | sdny-23-cr-118 | 694 | high | explicit-seal-banner (1) | approved_public |
 | e3ca702416f64e84c5d9c211a9b817c4e5fbcb2f4a73766d085d8f017d328498 | nfsc-criminal-mirror | sdny-23-cr-118 | 716-1 | high | account-or-routing-number (13) | approved_public |
 | bde46ee50cd4190a455da67edad3c5fca2492b1fa3df8a7fb3a5ebb3d87f2da4 | nfsc-criminal-mirror | sdny-23-cr-118 | 716-2 | high | explicit-seal-banner (1), account-or-routing-number (31) | approved_public |
@@ -203,13 +226,13 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 89793eefca94246794ecbc5798e94636119df0eb8cfce0837ea338dab25de7f1 | nfsc-criminal-mirror | sdny-23-cr-118 | 777 | high | account-or-routing-number (1) | approved_public |
 | 95ded6c0994e84a3b62cd379ef5b2ba91297ac4db5af7540d0c1bf6625f6ba71 | nfsc-criminal-mirror | sdny-23-cr-118 | 788 | high | passport-or-license-number (1) | approved_public |
 | ffa8149d6bde0975a2c152d123fc050b481ee8df4501066833ee30ac5e7c9b27 | nfsc-criminal-mirror | sdny-23-cr-118 | 790-1 | high | account-or-routing-number (2) | approved_public |
-| 5f8979f577a6e365dae484284fed18a4b8e8bf9b9bb94164feddbdd109bd5dca | nfsc-criminal-mirror | sdny-23-cr-118 | 790-2 | high | explicit-seal-banner (1), account-or-routing-number (1) | approved_public |
+| 5f8979f577a6e365dae484284fed18a4b8e8bf9b9bb94164feddbdd109bd5dca | nfsc-criminal-mirror | sdny-23-cr-118 | 790-2 | high | explicit-seal-banner (5), account-or-routing-number (45) | approved_public |
 | 144c1db4c5ced56ca1d484c11db1031be58ecdadf5df06e45a91ad94abcb733d | nfsc-criminal-mirror | sdny-23-cr-118 | 790-2 | high | account-or-routing-number (1) | approved_public |
-| 5dd0a2a6e840ab7731fabbf048c84bdc47a0389fb30298fa1501cfe3f467c5c4 | nfsc-criminal-mirror | sdny-23-cr-118 | 790-3 | high | explicit-seal-banner (1), account-or-routing-number (5) | approved_public |
+| 5dd0a2a6e840ab7731fabbf048c84bdc47a0389fb30298fa1501cfe3f467c5c4 | nfsc-criminal-mirror | sdny-23-cr-118 | 790-3 | high | explicit-seal-banner (6), account-or-routing-number (49) | approved_public |
 | bc71fca4b75f97dd158ee590f58a6767b7336685d9a074efe14c80e8916529d5 | nfsc-criminal-mirror | sdny-23-cr-118 | 806 | high | explicit-seal-banner (1) | approved_public |
 | c574d804c65eddfb10a566c033920918bb1d5a3e8ae16bde754187125b5491cc | nfsc-criminal-mirror | sdny-23-cr-118 | 813 | high | explicit-seal-banner (1) | approved_public |
 | eda7870ef41c79e3705b39eeb7b26419429ded8e10d6bc703b9095ec98d4b092 | nfsc-criminal-mirror | sdny-23-cr-118 | 817 | high | explicit-seal-banner (1), passport-or-license-number (1) | approved_public |
-| 035b74a7c1f14c7fadf71bb699c963f84b513245afeb8e885c707d6c4d025e6d | nfsc-criminal-mirror | sdny-23-cr-118 | 822 | high | explicit-seal-banner (1) | approved_public |
+| 035b74a7c1f14c7fadf71bb699c963f84b513245afeb8e885c707d6c4d025e6d | nfsc-criminal-mirror | sdny-23-cr-118 | 822 | high | explicit-seal-banner (2), account-or-routing-number (2), passport-or-license-number (2) | approved_public |
 | ce7d21cb5bbb033894fb6286956c7995081b7c2be65e4b022c9b5c18efab7fe2 | nfsc-criminal-mirror | sdny-23-cr-118 | 826-1 | high | explicit-seal-banner (2) | approved_public |
 | 28ceb64b4c8a27c29965cb6057581fd434dd7791ccb8b0de90f8f8a239837235 | nfsc-criminal-mirror | sdny-23-cr-118 | 830 | high | explicit-seal-banner (1) | approved_public |
 | 10feee108382a36fbd120ec2aa9391733ab17aabd35e4adb85cfa4b26af0efec | nfsc-criminal-mirror | sdny-23-cr-118 | 838 | high | explicit-seal-banner (2) | approved_public |
@@ -219,6 +242,9 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 1179434e1838c9f697fda0075d2f7063ae3e927ba92b4d73bd64315b829ab46d | nfsc-criminal-mirror | sdny-23-cr-118 | 857 | high | social-security-number (1) | approved_public |
 | a10fae7c54a7dcc543219d5e09d9bb19590df142af98b591d66afda5168d8642 | nfsc-criminal-mirror | sdny-23-cr-118 | 859 | high | account-or-routing-number (2) | approved_public |
 | 81df1f2d4b568d5eb43bbfb31a596ff2e160f4f6734318e02b33d48e612e7b17 | himalaya-restoration-archive | sdny-23-cr-118 |  | high | explicit-seal-banner (1) | approved_public |
+| 4dc0dcb91be89dfa65d36bd60fddb47949500a19bbcdc63498896c69f32421aa | courtlistener-recap | bkd-24-05006-aws | 6 | medium | protective-order-material (3) | approved_public |
+| 4986b2e2503504c10224ae56bd7b99df0f37949c7cfa276960acfc1239ca1f57 | courtlistener-recap | dconn-22-50073 | 2778-4 | medium | date-of-birth (1) | approved_public |
+| 450814542254d3f40de73820a3427870629515634a5b293591be9ac8f332e1d1 | courtlistener-recap | discovered-ctb-67500817 | 86 | medium | protective-order-material (1) | approved_public |
 | 7e674ae5ecacfdc1f28878e936ae1e90f656e8e82dbefba7db8b41b4ffdad840 | courtlistener-recap | discovered-ctb-68240518 | 4 | medium | protective-order-material (3) | approved_public |
 | 4d0bbbf9d446ca94e95cec4676359417372019006c259f10b3fc25bca738a9c4 | courtlistener-recap | discovered-ctb-68241019 | 4 | medium | protective-order-material (3) | approved_public |
 | 5e188951149bbd6adbfd1d7265dac20fe673efcc710e923299672817ad52cde0 | courtlistener-recap | discovered-ctb-68241937 | 4 | medium | protective-order-material (3) | approved_public |
@@ -234,3 +260,4 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 7312342e417bc2d6a1d7624702ea3cbd64cc981dd9b5a75308f0fa82315c0207 | nfsc-criminal-mirror | sdny-23-cr-118 | 273-6 | medium | protective-order-material (11) | approved_public |
 | e5898e96cd61411d80b09210776a39b339707aea8e17bdbde104c565053c85a3 | nfsc-criminal-mirror | sdny-23-cr-118 | 282-3 | medium | protective-order-material (3) | approved_public |
 | 6b3cd7f3c848b083e3043bf15744981209b20e5c1a7f7511ef7b2c138ea96dde | himalaya-restoration-archive | sdny-23-cr-118 | 612-5 | medium | bulk-hid-identifiers (21) | approved_public |
+| 82f415b0b82d955feaf6c2c7bef35505c86b13d78eb5566827bb33247bda611b | nfsc-criminal-mirror | sdny-23-cr-118 | 848 | medium | bulk-hid-identifiers (23) | approved_public |

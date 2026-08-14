@@ -15,6 +15,7 @@
       strong { font-size: 17px; font-weight: 680; }
       p { max-width: 350px; margin: 0; color: #c9a9a9; font-size: 12px; line-height: 1.55; }
       span { color: #9aa3ad; font-size: 11px; line-height: 1.5; }
+      code { max-width: 350px; overflow-wrap: anywhere; color: #e2b4a7; font: 10px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
       button { min-width: 112px; height: 34px; border: 1px solid #4a4f55; border-radius: 6px; color: #f4f6f8; background: #1b1e21; font: inherit; cursor: pointer; }
       button:hover { border-color: #70b7c8; background: #24292d; }
     </style>
@@ -26,6 +27,7 @@
         <strong>启动安全检查或资料库校验失败</strong>
         <p>程序已停止启动，不会加载未知本地服务或降级为空资料库。请关闭占用端口的程序，或从项目官方 GitHub Release 重新下载安装包。</p>
         <span>Startup security or library verification failed. The app stopped instead of loading an unknown local service or an empty baseline.</span>
+        <code id="detail" hidden></code>
       </div>
       <button type="button">退出 / Quit</button>
     </main>

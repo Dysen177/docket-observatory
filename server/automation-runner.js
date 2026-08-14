@@ -9,6 +9,7 @@ import { humanDocumentResearch } from './human-legal-research.js'
 import { translateLegalTextToZh } from './i18n.js'
 import { runtimeSetting } from './settings-store.js'
 import { sortCaseDocuments } from './case-dossier-utils.js'
+import { allCaseRecords, localizeCaseRecord } from './discovered-case-records.js'
 import { evidenceForAi, textForAi } from './ai-data-boundary.js'
 import { compareDocketNumbers } from './docket-number.js'
 import {
@@ -314,14 +315,15 @@ async function executeRun(run, callbacks, options) {
 
   await runStep(run, 'dossier', async (step) => {
     const state = callbacks.getState()
-    step.total = state.cases.length
+    const caseRecords = allCaseRecords(state, manifest)
+    step.total = caseRecords.length
     await buildDocumentAnalysis(await callbacks.loadRawDocumentManifest(), state, lang, {
       catalog: 'compact',
       catalogLimit: 12,
       extractionLimit: Math.min(32, candidates.length),
     })
-    run.outputs.caseDossiers = state.cases.length
-    step.done = state.cases.length
+    run.outputs.caseDossiers = caseRecords.length
+    step.done = caseRecords.length
     const provider = activeAiProvider()
     if (isCloudAiProvider(provider.kind) || provider.kind === 'ollama') {
       let generated = 0
@@ -333,10 +335,10 @@ async function executeRun(run, callbacks, options) {
       }
       run.outputs.caseAiDossiers = Math.floor(generated / outputLanguages.length)
       run.outputs.localRuleCaseDossiers = Math.floor(localFallbacks / outputLanguages.length)
-      if (run.outputs.caseAiDossiers < state.cases.length) step.result = 'attention'
+      if (run.outputs.caseAiDossiers < caseRecords.length) step.result = 'attention'
     } else {
       let generated = 0
-      for (const outputLanguage of outputLanguages) generated += await writeLocalCaseDossiers(state, manifest, outputLanguage, run)
+      for (const outputLanguage of outputLanguages) generated += await writeLocalCaseDossiers(state, manifest, outputLanguage, run, caseRecords)
       run.outputs.localRuleCaseDossiers = Math.floor(generated / outputLanguages.length)
       step.result = 'local_only'
     }
@@ -772,21 +774,22 @@ async function cloudTranslateText(provider, text, targetLanguage, segmentLabel =
   return { text: translated.join('\n\n'), redacted: preparedText !== sourceText }
 }
 
-async function writeCaseAiDossiers(state, manifest, lang, run) {
+async function writeCaseAiDossiers(state, manifest, lang, run, caseRecords = allCaseRecords(state, manifest)) {
   await mkdir(caseAiDir, { recursive: true, mode: 0o700 })
   const files = Array.isArray(manifest.files) ? manifest.files : []
   const provider = activeAiProvider()
   let generated = 0
   let localRules = 0
-  for (const caseRecord of state.cases) {
+  for (const caseRecord of caseRecords) {
     try {
+      const dossierCaseRecord = localizeCaseRecord(caseRecord, lang)
       const caseFiles = sortCaseDocuments(files.filter((file) => file.caseId === caseRecord.id)).slice(0, 18)
       const events = state.events
         .filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds?.includes(caseRecord.id))
         .sort((left, right) => right.date.localeCompare(left.date))
         .slice(0, 20)
-      const dossierEvidence = await buildCaseDossierEvidence(caseRecord, caseFiles, events, state, lang)
-      const cachePath = path.join(caseAiDir, `${caseRecord.id}-${lang}-${caseDossierCacheKey(caseRecord, events, caseFiles)}.json`)
+      const dossierEvidence = await buildCaseDossierEvidence(dossierCaseRecord, caseFiles, events, state, lang)
+      const cachePath = path.join(caseAiDir, `${caseRecord.id}-${lang}-${caseDossierCacheKey(dossierCaseRecord, events, caseFiles)}.json`)
       const cached = await readJsonFile(cachePath)
       if (cached?.provider === provider.kind) {
         generated += 1
@@ -797,32 +800,32 @@ async function writeCaseAiDossiers(state, manifest, lang, run) {
       try {
         dossier = provider.kind === 'ollama'
           ? await ollamaCaseDossier({
-              caseRecord,
+              caseRecord: dossierCaseRecord,
               events,
               evidence: dossierEvidence,
               evidenceIndex: caseDossierEvidenceIndex(dossierEvidence),
               render: renderCaseDossierAnalysis,
               lang,
             })
-          : await cloudCaseDossier(provider.kind, caseRecord, events, dossierEvidence, lang)
+          : await cloudCaseDossier(provider.kind, dossierCaseRecord, events, dossierEvidence, lang)
       } catch (error) {
         actualProvider = 'local_rules'
         dossier = localCaseDossierAnalysis({
-          caseRecord,
+          caseRecord: dossierCaseRecord,
           events,
           evidenceIndex: caseDossierEvidenceIndex(dossierEvidence),
           render: renderCaseDossierAnalysis,
           lang,
         })
-        recordItemFailure(run, { docNumber: null, title: caseRecord.shortTitle }, `${provider.label} case dossier; local fallback used`, errorMessage(error), lang)
+        recordItemFailure(run, { docNumber: null, title: dossierCaseRecord.shortTitle }, `${provider.label} case dossier; local fallback used`, errorMessage(error), lang)
       }
       const payload = { schemaVersion: caseAiCacheVersion, provider: actualProvider, ...dossier }
       await writeJsonFile(cachePath, payload)
       if (actualProvider === provider.kind) generated += 1
       else localRules += 1
       addLog(run, lang === 'en'
-        ? `${actualProvider === provider.kind ? provider.label : 'Local rules'} case dossier cached: ${caseRecord.shortTitle}`
-        : `${actualProvider === provider.kind ? provider.label : '本地规则'} 案件级总览已缓存：${caseRecord.shortTitle}`)
+        ? `${actualProvider === provider.kind ? provider.label : 'Local rules'} case dossier cached: ${dossierCaseRecord.shortTitle}`
+        : `${actualProvider === provider.kind ? provider.label : '本地规则'} 案件级总览已缓存：${dossierCaseRecord.shortTitle}`)
     } catch (error) {
       recordItemFailure(run, { docNumber: null, title: caseRecord.shortTitle }, 'case AI dossier', errorMessage(error), lang)
     }
@@ -830,25 +833,26 @@ async function writeCaseAiDossiers(state, manifest, lang, run) {
   return { generative: generated, localRules }
 }
 
-async function writeLocalCaseDossiers(state, manifest, lang, run) {
+async function writeLocalCaseDossiers(state, manifest, lang, run, caseRecords = allCaseRecords(state, manifest)) {
   await mkdir(caseAiDir, { recursive: true, mode: 0o700 })
   const files = Array.isArray(manifest.files) ? manifest.files : []
   let generated = 0
-  for (const caseRecord of state.cases) {
+  for (const caseRecord of caseRecords) {
     try {
+      const dossierCaseRecord = localizeCaseRecord(caseRecord, lang)
       const caseFiles = sortCaseDocuments(files.filter((file) => file.caseId === caseRecord.id)).slice(0, 18)
       const events = state.events
         .filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds?.includes(caseRecord.id))
         .sort((left, right) => right.date.localeCompare(left.date))
         .slice(0, 20)
-      const dossierEvidence = await buildCaseDossierEvidence(caseRecord, caseFiles, events, state, lang)
-      const cachePath = path.join(caseAiDir, `${caseRecord.id}-${lang}-${caseDossierCacheKey(caseRecord, events, caseFiles)}.json`)
+      const dossierEvidence = await buildCaseDossierEvidence(dossierCaseRecord, caseFiles, events, state, lang)
+      const cachePath = path.join(caseAiDir, `${caseRecord.id}-${lang}-${caseDossierCacheKey(dossierCaseRecord, events, caseFiles)}.json`)
       if (await readJsonFile(cachePath)) {
         generated += 1
         continue
       }
       const dossier = localCaseDossierAnalysis({
-        caseRecord,
+        caseRecord: dossierCaseRecord,
         events,
         evidenceIndex: caseDossierEvidenceIndex(dossierEvidence),
         render: renderCaseDossierAnalysis,

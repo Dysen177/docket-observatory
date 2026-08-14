@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio'
-import { scanPublicRecapFeeds, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
+import { scanPublicRecapFeeds, scanPublicRecapRelatedPortfolio, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
 import { readTextWithLimit, safeFetch } from './safe-fetch.js'
 import { resolvedSecret } from './settings-store.js'
 import networkPolicy from './network-policy.cjs'
@@ -496,9 +496,10 @@ export async function courtlistenerRecap(source) {
   const start = Date.now()
   const token = resolvedSecret('courtlistenerToken')
   if (!token) {
-    const [archive, searchArchive] = await Promise.all([
+    const [archive, searchArchive, relatedArchive] = await Promise.all([
       scanPublicRecapFeeds(),
       scanPublicRecapSearch({ pageLimit: 1 }),
+      scanPublicRecapRelatedPortfolio({ pageLimit: 1 }),
     ])
     const failedTargetIds = new Set([
       ...archive.targets.filter((target) => target.error).map((target) => Number(target.courtListenerDocketId)),
@@ -508,15 +509,19 @@ export async function courtlistenerRecap(source) {
     const structuredEntries = searchArchive.targets.reduce((total, target) => total + target.docketEntries, 0)
     const reachableTargets = archive.targets.length - failedTargetIds.size
     return {
-      events: mergeCourtListenerEvents(archive.events, searchArchive.events),
-      status: sourceStatus(source, start, docketEntries || structuredEntries ? 'limited' : 'error', `CourtListener public RECAP sources scanned ${reachableTargets}/${archive.targets.length} tracked docket(s), returned ${docketEntries} recent feed entries, ${structuredEntries} structured search entries, and exposed ${searchArchive.documents.length} public PDF(s). A token is optional and adds full docket-entry pagination.`, {
-        itemCount: Math.max(docketEntries, structuredEntries),
+      events: mergeCourtListenerEvents(archive.events, searchArchive.events, relatedArchive.events),
+      status: sourceStatus(source, start, docketEntries || structuredEntries || relatedArchive.events.length ? 'limited' : 'error', `CourtListener public RECAP sources scanned ${reachableTargets}/${archive.targets.length} tracked docket(s) plus ${relatedArchive.acceptedDocketCount} accepted related docket(s), returned ${docketEntries} recent feed entries, ${structuredEntries} structured tracked entries, ${relatedArchive.events.length} related-search entries, and exposed ${searchArchive.documents.length + relatedArchive.documents.length} public PDF(s). A token is optional and adds full docket-entry pagination.`, {
+        itemCount: Math.max(docketEntries, structuredEntries, relatedArchive.events.length),
         retryable: failedTargetIds.size > 0,
         facts: archive.targets.map((target) => ({
           label: target.label,
           value: target.error ? 'feed error' : `${target.docketEntries} recent entries`,
           detail: target.error || `${target.latestDate ? `Latest observed ${target.latestDate}. ` : ''}Public feed and structured search are limited snapshots; use PACER as the docket of record.`,
-        })),
+        })).concat([{
+          label: 'Related-name discovery',
+          value: `${relatedArchive.acceptedDocketCount} accepted dockets`,
+          detail: `${relatedArchive.documents.length} available public PDF(s); ${relatedArchive.failures.length} search failure(s). Each new relationship remains marked for review.`,
+        }]),
       }),
     }
   }

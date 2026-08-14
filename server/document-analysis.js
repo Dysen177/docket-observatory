@@ -17,6 +17,7 @@ import { localAiAvailable, localAssistiveContentIntegrity, localAssistiveTransla
 import { humanCaseResearch, humanDocumentResearch } from './human-legal-research.js'
 import { himalayaRestorationSearchAliases } from './himalaya-restoration.js'
 import { searchDocumentCatalog } from './document-search.js'
+import { allCaseRecords, localizeDiscoveredCase } from './discovered-case-records.js'
 
 const documentAnalysisSchema = {
   type: 'object',
@@ -394,9 +395,9 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
     neutrality: neutralLabel(lang),
     extraction: extractionStatus(lang, extractionByUrl),
     sourceStrategy: sourceStrategy(lang),
-    portfolioRead: documentPortfolioRead(records, state, lang),
-    analytics: documentAnalytics(records, errorRecords, state, lang),
-    automation: automationPlan(records, errorRecords, extractionByUrl, state, lang, cacheInventory),
+    portfolioRead: documentPortfolioRead(records, state, lang, manifest),
+    analytics: documentAnalytics(records, errorRecords, state, lang, manifest),
+    automation: automationPlan(records, errorRecords, extractionByUrl, state, lang, cacheInventory, manifest),
     caseDossiers: await buildCaseDossiers(records, state, lang, manifest),
     counts: {
       totalFiles: files.length,
@@ -2392,7 +2393,8 @@ function sourceStrategy(lang) {
   }
 }
 
-function documentPortfolioRead(records, state, lang) {
+function documentPortfolioRead(records, state, lang, manifest) {
+  const caseRecords = allCaseRecords(state, manifest)
   const countsByCategory = records.reduce((acc, record) => {
     acc[record.categoryKey] = (acc[record.categoryKey] ?? 0) + 1
     return acc
@@ -2406,7 +2408,7 @@ function documentPortfolioRead(records, state, lang) {
         `Main clusters: forfeiture (${countsByCategory.Forfeiture ?? 0}), appeal/mandamus (${(countsByCategory.Appeal ?? 0) + (countsByCategory.Mandamus ?? 0)}), sentencing/judgment (${(countsByCategory.Sentencing ?? 0) + (countsByCategory.Judgment ?? 0)}), bankruptcy (${countsByCategory.Bankruptcy ?? 0}).`,
         `Overall case theory for the app: timeline, asset recovery, appeal posture, SEC/Fair Fund offsets, bankruptcy estate, and related-entity claims must be reconciled before conclusions.`,
       ],
-      openLoops: state.cases.flatMap((caseRecord) => caseRecord.watchQuestions.slice(0, 1)).slice(0, 6),
+      openLoops: caseRecords.flatMap((caseRecord) => localizedCaseRecord(caseRecord, lang).watchQuestions.slice(0, 1)).slice(0, 6),
     }
   }
   return {
@@ -2416,11 +2418,11 @@ function documentPortfolioRead(records, state, lang) {
       `主要簇：没收（${countsByCategory.Forfeiture ?? 0}）、上诉/强制令（${(countsByCategory.Appeal ?? 0) + (countsByCategory.Mandamus ?? 0)}）、量刑/判决（${(countsByCategory.Sentencing ?? 0) + (countsByCategory.Judgment ?? 0)}）、破产（${countsByCategory.Bankruptcy ?? 0}）。`,
       '整体案件解读应把时间线、资产追回、上诉姿态、SEC/Fair Fund 抵扣、破产财产和关联实体主张一起核对，再下结论。',
     ],
-    openLoops: state.cases.flatMap((caseRecord) => caseRecord.watchQuestions.slice(0, 1)).slice(0, 6),
+    openLoops: caseRecords.flatMap((caseRecord) => localizedCaseRecord(caseRecord, lang).watchQuestions.slice(0, 1)).slice(0, 6),
   }
 }
 
-function documentAnalytics(records, errorRecords, state, lang) {
+function documentAnalytics(records, errorRecords, state, lang, manifest) {
   const categoryOrder = [
     'Forfeiture',
     'Appeal',
@@ -2482,8 +2484,9 @@ function documentAnalytics(records, errorRecords, state, lang) {
   }))
 
   const sourceStatusById = new Map(state.sourceStatuses.map((status) => [status.sourceId, status]))
-  const caseMatrix = state.cases.map((caseRecord) => {
-    const localizedCase = lang === 'en' ? translateCaseFieldsToEn(caseRecord) : translateCaseFieldsToZh(caseRecord)
+  const caseRecords = allCaseRecords(state, manifest)
+  const caseMatrix = caseRecords.map((caseRecord) => {
+    const localizedCase = localizedCaseRecord(caseRecord, lang)
     const caseRecords = records.filter((record) => record.caseId === caseRecord.id || record.relatedTopicIds?.some((topicId) => caseRecord.watchQuestions?.join(' ').toLowerCase().includes(topicId)))
     const caseEvents = state.events.filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds?.includes(caseRecord.id))
     const sourceGapIds = caseRecord.sourceIds.filter((sourceId) => sourceStatusById.get(sourceId)?.status !== 'ok')
@@ -2503,7 +2506,7 @@ function documentAnalytics(records, errorRecords, state, lang) {
     }
   })
 
-  const relationshipGraph = relationshipGraphForRecords(records, state, lang)
+  const relationshipGraph = relationshipGraphForRecords(records, state, lang, caseRecords)
 
   return {
     categoryDistribution,
@@ -2522,7 +2525,7 @@ function documentAnalytics(records, errorRecords, state, lang) {
   }
 }
 
-function automationPlan(records, errorRecords, extractionByUrl, state, lang, cacheInventory) {
+function automationPlan(records, errorRecords, extractionByUrl, state, lang, cacheInventory, manifest) {
   const extractionAttempted = extractionByUrl.size
   const extracted = [...extractionByUrl.values()].filter((item) => item?.status === 'extracted').length
   const highPriority = records.filter((record) => ['critical', 'high'].includes(record.priority)).length
@@ -2606,7 +2609,7 @@ function automationPlan(records, errorRecords, extractionByUrl, state, lang, cac
           ? 'Bundled case dossiers remain available offline. New evidence can be organized locally, while Ollama or a configured cloud model can generate a deeper case-level update.'
           : '内置案件整体解读可离线直接使用；新增证据可先在本地归档，Ollama 或已配置的云端模型可生成更深入的案件级更新。',
       done: cacheInventory.caseAi,
-      total: state.cases.length,
+      total: allCaseRecords(state, manifest).length,
     },
   ]
 
@@ -2642,8 +2645,8 @@ function automationPlan(records, errorRecords, extractionByUrl, state, lang, cac
 }
 
 async function buildCaseDossiers(records, state, lang, manifest) {
-  return Promise.all(state.cases.map(async (caseRecord) => {
-    const localizedCase = lang === 'en' ? translateCaseFieldsToEn(caseRecord) : translateCaseFieldsToZh(caseRecord)
+  return Promise.all(allCaseRecords(state, manifest).map(async (caseRecord) => {
+    const localizedCase = localizedCaseRecord(caseRecord, lang)
     const caseRecords = records.filter((record) => record.caseId === caseRecord.id)
     const directEvents = state.events
       .filter((event) => event.caseId === caseRecord.id)
@@ -2814,8 +2817,9 @@ async function processingCacheInventory(manifest = null, state = null, lang = 'z
     text_extraction_unavailable: 0,
     stale_source_sha: 0,
   })
-  const currentCaseIds = new Set((state?.cases ?? []).map((caseRecord) => caseRecord.id))
-  const caseById = new Map((state?.cases ?? []).map((caseRecord) => [caseRecord.id, caseRecord]))
+  const currentCases = allCaseRecords(state, manifest)
+  const currentCaseIds = new Set(currentCases.map((caseRecord) => caseRecord.id))
+  const caseById = new Map(currentCases.map((caseRecord) => [caseRecord.id, localizedCaseRecord(caseRecord, lang)]))
   const currentCaseAi = uniqueCacheValues(
     caseAi.filter((entry) => entry.value?.schemaVersion === caseAiCacheVersion
       && typeof entry.value?.text === 'string'
@@ -3088,10 +3092,10 @@ function caseTrackKind(caseRecord) {
   return 'generic'
 }
 
-function relationshipGraphForRecords(records, state, lang) {
-  const nodes = state.cases.map((caseRecord) => ({
+function relationshipGraphForRecords(records, state, lang, caseRecords = state.cases) {
+  const nodes = caseRecords.map((caseRecord) => ({
     id: caseRecord.id,
-    label: lang === 'en' ? translateCaseFieldsToEn(caseRecord).shortTitle : translateCaseFieldsToZh(caseRecord).shortTitle,
+    label: localizedCaseRecord(caseRecord, lang).shortTitle,
     type: 'case',
     weight: records.filter((record) => record.caseId === caseRecord.id).length,
   }))
@@ -3112,6 +3116,11 @@ function relationshipGraphForRecords(records, state, lang) {
     nodes: [...nodes, ...entityNodes],
     links: links.filter((link) => nodes.some((node) => node.id === link.target) && entityNodes.some((node) => node.id === link.source)),
   }
+}
+
+function localizedCaseRecord(caseRecord, lang) {
+  if (caseRecord?.discovered) return localizeDiscoveredCase(caseRecord, lang)
+  return lang === 'en' ? translateCaseFieldsToEn(caseRecord) : translateCaseFieldsToZh(caseRecord)
 }
 
 function legalRelationshipLabel(entity, caseId, lang) {

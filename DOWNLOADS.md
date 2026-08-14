@@ -2,9 +2,9 @@
 
 [**中文安装教程**](#中文安装教程) | [**English Installation Guide**](#english-installation-guide)
 
-> `v0.1.0` 是免费、未经商业证书签名的完整社区版。请只从本项目 GitHub Releases 下载对应系统的安装包，再按下面的系统官方流程确认运行。不要关闭 Gatekeeper、SmartScreen 或其他系统安全功能。
+> `v0.1.1` 是免费、未经商业证书签名的完整社区版。请只从本项目 GitHub Releases 下载对应系统的安装包，再按下面的系统官方流程确认运行。不要关闭 Gatekeeper、SmartScreen 或其他系统安全功能。
 >
-> `v0.1.0` is the free complete community build without a commercial code-signing identity. Download only the installer for your operating system from this project's GitHub Release, then use the operating system's documented confirmation flow below. Do not disable Gatekeeper, SmartScreen, or other system security controls.
+> `v0.1.1` is the free complete community build without a commercial code-signing identity. Download only the installer for your operating system from this project's GitHub Release, then use the operating system's documented confirmation flow below. Do not disable Gatekeeper, SmartScreen, or other system security controls.
 
 ## 中文安装教程
 
@@ -12,9 +12,9 @@
 
 1. 打开 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest)。
 2. 向下找到 `Assets`，根据电脑选择：
-   - Apple 芯片 Mac（Apple silicon）：`Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
-   - Intel Mac：`Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
-   - Windows 10/11 x64：`Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
+   - Apple 芯片 Mac（Apple silicon）：`Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg`
+   - Intel Mac：`Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg`
+   - Windows 10/11 x64：`Docket-Observatory-0.1.1-Windows-x64-unsigned.exe`
 3. GitHub 自动生成的 `Source code (zip)` 和 `Source code (tar.gz)` 是源码，不是内置完整资料库的安装包。
 
 <p align="center"><img src="./docs/install/macos-download-zh.png" width="760" alt="GitHub 下载文件选择示意图"></p>
@@ -69,7 +69,7 @@
 
 ### 7. Windows：运行安装程序
 
-1. 双击 `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`。
+1. 双击 `Docket-Observatory-0.1.1-Windows-x64-unsigned.exe`。
 2. 如果 SmartScreen 显示“Windows 已保护你的电脑”，先点 **更多信息**，核对应用名和文件来源后再点 **仍要运行**。
 
 <p align="center"><img src="./docs/install/windows-smartscreen-zh.png" width="760" alt="Windows SmartScreen 更多信息和仍要运行示意图"></p>
@@ -88,7 +88,7 @@
 
 ### 为什么安装包很大
 
-完整版不是空资料库。发布基线包含 1,578 份有效法院、机构和历史公开 PDF（约 1.3 GB），以及约 0.5 GB 的正文提取、现有译文与阅读辅助、文件解读、案件整体解读、关系数据和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积。建议至少预留 5 GB 空间。
+完整版不是空资料库。发布基线包含 1,834 份有效法院、机构和历史公开 PDF（约 1.56 GB），以及约 0.65 GB 的正文提取、现有译文与阅读辅助、文件解读、案件整体解读、关系数据和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积。建议至少预留 5 GB 空间。
 
 ### 常见问题
 
@@ -103,9 +103,9 @@
 
 1. Open the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest).
 2. Under `Assets`, choose:
-   - Apple-silicon Mac: `Docket-Observatory-0.1.0-macOS-arm64-unsigned.dmg`
-   - Intel-based Mac: `Docket-Observatory-0.1.0-macOS-x64-unsigned.dmg`
-   - Windows 10/11 x64: `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`
+   - Apple-silicon Mac: `Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg`
+   - Intel-based Mac: `Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg`
+   - Windows 10/11 x64: `Docket-Observatory-0.1.1-Windows-x64-unsigned.exe`
 3. GitHub's automatically generated source-code archives are not the complete application bundle.
 
 <p align="center"><img src="./docs/install/macos-download-en.png" width="760" alt="Choose the correct installer from GitHub Release assets"></p>
@@ -160,7 +160,7 @@ The image above is a clean English illustration of the final confirmation layout
 
 ### 7. Windows: run the installer
 
-1. Double-click `Docket-Observatory-0.1.0-Windows-x64-unsigned.exe`.
+1. Double-click `Docket-Observatory-0.1.1-Windows-x64-unsigned.exe`.
 2. If SmartScreen displays **Windows protected your PC**, select **More info**, verify the application name and download source, and then select **Run anyway**.
 
 <p align="center"><img src="./docs/install/windows-smartscreen-en.png" width="760" alt="Windows SmartScreen More info and Run anyway illustration"></p>
@@ -179,7 +179,7 @@ The image above is a clean English illustration of the final confirmation layout
 
 ### Why the installers are large
 
-The complete edition is not an empty library. Its baseline contains 1,578 valid public court, agency, and historical PDFs (about 1.3 GB), plus about 0.5 GB of extracted text, existing translations and reading assistance, document-level readings, case dossiers, relationship data, and full-text indexes. Electron, OCR language models, and runtime dependencies add more. Keep at least 5 GB free.
+The complete edition is not an empty library. Its baseline contains 1,834 valid public court, agency, and historical PDFs (about 1.56 GB), plus about 0.65 GB of extracted text, existing translations and reading assistance, document-level readings, case dossiers, relationship data, and full-text indexes. Electron, OCR language models, and runtime dependencies add more. Keep at least 5 GB free.
 
 ### Troubleshooting
 

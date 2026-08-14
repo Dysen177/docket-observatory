@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { createSeedState } from '../server/seed.js'
+import { allCaseRecords } from '../server/discovered-case-records.js'
 
 const projectRoot = process.cwd()
 const sourceCorpusRoot = path.join(projectRoot, 'downloads', 'court-files-complete')
@@ -42,7 +43,7 @@ for (const filename of cacheFiles) {
 }
 
 const seedFiles = await inventory(seedCacheRoot)
-assertCompleteResearchBaseline(searchIndex, seedFiles, sanitizedCorpusManifest, createSeedState().cases)
+assertCompleteResearchBaseline(searchIndex, seedFiles, sanitizedCorpusManifest, allCaseRecords(createSeedState(), sanitizedCorpusManifest))
 const aggregateSha256 = createHash('sha256')
 for (const file of seedFiles) aggregateSha256.update(`${file.path}\0${file.bytes}\0${file.sha256}\n`)
 

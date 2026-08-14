@@ -4,6 +4,7 @@ import { open, readFile, stat } from 'node:fs/promises'
 import { gunzipSync } from 'node:zlib'
 import path from 'node:path'
 import { createSeedState } from '../server/seed.js'
+import { allCaseRecords } from '../server/discovered-case-records.js'
 
 const root = process.cwd()
 const sourceCorpusRoot = path.join(root, 'downloads', 'court-files-complete')
@@ -65,7 +66,8 @@ for (const sha256 of validCorpusHashes) {
   if (!indexedHashes.has(sha256)) throw new Error(`Valid PDF content is absent from the bundled search baseline: ${sha256}`)
 }
 
-const expectedCaseLanguages = new Set(createSeedState().cases.flatMap((caseRecord) => [`${caseRecord.id}:zh`, `${caseRecord.id}:en`]))
+const expectedCaseLanguages = new Set(allCaseRecords(createSeedState(), corpusManifest)
+  .flatMap((caseRecord) => [`${caseRecord.id}:zh`, `${caseRecord.id}:en`]))
 const bundledCaseLanguages = new Set()
 for (const file of seedManifest.files ?? []) {
   if (!file.path.startsWith('case-ai/') || !file.path.endsWith('.json')) continue

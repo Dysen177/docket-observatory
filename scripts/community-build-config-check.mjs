@@ -13,7 +13,7 @@ assert(packageJson.build?.forceCodeSigning === true, 'Formal release configurati
 assert(communityBuild.forceCodeSigning === false, 'Community build must explicitly allow unsigned packaging.')
 assert(communityBuild.mac?.identity === '-', 'Community macOS build must use an ad-hoc signature to seal the application bundle.')
 assert(communityBuild.mac?.notarize === false, 'Community macOS build must explicitly disable notarization.')
-assert(communityBuild.win?.signAndEditExecutable === false, 'Community Windows build must explicitly disable executable signing.')
+assert(communityBuild.win?.signAndEditExecutable === true, 'Community Windows build must edit executable resources so the bundled product icon is embedded without signing.')
 assert(communityBuild.mac?.artifactName?.includes('-unsigned.'), 'Community macOS artifact name must disclose unsigned status.')
 assert(communityBuild.win?.artifactName?.includes('-unsigned.'), 'Community Windows artifact name must disclose unsigned status.')
 assert(communityBuild.electronFuses?.runAsNode === false, 'Community build must preserve production Electron fuse hardening.')

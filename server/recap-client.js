@@ -31,12 +31,32 @@ const recapTargets = [
   { caseId: 'az-voice-of-guo', courtId: 'azd', court: 'D. Ariz.', docketNumber: '2:21-cv-01079', courtListenerDocketId: 60004239, label: 'Zhang v. Voice of Guo Media Incorporated' },
 ]
 
+// These exact-name searches extend discovery beyond the fixed docket list. The
+// result window is intentionally small and every discovered docket remains
+// pending relationship review until its caption and source record are read.
+const relatedSearchQueries = [
+  '"Ho Wan Kwok"',
+  '"Miles Guo"',
+  '"Guo Wengui"',
+  '"GTV Media Group"',
+  '"Voice of Guo Media"',
+  '"Himalaya Exchange"',
+  '"HK International Funds"',
+  '"Saraca Media"',
+  '"Rule of Law Society"',
+  '"Genever Holdings"',
+  '"Pacific Alliance Asia Opportunity Fund"',
+  '"Kin Ming Je"',
+]
+
 let publicFeedSnapshot = null
 let publicFeedPromise = null
 let publicSearchSnapshot = null
 let publicSearchPromise = null
 let publicPortfolioSnapshot = null
 let publicPortfolioPromise = null
+let publicRelatedPortfolioSnapshot = null
+let publicRelatedPortfolioPromise = null
 let recapArchiveSnapshot = null
 let recapArchivePromise = null
 let publicSearchRequestQueue = Promise.resolve()
@@ -81,6 +101,27 @@ export async function scanPublicRecapPortfolio(options = {}) {
     return value
   } finally {
     publicPortfolioPromise = null
+  }
+}
+
+export async function scanPublicRecapRelatedPortfolio(options = {}) {
+  const pageLimit = boundedInteger(options.pageLimit, 1, 2, 1)
+  const queryLimit = boundedInteger(options.queryLimit, 1, relatedSearchQueries.length, relatedSearchQueries.length)
+  const queries = relatedSearchQueries.slice(0, queryLimit)
+  const cacheKey = `related:${queries.join('|')}:${pageLimit}`
+  if (publicRelatedPortfolioSnapshot?.key === cacheKey && Date.now() - publicRelatedPortfolioSnapshot.at < snapshotTtlMs) {
+    return publicRelatedPortfolioSnapshot.value
+  }
+  if (publicRelatedPortfolioPromise?.key === cacheKey) return publicRelatedPortfolioPromise.value
+
+  const scan = performRelatedRecapPortfolioSearch(queries, pageLimit)
+  publicRelatedPortfolioPromise = { key: cacheKey, value: scan }
+  try {
+    const value = await scan
+    publicRelatedPortfolioSnapshot = { key: cacheKey, at: Date.now(), value }
+    return value
+  } finally {
+    publicRelatedPortfolioPromise = null
   }
 }
 
@@ -190,6 +231,77 @@ async function performPublicRecapPortfolioSearch(query, courtId, pageLimit) {
       .sort((left, right) => right.date.localeCompare(left.date) || right.id.localeCompare(left.id)),
     documents: dedupeBy(targetResults.flatMap((target) => target.documents), (document) => document.url),
   }
+}
+
+async function performRelatedRecapPortfolioSearch(queries, pageLimit) {
+  const scans = []
+  const failures = []
+  for (const query of queries) {
+    try {
+      scans.push(await performPublicRecapPortfolioSearch(query, '', pageLimit))
+    } catch (error) {
+      failures.push(`${query}: ${error instanceof Error ? error.message : String(error)}`)
+    }
+  }
+
+  const targetsByDocket = new Map()
+  for (const scan of scans) {
+    for (const target of scan.targets ?? []) {
+      const docketId = Number(target.courtListenerDocketId)
+      if (!Number.isInteger(docketId) || docketId <= 0) continue
+      const previous = targetsByDocket.get(docketId)
+      const discoveryQueries = [...new Set([...(previous?.discoveryQueries ?? []), scan.query].filter(Boolean))]
+      targetsByDocket.set(docketId, {
+        ...(previous ?? {}),
+        ...target,
+        discoveryQueries,
+        relationStatus: target.caseId?.startsWith('discovered-') ? 'pending_review' : 'tracked',
+      })
+    }
+  }
+
+  const acceptedTargets = [...targetsByDocket.values()].filter(isLikelyRelatedDocket)
+  const acceptedIds = new Set(acceptedTargets.map((target) => Number(target.courtListenerDocketId)))
+  const documents = scans.flatMap((scan) => scan.documents ?? [])
+    .filter((document) => acceptedIds.has(Number(document.courtListenerDocketId)))
+    .map((document) => {
+      const target = targetsByDocket.get(Number(document.courtListenerDocketId))
+      return {
+        ...document,
+        relationStatus: target?.relationStatus ?? 'pending_review',
+        discoveryQueries: target?.discoveryQueries ?? [],
+      }
+    })
+  const events = scans.flatMap((scan) => scan.events ?? [])
+    .filter((event) => acceptedIds.has(Number(event.courtListenerDocketId)))
+  return {
+    mode: 'public_related_portfolio_search',
+    queries,
+    pagesScanned: scans.reduce((total, scan) => total + Number(scan.pagesScanned ?? 0), 0),
+    targets: acceptedTargets,
+    events: dedupeBy(events, (event) => event.id).sort((left, right) => right.date.localeCompare(left.date) || right.id.localeCompare(left.id)),
+    documents: dedupeBy(documents, (document) => document.url),
+    failures,
+    observedDocketCount: targetsByDocket.size,
+    acceptedDocketCount: acceptedTargets.length,
+  }
+}
+
+function isLikelyRelatedDocket(target) {
+  const title = cleanText([target.title, target.label, ...(target.parties ?? [])].filter(Boolean).join(' '))
+  const titleAnchor = /(?:ho\s+wan\s+kwok|kwok|guo|wengui|gtv\s+media|voice\s+of\s+guo|saraca\s+media|himalaya\s+exchange|hk\s+international|genever\s+holdings|despins|g[- ]club|gettr|rule\s+of\s+law|pacific\s+alliance\s+asia\s+opportunity|mountains\s+of\s+spices)/i.test(title)
+  if (titleAnchor) return true
+
+  const queryHits = new Set(target.discoveryQueries ?? [])
+  const filedYear = Number(String(target.dateFiled ?? '').slice(0, 4))
+  const bankruptcyEstateLine = String(target.courtId).toLowerCase() === 'ctb'
+    && filedYear >= 2022
+    && /(?:despins|genever|kwok|guo|hk\s+international|pacific\s+alliance|nunberg)/i.test(title)
+  if (bankruptcyEstateLine) return true
+
+  // A repeated match across independent exact-name searches is a useful
+  // discovery signal for captions whose title does not name the subject.
+  return queryHits.size >= 2 && filedYear >= 2017
 }
 
 async function searchPublicRecapTargetBatch(targets, pageLimit) {

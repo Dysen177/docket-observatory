@@ -131,6 +131,10 @@ function protectLocalRequests(request, response, next) {
 }
 
 function protectDesktopSession(request, response, next) {
+  if (!request.path.startsWith('/api/')) {
+    next()
+    return
+  }
   const expected = process.env.GUO_INTEL_LOCAL_API_TOKEN
   if (!expected) {
     next()

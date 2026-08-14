@@ -1,7 +1,7 @@
 {
   "name": "guo-intel",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local legal intelligence workbench for Guo-related federal cases and policy monitoring.",
   "author": "Docket Observatory contributors",
   "license": "MIT",
@@ -166,6 +166,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "案卷观察台"
