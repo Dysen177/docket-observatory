@@ -17,14 +17,18 @@ const riskPatterns = [
   { id: 'hardcoded-secret', severity: 'critical', pattern: /(?:sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY\s*=\s*["'][^"']+|PACER_PASSWORD\s*=\s*["'][^"']+)/g },
 ]
 
+function relativePath(filePath) {
+  return path.relative(root, filePath).split(path.sep).join('/')
+}
+
 function addFinding(id, severity, file, message, line = null) {
-  findings.push({ id, severity, file: path.relative(root, file), line, message })
+  findings.push({ id, severity, file: relativePath(file), line, message })
 }
 
 function isIgnored(filePath) {
-  const relative = path.relative(root, filePath)
+  const relative = relativePath(filePath)
   if (!relative || relative.startsWith('..')) return true
-  return [...ignoredDirectories].some((entry) => relative === entry || relative.startsWith(`${entry}${path.sep}`))
+  return [...ignoredDirectories].some((entry) => relative === entry || relative.startsWith(`${entry}/`))
 }
 
 async function walk(directory) {
@@ -36,7 +40,7 @@ async function walk(directory) {
     const info = await stat(fullPath)
     if (info.isDirectory()) {
       files.push(...(await walk(fullPath)))
-    } else if (codeExtensions.has(path.extname(fullPath)) && path.relative(root, fullPath) !== 'scripts/security-check.mjs') {
+    } else if (codeExtensions.has(path.extname(fullPath)) && relativePath(fullPath) !== 'scripts/security-check.mjs') {
       files.push(fullPath)
     }
   }
@@ -62,11 +66,11 @@ async function scanRiskPatterns(files) {
 
 function approvedRiskPattern(ruleId, file, content) {
   if (ruleId !== 'subprocess') return false
-  const relative = path.relative(root, file)
-  if (relative === path.join('server', 'document-search.js')) {
+  const relative = relativePath(file)
+  if (relative === 'server/document-search.js') {
     return false
   }
-  if (relative === path.join('scripts', 'settings-persistence-check.mjs')) {
+  if (relative === 'scripts/settings-persistence-check.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes("spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--verify', temporaryRoot], {")
       && content.includes("env: { GUO_INTEL_CACHE_DIR: temporaryRoot }")
@@ -74,14 +78,14 @@ function approvedRiskPattern(ruleId, file, content) {
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'build-macos-keychain-addon.mjs')) {
+  if (relative === 'scripts/build-macos-keychain-addon.mjs') {
     return content.includes("import { execFileSync } from 'node:child_process'")
       && content.includes("execFileSync('xcrun', [")
       && (content.match(/\bexecFileSync\s*\(/g) ?? []).length === 1
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'release-signing-preflight.mjs')) {
+  if (relative === 'scripts/release-signing-preflight.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes('function run(command, args, timeout = 120000)')
       && content.includes("run('/usr/bin/security', ['find-identity', '-v', '-p', 'codesigning']")
@@ -91,7 +95,7 @@ function approvedRiskPattern(ruleId, file, content) {
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'release-environment-preflight.mjs')) {
+  if (relative === 'scripts/release-environment-preflight.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes("const gitCommand = process.platform === 'win32' ? 'git.exe' : '/usr/bin/git'")
       && content.includes('spawnSync(gitCommand, args, {')
@@ -100,20 +104,20 @@ function approvedRiskPattern(ruleId, file, content) {
       && !content.includes('process.argv')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'finalize-release-assets.mjs')) {
+  if (relative === 'scripts/finalize-release-assets.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes("spawnSync(npmCommand, ['sbom', '--omit=dev', '--sbom-format=cyclonedx']")
       && (content.match(/\bspawnSync\s*\(/g) ?? []).length === 1
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'verify-macos-release.mjs')) {
+  if (relative === 'scripts/verify-macos-release.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes('spawnSync(command, args,')
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
-  if (relative === path.join('scripts', 'verify-macos-community-release.mjs')) {
+  if (relative === 'scripts/verify-macos-community-release.mjs') {
     return content.includes("import { spawnSync } from 'node:child_process'")
       && content.includes("run('/usr/bin/hdiutil', ['verify', filePath]")
       && content.includes("run('/usr/bin/hdiutil', ['attach', filePath, '-nobrowse', '-readonly', '-mountpoint', mountDirectory]")
