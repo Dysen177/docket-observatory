@@ -32,13 +32,13 @@
 
 ## Quick Download
 
-`v0.1.1` is the complete community edition. It bundles the complete legal corpus in the current release baseline, search indexes, and existing bilingual research assistance. It is not a small client that downloads the historical library after first launch. It currently ships for macOS and Windows desktop; there is no iPhone, iPad, or Android edition.
+`v0.1.1` is the complete community edition. It carries a complete copy of the public release baseline prepared through August 15, 2026, together with its search indexes and existing bilingual research assistance. It is not a small client that downloads the historical library after first launch. “Complete” means that the installer carries this public release baseline; it does not mean that sealed, restricted, removed, or not-yet-public PACER material has been obtained. It currently ships for macOS and Windows desktop; there is no iPhone, iPad, or Android edition.
 
 | Computer | Download | Size |
 | --- | --- | ---: |
-| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | about 1.80 GB |
-| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | about 1.81 GB |
-| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | about 1.66 GB |
+| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | about 1.84 GB |
+| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | about 1.85 GB |
+| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | about 1.69 GB |
 
 1. If you are unsure which Mac installer to use, open **About This Mac** and check whether the chip is Apple or Intel.
 2. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. The public Release uploads only three installers; GitHub's automatically generated Source code archives are source downloads, not the complete application.
@@ -46,6 +46,13 @@
 > **Before installing:** All three installers are explicitly labeled free unsigned builds. macOS may require **Open Anyway** in Privacy & Security; Windows may require **More info** in SmartScreen. Do not disable operating-system security controls, and confirm that the installer came from this project's official GitHub Release.
 
 > **First installation:** Follow the [step-by-step Chinese and English illustrated guide](DOWNLOADS.md) from downloading the DMG/EXE through successful launch. It covers macOS Privacy & Security, Touch ID/password authorization, Windows SmartScreen, and UAC. The guide images contain no real user's desktop, account name, or files.
+
+### Release Validation
+
+Free and unsigned means that no Apple Developer ID or commercial Windows publisher certificate was purchased; it does not mean that the installers are untested. Both `v0.1.1` DMGs passed image-integrity, read-only mount, application resource-seal, target-architecture, and native PDF dependency checks. The Windows EXE completed download, NSIS validation, installation, complete-corpus verification, renderer startup, running-app upgrade, post-upgrade startup, and uninstall on a native GitHub Windows runner. Source builds, search, credential encryption, and no-key defaults also passed on macOS and Windows.
+
+- [Native Windows installer validation](https://github.com/Dysen177/docket-observatory/actions/runs/31884932315)
+- [Cross-platform macOS / Windows source validation](https://github.com/Dysen177/docket-observatory/actions/runs/31885225295)
 
 ## Core Capabilities
 
@@ -56,7 +63,7 @@
 | Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, source type, and verification status in one document view. |
 | Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
 | Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
-| Local-first operation | No account, forced cloud service, advertising, telemetry, or hidden update channel. User credentials are encrypted locally. |
+| Local-first operation | No account, forced cloud service, advertising, telemetry, or hidden update channel. Credentials are encrypted locally and sent to a selected API only as HTTPS authentication when the user invokes that service. |
 
 ## Two Reading Layers
 
@@ -90,10 +97,11 @@ These screenshots are from the current application build.
 
 - 1,865 material records;
 - 1,838 valid PDFs totaling 1,570,950,358 bytes;
-- all 1,795 SHA-256-deduplicated PDFs indexed for full-text search, with 1,770 complete and 25 partial original-text extractions;
+- all 1,795 content-deduplicated PDFs indexed for full-text search, with 1,770 complete extractions and 25 partial extractions limited by scan quality or source structure;
 - a bilingual legal-reading baseline for every unique PDF: 88 version-locked professional editorial reviews and 1,707 deterministic local-rule first reads;
 - bilingual case-level dossiers for all 131 cases, totaling 262 language versions;
 - 67 reviewed complete Chinese translations, 1,685 assistive Chinese translations, and 43 retained Chinese-source documents; 48 PDFs meet both the complete-translation and professional-review standard;
+- relationship attribution audited across 154 dockets: 76 supported by verified public evidence, 20 classified as probable, 39 excluded, and 19 awaiting more public evidence; pending dockets and their files remain included and searchable;
 - 16,825 release seed-cache files totaling 735,603,674 bytes, covering extraction, translation and reading, relationship data, and search indexes.
 
 A “local-rule first read” supports offline search, procedural classification, and plain-language orientation. It is not generative AI and is not represented as page-by-page attorney review. The interface keeps it separate from “professional review” and preserves the original PDF, source, filing date, and limitations for verification.
@@ -114,12 +122,12 @@ Automated publication checks flagged 240 files for possible privacy, sealing-lan
 
 The Settings page supports OpenAI Responses, Anthropic Messages, Google Gemini, Ollama, and a user-selected HTTPS OpenAI-compatible gateway, including compatible relay services. Translation and legal analysis can use separate providers and model IDs. Protocol compatibility does not make model quality equivalent: legal terminology, long-document coverage, citation stability, speed, and cost depend on the selected model, context window, reasoning settings, provider implementation, and account limits.
 
-Cloud text transmission is off by default and must be enabled explicitly in Settings. Only after consent does the app send extracted text for processing to the selected service; original PDFs, local paths, and keys are not uploaded as document content. Ollama connects only to the user's configured local loopback address.
+Cloud text transmission is off by default and must be enabled explicitly in Settings. Only after consent does the app send extracted text to the selected service; original PDFs and local paths are not sent. When a cloud model is invoked, that provider necessarily receives the API key as HTTPS authentication and the extracted text the user allowed. The app does not mix the key into document content or send either item to a separate project-operated server. Ollama connects only to the user's configured local loopback address.
 
 ## Automatic Updates And Processing
 
 1. When online, the app refreshes allowlisted public sources on the configured schedule. Automatic refresh is enabled by default and can be disabled or rescheduled in Settings.
-2. It downloads only new or changed public files, confirms that the PDF structure is valid, records the source URL and filing date, and does not overwrite the published baseline.
+2. Where a source provides a usable public download URL, it downloads only new or changed files, confirms that the PDF structure is valid, records the source URL and filing date, and does not overwrite the published baseline.
 3. With no key, it performs local extraction, OCR, indexing, and deterministic preliminary organization. Generative translation and AI reads for new files require Ollama or the user's cloud configuration.
 4. Background processing can target priority files or all public files and can produce Chinese, English, or bilingual output. Full mode may take longer and use more API quota.
 
@@ -145,7 +153,7 @@ This is not a general-purpose docket browser. It is a focused legal-research wor
 
 - No user-account system, advertising SDK, analytics SDK, telemetry SDK, remote database, or hidden update channel.
 - Electron context isolation, sandboxing, external-link validation, loopback API allowlisting, ASAR integrity, and Electron Fuses hardening.
-- macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. Full secrets are never returned to the UI.
+- macOS credentials use a Keychain-protected encrypted vault; Windows credentials use DPAPI-backed `safeStorage`. Full secrets are never returned to the UI; a selected external API receives a key only when the user actually invokes that service and authentication requires it.
 - Source code, lockfile, network allowlist, corpus manifests, publication-review evidence, and the complete build workflow are available in the repository.
 
 The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party repackaging. See [open-source audit notes](OPEN_SOURCE_AUDIT.md), [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network manifest](NETWORK.md), and [installation instructions](DOWNLOADS.md).
