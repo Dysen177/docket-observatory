@@ -90,19 +90,42 @@ jobs:
           $profile = Join-Path $env:RUNNER_TEMP 'docket-observatory-render-test'
           $ready = Join-Path $profile 'startup-ready.json'
 
-          function Wait-ForRenderer($process, $marker) {
+          function Wait-ForRenderer($process, $marker, $expectedVersion) {
             $deadline = (Get-Date).AddMinutes(4)
+            $lastMarker = ''
             while ((Get-Date) -lt $deadline) {
-              if (Test-Path $marker) { return Get-Content $marker -Raw | ConvertFrom-Json }
-              if ($process.HasExited) { throw "Application exited before renderer startup with code $($process.ExitCode)." }
+              if (Test-Path $marker) {
+                try {
+                  $lastMarker = Get-Content $marker -Raw
+                  if (-not [string]::IsNullOrWhiteSpace($lastMarker)) {
+                    $parsed = $lastMarker | ConvertFrom-Json
+                    if (
+                      $parsed.readyAt -and
+                      $parsed.version -eq $expectedVersion -and
+                      $parsed.platform -eq 'win32' -and
+                      $parsed.arch -eq 'x64'
+                    ) {
+                      return $parsed
+                    }
+                  }
+                } catch {
+                  # Node creates the marker before its single small write is
+                  # guaranteed to be visible to another process. Retry until
+                  # a complete JSON object is readable.
+                }
+              }
+              if ($process.HasExited) {
+                throw "Application exited before renderer startup with code $($process.ExitCode). Last marker: $lastMarker"
+              }
               Start-Sleep -Seconds 2
             }
-            throw 'Renderer did not create startup-ready.json within four minutes.'
+            throw "Renderer did not create a complete startup marker within four minutes. Last marker: $lastMarker"
           }
 
+          $expectedVersion = $env:RELEASE_TAG.TrimStart('v')
           $first = Start-Process -FilePath $app -ArgumentList "--user-data-dir=$profile" -PassThru
-          $firstReady = Wait-ForRenderer $first $ready
-          if ($firstReady.platform -ne 'win32' -or $firstReady.arch -ne 'x64') { throw 'Renderer startup marker has unexpected platform metadata.' }
+          $firstReady = Wait-ForRenderer $first $ready $expectedVersion
+          Write-Host "First startup marker: $($firstReady | ConvertTo-Json -Compress)"
 
           $upgrade = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$env:INSTALL_DIR" -Wait -PassThru
           if ($upgrade.ExitCode -ne 0) { throw "Running-app upgrade failed with exit code $($upgrade.ExitCode)." }
@@ -111,11 +134,23 @@ jobs:
 
           Remove-Item $ready -Force
           $second = Start-Process -FilePath $app -ArgumentList "--user-data-dir=$profile" -PassThru
-          $secondReady = Wait-ForRenderer $second $ready
-          $expectedVersion = $env:RELEASE_TAG.TrimStart('v')
-          if ($secondReady.version -ne $expectedVersion) { throw "Post-upgrade renderer reported version $($secondReady.version) instead of $expectedVersion." }
+          $secondReady = Wait-ForRenderer $second $ready $expectedVersion
+          Write-Host "Second startup marker: $($secondReady | ConvertTo-Json -Compress)"
           Stop-Process -Id $second.Id -Force
           Write-Host 'Validated first launch, rendered UI readiness, running-app upgrade, and post-upgrade launch.'
+
+      - name: Show renderer diagnostics on failure
+        if: failure()
+        shell: pwsh
+        run: |
+          $profile = Join-Path $env:RUNNER_TEMP 'docket-observatory-render-test'
+          foreach ($name in @('startup-ready.json', 'startup.log')) {
+            $target = Join-Path $profile $name
+            if (Test-Path $target) {
+              Write-Host "===== $name ====="
+              Get-Content $target -Raw
+            }
+          }
 
       - name: Uninstall test application
         if: always()
