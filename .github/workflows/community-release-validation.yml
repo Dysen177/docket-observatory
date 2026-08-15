@@ -74,11 +74,15 @@ jobs:
           $seed = Get-Content (Join-Path $resources 'seed-cache-manifest.json') -Raw | ConvertFrom-Json
           if ($corpus.files.Count -ne 1864) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of 1864." }
           if ($seed.seedFiles -ne 14244) { throw "Installed seed contains $($seed.seedFiles) files instead of 14244." }
+          $canvasBinding = Join-Path $resources 'app.asar.unpacked\node_modules\@napi-rs\canvas-win32-x64-msvc\skia.win32-x64-msvc.node'
+          if (-not (Test-Path $canvasBinding)) { throw 'Windows PDF canvas native binding is missing.' }
           $versionInfo = (Get-Item $app).VersionInfo
           if ([string]::IsNullOrWhiteSpace($versionInfo.ProductName)) { throw 'Windows executable is missing product metadata and icon resource editing did not run.' }
           Write-Host "Validated Windows x64 install with $pdfCount PDFs and $($seed.seedFiles) seed files."
 
       - name: Verify renderer startup and running-app upgrade
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
         shell: pwsh
         run: |
           $app = Join-Path $env:INSTALL_DIR '案卷观察台.exe'
@@ -108,7 +112,8 @@ jobs:
           Remove-Item $ready -Force
           $second = Start-Process -FilePath $app -ArgumentList "--user-data-dir=$profile" -PassThru
           $secondReady = Wait-ForRenderer $second $ready
-          if ($secondReady.version -ne '0.1.1') { throw "Post-upgrade renderer reported version $($secondReady.version) instead of 0.1.1." }
+          $expectedVersion = $env:RELEASE_TAG.TrimStart('v')
+          if ($secondReady.version -ne $expectedVersion) { throw "Post-upgrade renderer reported version $($secondReady.version) instead of $expectedVersion." }
           Stop-Process -Id $second.Id -Force
           Write-Host 'Validated first launch, rendered UI readiness, running-app upgrade, and post-upgrade launch.'
 

@@ -36,9 +36,9 @@
 
 | Computer | Download | Size |
 | --- | --- | ---: |
-| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | about 1.58 GB |
-| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | about 1.58 GB |
-| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | about 1.47 GB |
+| Apple-silicon Mac | [Download macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | about 1.80 GB |
+| Intel Mac | [Download macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | about 1.81 GB |
+| Windows 10/11 64-bit | [Download Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | about 1.66 GB |
 
 1. If you are unsure which Mac installer to use, open **About This Mac** and check whether the chip is Apple or Intel.
 2. Download only from the [latest GitHub Release](https://github.com/Dysen177/docket-observatory/releases/latest) or the direct links above. The public Release uploads only three installers; GitHub's automatically generated Source code archives are source downloads, not the complete application.

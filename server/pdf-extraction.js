@@ -3,10 +3,22 @@ import { createReadStream } from 'node:fs'
 import { mkdir, readFile, readdir, realpath, rename, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { PDFParse } from 'pdf-parse'
+import {
+  DOMMatrix,
+  ImageData,
+  Path2D,
+} from '@napi-rs/canvas'
 import { createWorker, OEM, PSM } from 'tesseract.js'
 import { runtimeSetting } from './settings-store.js'
 import { atomicWriteJson } from './atomic-write.js'
+
+// Electron exposes a browser-like process marker to pdfjs. Install the Node
+// canvas primitives before loading pdf-parse so the same extractor works in
+// the main process on Windows, macOS, and Linux.
+if (!globalThis.DOMMatrix) globalThis.DOMMatrix = DOMMatrix
+if (!globalThis.ImageData) globalThis.ImageData = ImageData
+if (!globalThis.Path2D) globalThis.Path2D = Path2D
+const { PDFParse } = await import('pdf-parse')
 
 const extractionCacheVersion = 8
 const require = createRequire(import.meta.url)

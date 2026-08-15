@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "appVersion": "0.1.1",
-  "generatedAt": "2026-08-14T23:20:52.181Z",
+  "generatedAt": "2026-08-15T00:26:34.942Z",
   "evidence": {
     "package-lock.json": {
-      "bytes": 234329,
-      "sha256": "afc0c107ed4f02c1cdf2aa7dc14e56d110407c4d9041b70e23a3acf2d094ecb6"
+      "bytes": 234366,
+      "sha256": "14054b440164c5aeea7d5c9574001c7f5ddecee3e5e2dc429cf5de9578b23d57"
     },
     "output/release-review/corpus-risk-audit.json": {
       "bytes": 231586,

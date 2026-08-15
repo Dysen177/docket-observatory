@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtemp, readdir, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
@@ -8,7 +8,10 @@ if (process.platform !== 'darwin') throw new Error('macOS community release veri
 
 const releaseDirectory = path.resolve(process.argv[2] ?? 'release')
 const names = await readdir(releaseDirectory)
-const dmgs = names.filter((name) => name.endsWith('-unsigned.dmg')).sort()
+const packageMetadata = JSON.parse(await readFile(path.resolve('package.json'), 'utf8'))
+const dmgs = names
+  .filter((name) => name.includes(`-${packageMetadata.version}-`) && name.endsWith('-unsigned.dmg'))
+  .sort()
 
 if (!dmgs.some((name) => name.includes('macOS-arm64')) || !dmgs.some((name) => name.includes('macOS-x64'))) {
   throw new Error('Both arm64 and x64 unsigned community DMGs are required.')
@@ -54,6 +57,21 @@ for (const name of dmgs) {
       const segments = relativeResource.split('/')
       const parentEntries = await readdir(path.join(resourceRoot, ...segments.slice(0, -1))).catch(() => [])
       if (!parentEntries.includes(segments.at(-1))) throw new Error(`${name} is missing packaged resource ${relativeResource}.`)
+    }
+
+    const expectedArch = name.includes('macOS-arm64') ? 'arm64' : 'x64'
+    const canvasBinding = path.join(
+      resourceRoot,
+      'app.asar.unpacked',
+      'node_modules',
+      '@napi-rs',
+      `canvas-darwin-${expectedArch}`,
+      `skia.darwin-${expectedArch}.node`,
+    )
+    const bindingInfo = run('/usr/bin/file', [canvasBinding], `${name} PDF canvas binding`)
+    const expectedMachine = expectedArch === 'arm64' ? 'arm64' : 'x86_64'
+    if (!bindingInfo.includes(expectedMachine)) {
+      throw new Error(`${name} contains a PDF canvas binding for the wrong architecture: ${bindingInfo.trim()}`)
     }
   } finally {
     if (attached) spawnSync('/usr/bin/hdiutil', ['detach', mountDirectory, '-force'], { encoding: 'utf8', timeout: 120000 })

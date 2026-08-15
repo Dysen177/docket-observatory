@@ -36,9 +36,9 @@
 
 | 电脑 | 下载文件 | 大小 |
 | --- | --- | ---: |
-| Apple 芯片 Mac（Apple silicon） | [下载 macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | 约 1.58 GB |
-| Intel Mac | [下载 macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | 约 1.58 GB |
-| Windows 10/11 64 位 | [下载 Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | 约 1.47 GB |
+| Apple 芯片 Mac（Apple silicon） | [下载 macOS arm64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-arm64-unsigned.dmg) | 约 1.80 GB |
+| Intel Mac | [下载 macOS x64 DMG](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-macOS-x64-unsigned.dmg) | 约 1.81 GB |
+| Windows 10/11 64 位 | [下载 Windows x64 EXE](https://github.com/Dysen177/docket-observatory/releases/download/v0.1.1/Docket-Observatory-0.1.1-Windows-x64-unsigned.exe) | 约 1.66 GB |
 
 1. 不确定 Mac 芯片：打开“关于本机”，看“芯片”是 Apple 还是 Intel。
 2. 只从 [GitHub 最新版本页面](https://github.com/Dysen177/docket-observatory/releases/latest) 或上述直达链接下载。公开 Release 上传的附件只有三个安装包；GitHub 自动生成的 Source code 压缩包是源码归档，不是完整应用。
