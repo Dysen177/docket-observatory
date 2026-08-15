@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { x as extractTar } from 'tar'
@@ -15,16 +15,27 @@ if (!canvasVersion || !/^\d+\.\d+\.\d+$/.test(canvasVersion)) {
 }
 
 const bindings = {
-  mac: [
+  'mac-arm64': [
     ['canvas-darwin-arm64', 'skia.darwin-arm64.node'],
+  ],
+  'mac-x64': [
     ['canvas-darwin-x64', 'skia.darwin-x64.node'],
   ],
-  win: [
+  'win-x64': [
     ['canvas-win32-x64-msvc', 'skia.win32-x64-msvc.node'],
   ],
 }
 
-if (!bindings[target]) throw new Error('Usage: node scripts/prepare-native-packaging-deps.mjs <mac|win>')
+if (!bindings[target]) throw new Error('Usage: node scripts/prepare-native-packaging-deps.mjs <mac-arm64|mac-x64|win-x64>')
+
+const expectedPackageNames = new Set(bindings[target].map(([packageName]) => packageName))
+for (const scopeDirectory of await napiScopeDirectories(path.join(projectRoot, 'node_modules'))) {
+  for (const entry of await readdir(scopeDirectory, { withFileTypes: true })) {
+    if (entry.isDirectory() && entry.name.startsWith('canvas-') && !expectedPackageNames.has(entry.name)) {
+      await rm(path.join(scopeDirectory, entry.name), { recursive: true, force: true })
+    }
+  }
+}
 
 for (const [packageName, binaryName] of bindings[target]) {
   await ensureBinding(packageName, binaryName)
@@ -78,4 +89,29 @@ function validRegistryUrl(value) {
   } catch {
     return false
   }
+}
+
+async function napiScopeDirectories(nodeModulesDirectory, visited = new Set()) {
+  const normalized = path.resolve(nodeModulesDirectory)
+  if (visited.has(normalized)) return []
+  visited.add(normalized)
+
+  const entries = await readdir(normalized, { withFileTypes: true }).catch(() => [])
+  const scopes = []
+  if (entries.some((entry) => entry.isDirectory() && entry.name === '@napi-rs')) {
+    scopes.push(path.join(normalized, '@napi-rs'))
+  }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name === '.bin' || entry.name === '@napi-rs') continue
+    const packageRoots = entry.name.startsWith('@')
+      ? (await readdir(path.join(normalized, entry.name), { withFileTypes: true }).catch(() => []))
+          .filter((child) => child.isDirectory())
+          .map((child) => path.join(normalized, entry.name, child.name))
+      : [path.join(normalized, entry.name)]
+    for (const packageRoot of packageRoots) {
+      scopes.push(...await napiScopeDirectories(path.join(packageRoot, 'node_modules'), visited))
+    }
+  }
+  return scopes
 }
