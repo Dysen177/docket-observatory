@@ -49,7 +49,7 @@ The installed application resources report:
 - Product version: `0.1.1.0`
 - One icon group containing 16, 24, 32, 48, 64, 128, and 256-pixel variants
 
-The outer installer reports the same product identity and version. No old author name, email address, or prior project identity was found in these resources.
+The outer installer reports the same product identity and version. No old author name or email address was found in these PE version resources.
 
 ## Runtime supply-chain check
 
@@ -125,7 +125,7 @@ The corpus manifest contains 1,865 records:
 
 Three Aspose-produced appellate PDFs do not place `%%EOF` within their final 2 KiB, but all three parse successfully, report complete page counts, and are not structurally suspect. This is not treated as corruption.
 
-Four public court PDFs contain PDF-level JavaScript. Manual extraction found only standard date/field formatting, field visibility behavior, and one Westlaw URL launch. No script contains an operating-system command, file write, PowerShell, or `cmd.exe` call. The Westlaw host is not in the application's external-link allowlist.
+Four public court PDFs contain PDF-level JavaScript. Manual extraction found only standard date/field formatting, field visibility behavior, and one Westlaw URL launch. No script contains an operating-system command, file write, PowerShell, or `cmd.exe` call. The built-in reader fetches the PDF into `pdfjs-dist` and renders pages directly to a canvas without an annotation or scripting layer, so these document scripts are not executed by the reader. The Westlaw host is also not in the application's external-link allowlist.
 
 The bundled seed cache also passed its complete application-native integrity check:
 
@@ -155,9 +155,17 @@ The earlier native Windows validation run passed silent installation, x64 archit
 
 <https://github.com/Dysen177/docket-observatory/actions/runs/31884932315>
 
-A fresh native validation against the unchanged `v0.1.1` release asset was started during this audit:
+A first audit-time rerun passed installation and corpus checks but received an empty version field from `startup-ready.json`, consistent with reading the marker during its create/write window. The application had not crashed, the installer upgrade completed, and uninstall passed. The workflow was changed to wait for a complete JSON object and print both startup markers:
 
 <https://github.com/Dysen177/docket-observatory/actions/runs/31900400506>
+
+An immediate rerun of the original workflow passed every step against the unchanged EXE, confirming that the prior failure was intermittent test-marker reading rather than a repeatable installer failure:
+
+<https://github.com/Dysen177/docket-observatory/actions/runs/31900870174>
+
+The hardened workflow then passed every step against the same EXE. It recorded both startup markers as `version: 0.1.1`, `platform: win32`, and `arch: x64`, before and after the running-app upgrade:
+
+<https://github.com/Dysen177/docket-observatory/actions/runs/31900975364>
 
 ## Findings by severity
 
