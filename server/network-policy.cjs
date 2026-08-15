@@ -1,4 +1,4 @@
-const allowedOutboundHosts = [
+const allowedFetchHosts = [
   {
     host: 'nfsc.press',
     purpose: 'Public mirror for court-file PDFs already linked from the source page.',
@@ -104,6 +104,54 @@ const allowedOutboundHosts = [
   },
 ]
 
+const externalOnlyHosts = [
+  {
+    host: 'youtube.com',
+    purpose: 'User-opened historical livestream reposts; the application does not fetch or embed YouTube media.',
+  },
+  {
+    host: 'www.youtube.com',
+    purpose: 'User-opened historical livestream reposts; the application does not fetch or embed YouTube media.',
+  },
+  {
+    host: 'youtu.be',
+    purpose: 'User-opened YouTube short links for historical livestream reposts.',
+  },
+  {
+    host: 'gettr.com',
+    purpose: 'User-opened GETTR public statements and historical livestream posts.',
+  },
+  {
+    host: 'www.gettr.com',
+    purpose: 'User-opened GETTR public statements and historical livestream posts.',
+  },
+  {
+    host: 'x.com',
+    purpose: 'User-opened public statements on X.',
+  },
+  {
+    host: 'www.x.com',
+    purpose: 'User-opened public statements on X.',
+  },
+  {
+    host: 'rumble.com',
+    purpose: 'User-opened historical livestream reposts on Rumble.',
+  },
+  {
+    host: 'www.rumble.com',
+    purpose: 'User-opened historical livestream reposts on Rumble.',
+  },
+  {
+    host: 'odysee.com',
+    purpose: 'User-opened historical livestream reposts on Odysee.',
+  },
+]
+
+const allowedExternalHosts = [
+  ...allowedFetchHosts.map(({ host, purpose }) => ({ host, purpose })),
+  ...externalOnlyHosts,
+]
+
 const localhostNames = new Set(['localhost', '127.0.0.1', '::1'])
 const configuredAppPorts = String(process.env.GUO_INTEL_ALLOWED_APP_PORTS ?? '')
   .split(',')
@@ -120,9 +168,14 @@ const allowedLocalAiPorts = new Set(['11434', ...configuredLocalAiPorts])
 function hostAllowed(hostname, options = {}) {
   const normalized = String(hostname || '').toLowerCase()
   if (!normalized) return false
-  const configuredEntry = allowedOutboundHosts.find((entry) => entry.host === normalized)
+  const configuredEntry = allowedFetchHosts.find((entry) => entry.host === normalized)
   if (configuredEntry?.aiProvider && (options.includeAi === false || options.includeOpenAI === false)) return false
-  return allowedOutboundHosts.some((entry) => entry.host === normalized)
+  return allowedFetchHosts.some((entry) => entry.host === normalized)
+}
+
+function externalHostAllowed(hostname) {
+  const normalized = String(hostname || '').toLowerCase()
+  return Boolean(normalized) && allowedExternalHosts.some((entry) => entry.host === normalized)
 }
 
 function isAllowedOutboundUrl(value, options = {}) {
@@ -168,7 +221,7 @@ function isAllowedExternalUrl(value) {
     const url = new URL(String(value))
     if (!['https:', 'http:'].includes(url.protocol)) return false
     if (url.protocol === 'http:' && !localhostNames.has(url.hostname)) return false
-    return hostAllowed(url.hostname) || (localhostNames.has(url.hostname) && allowedAppPorts.has(url.port))
+    return externalHostAllowed(url.hostname) || (localhostNames.has(url.hostname) && allowedAppPorts.has(url.port))
   } catch {
     return false
   }
@@ -187,7 +240,8 @@ function isAllowedLocalhostOrigin(origin) {
 module.exports = {
   allowedAppPorts: [...allowedAppPorts],
   allowedLocalAiPorts: [...allowedLocalAiPorts],
-  allowedOutboundHosts,
+  allowedExternalHosts,
+  allowedOutboundHosts: allowedFetchHosts,
   assertAllowedOutboundUrl,
   isAllowedExternalUrl,
   isAllowedLocalAiUrl,

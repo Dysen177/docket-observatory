@@ -51,6 +51,14 @@ for (const query of ['HID', '"Bradford Geyer"', '"Rule 32.2"', '"21 U.S.C. § 85
   assert.ok(result.filtered > 0, `${query} should return at least one result`)
 }
 
+const geyer = await search('geyer', 'all', 100)
+assert.equal(geyer.catalog.filter((record) => record.docNumber === '761').length, 1)
+assert.equal(
+  new Set(geyer.catalog.map((record) => record.sourceUrl)).size,
+  geyer.catalog.length,
+  'logical search results must not repeat the same canonical source',
+)
+
 const renameCandidate = manifest.files.find((file) => file?.path && file?.sha256 && file?.status !== 'error')
 assert.ok(renameCandidate, 'A local PDF is required for the cache identity check')
 const originalExtraction = await extractPdfSnippetForFile(renameCandidate)
@@ -76,6 +84,6 @@ console.log(JSON.stringify({
   status: 'ok',
   indexedOriginals: refreshedIndex.coverage.indexedOriginals,
   uniquePdfContents: refreshedIndex.coverage.uniquePdfContents,
-  checkedQueries: 12,
+  checkedQueries: 13,
   cacheIdentity: 'sha256-stable-across-path-and-url-change',
 }, null, 2))

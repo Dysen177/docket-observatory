@@ -61,6 +61,7 @@ Free and unsigned means that no Apple Developer ID or commercial Windows publish
 | --- | --- |
 | Docket monitoring | Refreshes allowlisted public feeds while online, discovers new or changed public material, and preserves source URLs, filing dates, and update status. |
 | PDF library | Bundles 1,838 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
+| Historical public record | Separately indexes 2,523 accessible livestream/video copies from January 26, 2017 through March 14, 2023, searchable by year, platform, title, repost account, and keyword. This is a closed historical index, not a feed awaiting future livestreams; developments after March 15, 2023 enter docket monitoring. |
 | Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, source type, and verification status in one document view. |
 | Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
 | Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
@@ -88,15 +89,17 @@ These screenshots are from the current application build.
     <td width="50%" valign="top"><strong>People, companies, and case relationships</strong><br><img src="./docs/screenshots/entities.png" alt="Case relationships" width="100%"></td>
   </tr>
   <tr>
-    <td colspan="2" valign="top"><strong>Local settings and credential management</strong><br><img src="./docs/screenshots/settings.png" alt="Local settings" width="100%"></td>
+    <td width="50%" valign="top"><strong>Historical livestreams and public statements</strong><br><img src="./docs/screenshots/public-records.png" alt="Historical livestreams and public statements" width="100%"></td>
+    <td width="50%" valign="top"><strong>Local settings and credential management</strong><br><img src="./docs/screenshots/settings.png" alt="Local settings" width="100%"></td>
   </tr>
 </table>
 
 ## Complete Data Baseline
 
-`v0.1.1` includes:
+The current `v0.1.2` source release candidate includes:
 
 - 1,865 material records;
+- 2,523 content-deduplicated historical livestream/public-video records covering January 26, 2017 through March 14, 2023; 2,406 have an independently checked alternate copy;
 - 1,838 valid PDFs totaling 1,570,950,358 bytes;
 - all 1,795 content-deduplicated PDFs indexed for full-text search, with 1,770 complete extractions and 25 partial extractions limited by scan quality or source structure;
 - a bilingual legal-reading baseline for every unique PDF: 88 version-locked professional editorial reviews and 1,707 deterministic local-rule first reads;
@@ -143,6 +146,7 @@ Automatic updates process public court materials and research data only. They do
 | DOJ, SEC, and Federal Register | Official agency and policy material. | Useful for releases, complaints, orders, and policy context; not necessarily a court docket. |
 | Historical Himalaya Restoration pages and web archives | Historical public context and document leads. | Public pages or mirrors, not the official docket of record. |
 | NFSC | Backup public mirror. | Not the official docket of record; important material should be compared with PACER or RECAP. |
+| YouTube, GETTR, Rumble, and Odysee | Accessible repost copies for historical public-statement research. | Availability does not establish that the uploader is the original publisher or that statements in a video are true. Installers do not bundle third-party video, audio, images, or thumbnails. |
 
 Each item should expose an external link, filing date, docket number, document number, source type, and verification note. A mirror does not become a judicial finding merely because it is available. PACER, sealed or restricted filings, removed files, unmirrored PDFs, and records outside anonymous search windows can create coverage gaps, so the app makes no claim of absolute completeness.
 

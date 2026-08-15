@@ -31,7 +31,7 @@ npm run security:check
 
 ## Network Boundary
 
-Outbound network access should remain explicit and reviewable. The allowlist is implemented in:
+Outbound network access should remain explicit and reviewable. Backend-fetch hosts and user-opened external-browser hosts are evaluated separately, so a public video or social link cannot silently become an automatic data source. The policy is implemented in:
 
 ```text
 server/network-policy.cjs

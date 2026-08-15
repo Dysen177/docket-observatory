@@ -8,7 +8,7 @@
 
 - React/Electron 界面与 Express API 均在本机运行，API 只绑定 `127.0.0.1`。
 - Electron 开启 `contextIsolation`、关闭 `nodeIntegration`、启用 renderer sandbox，并使用临时本地会话令牌保护 API。
-- 外联域名由 `server/network-policy.cjs` 白名单限制，并在 `NETWORK.md` 逐项说明。
+- 外联域名由 `server/network-policy.cjs` 白名单限制，并在 `NETWORK.md` 逐项说明。后台自动请求与用户点击后由系统浏览器打开的域名分别授权，历史视频和社交平台链接不会因此变成后台爬取来源。
 - 没有任意 URL 抓取接口、任意本地文件读取接口或 Shell 命令执行入口。
 - PDF、OCR 页面和本地路径不会上传。OpenAI 只在用户配置 Key、选择 OpenAI 并满足正文授权条件时接收提取文本，所有 Responses API 请求使用 `store:false`。
 - macOS 将 OpenAI、CourtListener 和 PACER 凭证保存到 AES-256-GCM 加密库，随机密钥由原生钥匙串模块读取，并通过 `LAContext.interactionNotAllowed = true` 明确禁止系统认证弹窗；Windows 使用 Electron 异步 `safeStorage` 背后的 DPAPI。界面只返回掩码状态。

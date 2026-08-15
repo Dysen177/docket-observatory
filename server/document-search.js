@@ -30,6 +30,7 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
   const query = parseDocumentSearchQuery(options.query)
   const scope = validScopes.has(options.scope) ? options.scope : 'all'
   const priority = ['critical', 'high', 'medium', 'low'].includes(options.priority) ? options.priority : 'all'
+  const language = options.language === 'en' ? 'en' : 'zh'
   const offset = boundedNumber(options.offset, 0, Number.MAX_SAFE_INTEGER)
   const limit = boundedNumber(options.limit, 12, 100)
   const signal = options.signal
@@ -41,8 +42,9 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
     : new Map()
   throwIfSearchAborted(signal)
   const recoveryState = compiled.searchTextFault ? await currentDocumentSearchIndex(manifest) : null
+  const logicalKeys = buildLogicalCatalogRecordKeys(records, compiled)
 
-  const filtered = records.map((record) => {
+  const matchedRecords = records.map((record) => {
     if (priority !== 'all' && record.priority !== priority) return null
     const document = compiled.bySourceUrl.get(record.sourceUrl)
     if (!query.raw) return recordAvailableInScope(record, document, scope) ? { record, score: 0 } : null
@@ -65,10 +67,11 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
     }
   }).filter(Boolean)
 
+  const filtered = collapseLogicalCatalogResults(matchedRecords, records, compiled, logicalKeys, language)
   filtered.sort((left, right) => right.score - left.score || compareCatalogRecords(left.record, right.record))
   return {
     generatedAt: new Date().toISOString(),
-    total: records.length,
+    total: new Set(logicalKeys.values()).size,
     filtered: filtered.length,
     offset,
     limit,
@@ -85,6 +88,195 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
       coverage: compiled.coverage,
     },
   }
+}
+
+function collapseLogicalCatalogResults(items, records, compiled, logicalKeys, language) {
+  const allRecordGroups = groupBy(records, (record) => logicalKeys.get(catalogRecordIdentity(record)))
+  const groups = groupBy(items, (item) => logicalKeys.get(catalogRecordIdentity(item.record)))
+  return [...groups.entries()].map(([key, matchedGroup]) => {
+    const matchedBySourceUrl = new Map(matchedGroup.map((item) => [item.record.sourceUrl, item]))
+    const group = (allRecordGroups.get(key) ?? matchedGroup.map((item) => item.record)).map((record) => (
+      matchedBySourceUrl.get(record.sourceUrl) ?? { record, score: 0 }
+    ))
+    const documents = [...new Map(group
+      .map((item) => compiled.bySourceUrl.get(item.record.sourceUrl))
+      .filter(Boolean)
+      .map((document) => [document.contentSha256, document])).values()]
+    const canonical = [...group].sort((left, right) => (
+      canonicalCatalogRank(right, compiled) - canonicalCatalogRank(left, compiled)
+      || right.score - left.score
+      || compareCatalogRecords(left.record, right.record)
+    ))[0]
+    const score = Math.max(...matchedGroup.map((item) => item.score))
+    const searchMatches = uniqueSearchMatches(matchedGroup)
+    const sourceAlternatives = mergeLogicalSourceAlternatives(canonical.record, group, documents, compiled, language)
+    return {
+      record: {
+        ...canonical.record,
+        ...(searchMatches.length ? { searchMatches, searchScore: score } : {}),
+        ...(sourceAlternatives.length ? { sourceAlternatives } : {}),
+      },
+      score,
+    }
+  })
+}
+
+function buildLogicalCatalogRecordKeys(records, compiled) {
+  const parents = records.map((_, index) => index)
+  const find = (index) => {
+    let root = index
+    while (parents[root] !== root) root = parents[root]
+    while (parents[index] !== index) {
+      const next = parents[index]
+      parents[index] = root
+      index = next
+    }
+    return root
+  }
+  const union = (left, right) => {
+    const leftRoot = find(left)
+    const rightRoot = find(right)
+    if (leftRoot !== rightRoot) parents[rightRoot] = leftRoot
+  }
+  const filingOwners = new Map()
+  const hashGroups = new Map()
+
+  records.forEach((record, index) => {
+    if (record.resourceKind === 'web_page') return
+    const docNumber = String(record.docNumber ?? '').trim().toLowerCase()
+    if (docNumber) {
+      const docket = String(record.docketNumber ?? '').trim().toLowerCase().replace(/\s+/g, '')
+      const filingKeys = [
+        docket ? `docket:${docket}:${docNumber}` : '',
+        record.caseId ? `case:${record.caseId}:${docNumber}` : '',
+      ].filter(Boolean)
+      for (const key of filingKeys) {
+        if (filingOwners.has(key)) union(index, filingOwners.get(key))
+        else filingOwners.set(key, index)
+      }
+    }
+    const document = compiled.bySourceUrl.get(record.sourceUrl)
+    if (!document?.contentSha256) return
+    const hashKey = `${document.contentSha256}:${docNumber}`
+    const group = hashGroups.get(hashKey) ?? []
+    group.push(index)
+    hashGroups.set(hashKey, group)
+  })
+
+  for (const indexes of hashGroups.values()) {
+    const dockets = new Set(indexes
+      .map((index) => String(records[index].docketNumber ?? '').trim().toLowerCase().replace(/\s+/g, ''))
+      .filter(Boolean))
+    if (dockets.size > 1) continue
+    for (const index of indexes.slice(1)) union(indexes[0], index)
+  }
+
+  return new Map(records.map((record, index) => [catalogRecordIdentity(record), `logical:${find(index)}`]))
+}
+
+function catalogRecordIdentity(record) {
+  return `${record.resourceKind ?? 'pdf'}:${record.id ?? record.sourceUrl}`
+}
+
+function canonicalCatalogRank(item, compiled) {
+  const record = item.record
+  const document = compiled.bySourceUrl.get(record.sourceUrl)
+  const source = document?.sources.find((candidate) => candidate.sourceUrl === record.sourceUrl)
+  return (record.status === 'error' ? -100000 : 0)
+    + (record.variantKey === 'source' ? 10000 : 0)
+    + (record.sourceVerification?.primary ? 5000 : 0)
+    + (record.sourceUrl === document?.canonicalSourceUrl ? 1000 : 0)
+    + Number(source?.authority ?? 0)
+}
+
+function uniqueSearchMatches(group) {
+  const matches = group
+    .sort((left, right) => right.score - left.score)
+    .flatMap((item) => item.record.searchMatches ?? [])
+  const seen = new Set()
+  return matches.filter((match) => {
+    const key = [match.kind, match.pageNumber ?? '', match.snippet ?? ''].join('|')
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  }).slice(0, 3)
+}
+
+function mergeLogicalSourceAlternatives(canonicalRecord, group, documents, compiled, language) {
+  const alternatives = []
+  const existingAlternatives = group.flatMap((item) => item.record.sourceAlternatives ?? [])
+  const recordBySourceUrl = new Map(group.map((item) => [item.record.sourceUrl, item.record]))
+  const canonicalDocument = compiled.bySourceUrl.get(canonicalRecord.sourceUrl)
+  for (const document of documents) {
+    for (const source of document.sources ?? []) {
+      if (source.sourceUrl === canonicalRecord.sourceUrl) continue
+      const record = recordBySourceUrl.get(source.sourceUrl)
+      const byteIdentical = document.contentSha256 === canonicalDocument?.contentSha256
+      const languageVariant = record?.variantKey && record.variantKey !== canonicalRecord.variantKey
+      const displaySource = { ...source, sourceLabel: record?.sourceLabel ?? source.sourceLabel }
+      alternatives.push({
+        sourceId: source.sourceId,
+        sourceLabel: displaySource.sourceLabel,
+        sourceUrl: source.sourceUrl,
+        sourcePage: source.sourcePage,
+        kind: byteIdentical ? 'byte_identical_alternate' : languageVariant ? 'language_variant' : 'same_docket_alternative',
+        equivalenceStatus: byteIdentical ? 'byte_identical' : languageVariant ? 'distinct_language_variant' : 'docket_coordinates_match_bytes_differ',
+        localAvailable: record?.status !== 'error',
+        sha256: document.contentSha256,
+        label: logicalAlternativeLabel(displaySource, record, byteIdentical, languageVariant, language),
+        note: logicalAlternativeNote(byteIdentical, languageVariant, language),
+      })
+    }
+  }
+  alternatives.push(...existingAlternatives)
+  const seen = new Set()
+  return alternatives.filter((alternative) => {
+    if (!alternative?.sourceUrl || alternative.sourceUrl === canonicalRecord.sourceUrl || seen.has(alternative.sourceUrl)) return false
+    seen.add(alternative.sourceUrl)
+    return true
+  }).sort(compareLogicalAlternatives)
+}
+
+function compareLogicalAlternatives(left, right) {
+  const rank = (value) => {
+    if (value.kind === 'language_variant') return 0
+    if (String(value.sourceId).includes('pacer') || String(value.sourceId).includes('courtlistener')) return 1
+    if (value.kind === 'same_docket_alternative') return 2
+    if (value.kind === 'byte_identical_alternate') return 3
+    return 4
+  }
+  return rank(left) - rank(right) || String(left.sourceLabel).localeCompare(String(right.sourceLabel))
+}
+
+function logicalAlternativeLabel(source, record, byteIdentical, languageVariant, language) {
+  if (languageVariant) {
+    const variant = record?.variantLabel || (language === 'en' ? 'Language variant' : '语言版本')
+    return `${variant} · ${source.sourceLabel}`
+  }
+  if (byteIdentical) {
+    return language === 'en'
+      ? `Byte-identical copy · ${source.sourceLabel}`
+      : `字节完全一致的副本 · ${source.sourceLabel}`
+  }
+  return language === 'en'
+    ? `Same-filing public version · ${source.sourceLabel}`
+    : `同一案卷文件的公开版本 · ${source.sourceLabel}`
+}
+
+function logicalAlternativeNote(byteIdentical, languageVariant, language) {
+  if (languageVariant) {
+    return language === 'en'
+      ? 'This is a distinct language version retained under the same logical docket filing; it is not an additional court event.'
+      : '这是归入同一逻辑案卷文件的不同语言版本，不代表另一次法院事件。'
+  }
+  if (byteIdentical) {
+    return language === 'en'
+      ? 'SHA-256 establishes byte-for-byte identity; this is retained as an alternative source, not a separate filing.'
+      : 'SHA-256 已确认两份 PDF 逐字节一致；这是保留的替代来源，不是另一份案卷文件。'
+  }
+  return language === 'en'
+    ? 'The docket coordinates match, but the PDF bytes differ; both versions remain available for verification.'
+    : '案卷坐标一致，但 PDF 字节不同；两个版本都保留供核验。'
 }
 
 export async function refreshDocumentSearchIndex(manifest) {

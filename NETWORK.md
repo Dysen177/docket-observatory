@@ -25,6 +25,20 @@ All routine outbound access should be visible here and enforced in `server/netwo
 | `aistudio.google.com` | User-opened official Gemini API-key setup page. | No automatic transfer; external browser navigation only. |
 | `ollama.com` | User-opened official Ollama download page for optional local generative AI. | No automatic transfer; external browser navigation only. |
 
+## External-browser-only historical links
+
+The historical public-record workspace can open the following hosts in the operating system browser. They are deliberately excluded from the backend-fetch allowlist: the application does not scrape, embed, proxy, or download their video, image, audio, or social-media payloads.
+
+| Host | Purpose | Automatic application access |
+| --- | --- | --- |
+| `youtube.com`, `www.youtube.com`, `youtu.be` | User-selected historical livestream reposts. | None; browser open only. |
+| `gettr.com`, `www.gettr.com` | User-selected historical GETTR posts and livestream copies. | None; browser open only. |
+| `x.com`, `www.x.com` | User-selected public statements on X. | None; browser open only. |
+| `rumble.com`, `www.rumble.com` | User-selected historical Rumble reposts. | None; browser open only. |
+| `odysee.com` | User-selected historical Odysee reposts. | None; browser open only. |
+
+The bundled index stores text metadata and external HTTPS links only. It does not contain third-party video, audio, thumbnails, profile images, cookies, session data, or platform credentials. A repost link records an accessible copy and is not labeled as an original official publication unless separately established.
+
 The local UI and API use:
 
 - `http://127.0.0.1:5173` for Vite development.

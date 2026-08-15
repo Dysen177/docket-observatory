@@ -23,6 +23,7 @@ import { documentVariantKey } from './document-variant.js'
 import { ollamaGenerateJson } from './local-legal-ai.js'
 import { getDocumentSearchProcessingSnapshot, refreshDocumentSearchIndex, warmDocumentSearchIndex } from './document-search.js'
 import { cloudGenerateText, cloudModelForPurpose, cloudProviderConfigured, cloudProviderLabel, isCloudAiProvider } from './cloud-ai.js'
+import { queryPublicRecords } from './public-records.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -1042,6 +1043,14 @@ app.get('/api/calendar', (request, response) => {
 app.get('/api/litigation-positions', (request, response) => {
   const lang = requestLanguage(request)
   response.json(buildLitigationPositions(state, dashboardPayload(lang), lang))
+})
+
+app.get('/api/public-records', async (request, response, next) => {
+  try {
+    response.json(await queryPublicRecords(request.query, requestLanguage(request)))
+  } catch (error) {
+    next(error)
+  }
 })
 
 app.get('/api/documents', async (request, response) => {

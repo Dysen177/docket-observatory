@@ -319,9 +319,9 @@ const priorityWeight = {
   low: 1,
 }
 
-const analysisCacheVersion = 'document-analysis-v34'
+const analysisCacheVersion = 'document-analysis-v35'
 const translationCacheVersion = 'translation-v7'
-const documentCatalogCacheVersion = 'document-catalog-v13'
+const documentCatalogCacheVersion = 'document-catalog-v14'
 const analysisBuilds = new Map()
 const analysisMemoryCache = new Map()
 const documentCatalogBuilds = new Map()
@@ -490,7 +490,7 @@ export async function buildDocumentCatalog(manifest, state, lang = 'zh', options
     }
   }
 
-  const result = await searchDocumentCatalog(manifest, index.records, options)
+  const result = await searchDocumentCatalog(manifest, index.records, { ...options, language: lang })
   return { ...result, catalog: result.catalog.map(withoutCatalogSearchText) }
 }
 
@@ -670,6 +670,7 @@ export function localDocumentAnalysis(file, state, lang = 'zh', context = null) 
     variantKey: documentVariantKey(displayFile),
     variantLabel: documentVariantLabel(displayFile, lang),
     caseId: displayFile.caseId,
+    docketNumber: displayFile.docketNumber ?? (state.cases ?? []).find((caseRecord) => caseRecord.id === displayFile.caseId)?.docket ?? null,
     sourceId: displayFile.sourceId,
     sourceLabel: lang === 'en' ? englishSourceLabel(displayFile) : documentSourceLabelZh(displayFile.sourceId, displayFile.sourceLabel),
     sourceUrl: displayFile.url,
@@ -1023,6 +1024,7 @@ function compactCatalogRecord(record, lang = 'zh') {
     variantKey: record.variantKey,
     variantLabel: record.variantLabel,
     caseId: record.caseId,
+    docketNumber: record.docketNumber ?? null,
     sourceId: record.sourceId,
     sourceLabel: record.sourceLabel,
     sourceUrl: record.sourceUrl,
@@ -3030,8 +3032,8 @@ function caseTrackKind(caseRecord) {
   return 'generic'
 }
 
-function relationshipGraphForRecords(records, state, lang, caseRecords = state.cases) {
-  const nodes = caseRecords.map((caseRecord) => ({
+export function relationshipGraphForRecords(records, state, lang, caseRecords = state.cases) {
+  const caseNodes = caseRecords.map((caseRecord) => ({
     id: caseRecord.id,
     label: localizedCaseRecord(caseRecord, lang).shortTitle,
     type: 'case',
@@ -3043,16 +3045,24 @@ function relationshipGraphForRecords(records, state, lang, caseRecords = state.c
     type: entity.type.includes('Person') ? 'person' : entity.type.includes('Company') ? 'company' : 'asset',
     weight: entity.caseIds.length,
   }))
-  const links = state.entities.flatMap((entity) =>
+  const candidateLinks = state.entities.flatMap((entity) =>
     entity.caseIds.map((caseId) => ({
       source: entity.id,
       target: caseId,
       label: legalRelationshipLabel(entity, caseId, lang),
     })),
   )
+  const caseIds = new Set(caseNodes.map((node) => node.id))
+  const entityIds = new Set(entityNodes.map((node) => node.id))
+  const links = candidateLinks.filter((link) => caseIds.has(link.target) && entityIds.has(link.source))
+  const linkedCaseIds = new Set(links.map((link) => link.target))
+  const linkedEntityIds = new Set(links.map((link) => link.source))
   return {
-    nodes: [...nodes, ...entityNodes],
-    links: links.filter((link) => nodes.some((node) => node.id === link.target) && entityNodes.some((node) => node.id === link.source)),
+    nodes: [
+      ...caseNodes.filter((node) => linkedCaseIds.has(node.id)),
+      ...entityNodes.filter((node) => linkedEntityIds.has(node.id)),
+    ],
+    links,
   }
 }
 

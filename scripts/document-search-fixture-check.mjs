@@ -10,23 +10,24 @@ process.env.GUO_INTEL_CACHE_DIR = cacheRoot
 const { refreshDocumentSearchIndex, searchDocumentCatalog } = await import('../server/document-search.js')
 
 const originalUrl = 'https://storage.courtlistener.com/recap/example.1.0.pdf'
+const duplicateUrl = 'https://nfsc.example/archive/example.1.0.pdf'
 const newUrl = 'https://storage.courtlistener.com/recap/example.2.0.pdf'
 const originalSha256 = 'a'.repeat(64)
 const newSha256 = 'b'.repeat(64)
 
-function manifestFile(url, sha256, docNumber) {
+function manifestFile(url, sha256, docNumber, sourceId = 'courtlistener-recap', sourceLabel = 'CourtListener / RECAP') {
   return {
     url,
     sha256,
     status: 'downloaded',
     path: `/managed/doc-${docNumber}.pdf`,
-    sourceId: 'courtlistener-recap',
-    sourceLabel: 'CourtListener / RECAP',
+    sourceId,
+    sourceLabel,
     sourcePage: url,
   }
 }
 
-function catalogRecord(url, docNumber) {
+function catalogRecord(url, docNumber, sourceId = 'courtlistener-recap', sourceLabel = 'CourtListener / RECAP') {
   return {
     id: `record-${docNumber}`,
     sourceUrl: url,
@@ -37,7 +38,8 @@ function catalogRecord(url, docNumber) {
     title: `Fixture document ${docNumber}`,
     originalTitle: `Fixture document ${docNumber}`,
     category: 'Motion',
-    sourceLabel: 'CourtListener / RECAP',
+    sourceId,
+    sourceLabel,
     sourceVerification: { label: 'Official docket copy' },
     searchAliases: [],
     summary: '',
@@ -86,12 +88,21 @@ try {
     ])),
   ])
 
-  const firstManifest = { files: [manifestFile(originalUrl, originalSha256, '1')] }
-  const firstRecords = [catalogRecord(originalUrl, '1')]
+  const firstManifest = { files: [
+    manifestFile(originalUrl, originalSha256, '1'),
+    manifestFile(duplicateUrl, originalSha256, '1', 'nfsc-criminal-mirror', 'NFSC backup mirror'),
+  ] }
+  const firstRecords = [
+    catalogRecord(originalUrl, '1'),
+    catalogRecord(duplicateUrl, '1', 'nfsc-criminal-mirror', 'NFSC backup mirror'),
+  ]
   await refreshDocumentSearchIndex(firstManifest)
 
   const crossPage = await search(firstManifest, firstRecords, 'alpha omega')
   assert.equal(crossPage.filtered, 1)
+  assert.equal(crossPage.total, 1)
+  assert.equal(crossPage.catalog[0].sourceUrl, originalUrl)
+  assert.equal(crossPage.catalog[0].sourceAlternatives.some((source) => source.sourceUrl === duplicateUrl), true)
   assert.deepEqual(crossPage.catalog[0].searchMatches[0].matchedPageNumbers, [1, 2])
   assert.match(crossPage.catalog[0].searchMatches[0].snippet, /Alpha/)
   assert.equal((await search(firstManifest, firstRecords, '"alpha omega"')).filtered, 0)
@@ -108,6 +119,7 @@ try {
   const secondManifest = { files: [...firstManifest.files, manifestFile(newUrl, newSha256, '2')] }
   const secondRecords = [...firstRecords, catalogRecord(newUrl, '2')]
   const refreshed = await refreshDocumentSearchIndex(secondManifest)
+  assert.equal(refreshed.coverage.manifestPdfFiles, 3)
   assert.equal(refreshed.coverage.uniquePdfContents, 2)
   assert.equal((await search(secondManifest, secondRecords, 'heliotrope')).catalog[0]?.docNumber, '2')
 
@@ -137,7 +149,7 @@ try {
 
   console.log(JSON.stringify({
     status: 'ok',
-    scenarios: ['cross-page-and', 'quoted-phrase-boundary', 'case-preserving-snippet', 'numeric-normalization', 'new-file-indexing', 'rewritten-cache-invalidation', 'missing-body-background-recovery', 'corrupt-index-recovery'],
+    scenarios: ['exact-content-deduplication', 'canonical-source-preference', 'alternate-source-retention', 'cross-page-and', 'quoted-phrase-boundary', 'case-preserving-snippet', 'numeric-normalization', 'new-file-indexing', 'rewritten-cache-invalidation', 'missing-body-background-recovery', 'corrupt-index-recovery'],
   }, null, 2))
 } finally {
   await rm(cacheRoot, { recursive: true, force: true })

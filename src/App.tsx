@@ -31,14 +31,18 @@ import {
   Eye,
   EyeOff,
   GitBranch,
+  History,
   KeyRound,
   Landmark,
   Languages,
+  Link2,
   Loader2,
   LockKeyhole,
   Minus,
   Network,
   Plus,
+  PlayCircle,
+  Radio,
   RefreshCw,
   RotateCcw,
   Save,
@@ -81,10 +85,10 @@ type Language = 'zh' | 'en'
 type Theme = 'dark' | 'light'
 type Severity = 'critical' | 'high' | 'medium' | 'low'
 type DocumentSearchScope = 'all' | 'original' | 'translation' | 'analysis' | 'web'
-type WorkspaceView = '#timeline' | '#documents' | '#cases' | '#positions' | '#entities' | '#policy' | '#calendar'
+type WorkspaceView = '#timeline' | '#documents' | '#cases' | '#positions' | '#entities' | '#public-records' | '#policy' | '#calendar'
 type DocumentWorkspaceTab = 'files' | 'review' | 'audit' | 'analytics' | 'automation'
 
-const workspaceViews = new Set<WorkspaceView>(['#timeline', '#documents', '#cases', '#positions', '#entities', '#policy', '#calendar'])
+const workspaceViews = new Set<WorkspaceView>(['#timeline', '#documents', '#cases', '#positions', '#entities', '#public-records', '#policy', '#calendar'])
 
 function normalizeWorkspaceView(hash: string): WorkspaceView {
   return workspaceViews.has(hash as WorkspaceView) ? hash as WorkspaceView : '#timeline'
@@ -117,6 +121,50 @@ type SourceRecord = {
   url: string
   coverage: string
   limitations: string
+}
+
+type PublicRecordSource = {
+  platform: 'youtube' | 'gettr' | 'rumble' | 'odysee' | 'x'
+  url: string
+  uploader: string
+  sourceTitle: string
+  durationSec: number | null
+  checkedAt: string | null
+  role: string
+}
+
+type PublicRecordItem = {
+  id: string
+  date: string
+  title: string
+  originalTitle: string
+  summary: string
+  speaker: string
+  recordType: string
+  verificationStatus: string
+  completeness: string
+  primarySource: PublicRecordSource
+  alternatives: PublicRecordSource[]
+  tags: string[]
+}
+
+type PublicRecordLibrary = {
+  summary: {
+    coverageStart: string
+    coverageEnd: string
+    casePhaseStart: string
+    totalRecords: number
+    unresolvedSourceLeads: number
+    platformCounts: Record<string, number>
+    yearCounts: Array<{ year: string; count: number }>
+    generatedAt: string | null
+  }
+  filters: { q: string; year: string; platform: string; sort: 'newest' | 'oldest' }
+  total: number
+  offset: number
+  limit: number
+  hasMore: boolean
+  records: PublicRecordItem[]
 }
 
 type EventRecord = {
@@ -463,6 +511,7 @@ type DocumentAnalysisRecord = {
   variantKey: 'source' | 'chinese_reference_translation' | string
   variantLabel: string
   caseId: string
+  docketNumber?: string | null
   sourceId: string
   sourceLabel: string
   sourceUrl: string
@@ -1102,6 +1151,7 @@ const ui = {
     navCases: '案件组合',
     navPositions: '诉讼方动态',
     navEntities: '实体关系',
+    navPublicRecords: '公开言论',
     navPolicy: '政策雷达',
     navCalendar: '程序日历',
     navDocuments: '证据文件库',
@@ -1307,6 +1357,8 @@ const ui = {
     positionsWorkspaceCopy: '按案件、提交方和程序状态核对检方、辩方、法院及其他诉讼参与人的动议、回应和裁定，并保留原始文件依据。',
     entitiesWorkspaceTitle: '关联人物、机构与资产网络',
     entitiesWorkspaceCopy: '查看跨案件的人物、公司、基金与资产关系；关系只表示资料中的关联，不自动推定责任。',
+    publicRecordsWorkspaceTitle: '历史直播与公开言论',
+    publicRecordsWorkspaceCopy: '独立索引 2017 年 1 月 26 日至 2023 年 3 月 14 日的历史直播和公开视频；转载副本与法院认定严格分开。',
     policyWorkspaceTitle: '美国政策与制度环境',
     policyWorkspaceCopy: '独立跟踪与案件相关的法律政策、执法制度和公开机构来源，避免把政策背景混同为个案事实。',
     calendarWorkspaceTitle: '案卷日期与期限核验',
@@ -1690,6 +1742,7 @@ const ui = {
     navCases: 'Case portfolio',
     navPositions: 'Party activity',
     navEntities: 'Entity map',
+    navPublicRecords: 'Public record',
     navPolicy: 'Policy radar',
     navCalendar: 'Calendar',
     navDocuments: 'Evidence library',
@@ -1895,6 +1948,8 @@ const ui = {
     positionsWorkspaceCopy: 'Review motions, responses, and rulings by matter, filer, and procedural status across prosecution, defense, courts, and other participants, with links to the underlying record.',
     entitiesWorkspaceTitle: 'People, organizations, and asset network',
     entitiesWorkspaceCopy: 'Review cross-case links among people, companies, funds, and assets. A displayed link records an association in the materials and does not itself establish liability.',
+    publicRecordsWorkspaceTitle: 'Historical livestreams and public statements',
+    publicRecordsWorkspaceCopy: 'A separate index of historical livestreams and public videos from January 26, 2017 through March 14, 2023; repost copies remain distinct from judicial findings.',
     policyWorkspaceTitle: 'U.S. policy and institutional context',
     policyWorkspaceCopy: 'Track relevant legal policy, enforcement institutions, and public-agency sources separately from adjudicated facts in individual proceedings.',
     calendarWorkspaceTitle: 'Docket dates and deadline verification',
@@ -3155,13 +3210,14 @@ function App() {
   const officialOrRecapFileCount = documentAnalysis?.analytics.gaps.officialOrRecapFiles ?? documents?.counts.officialOrRecapFiles ?? null
   const officialAgencyFileCount = documentAnalysis?.analytics.verificationDistribution.find((item) => item.key === 'official_agency')?.value ?? null
   const backupMirrorFileCount = documentAnalysis?.analytics.gaps.backupMirrorFiles ?? null
-  const localDocumentCount = documents?.counts.localAvailable ?? documentAnalysis?.counts.localAvailable ?? null
+  const physicalDocumentCount = documents?.counts.localAvailable ?? documentAnalysis?.counts.localAvailable ?? null
   const latestEventTime = Math.max(0, ...dashboard.events.map((event) => new Date(`${event.date}T00:00:00`).getTime()).filter(Number.isFinite))
   const recentEventCount = dashboard.events.filter((event) => {
     const eventTime = new Date(`${event.date}T00:00:00`).getTime()
     return Number.isFinite(eventTime) && latestEventTime - eventTime <= 7 * 24 * 60 * 60 * 1000
   }).length
   const uniquePdfContentCount = documentAnalysis?.counts.uniquePdfContents ?? documents?.counts.uniquePdfContents ?? null
+  const localDocumentCount = uniquePdfContentCount ?? physicalDocumentCount
   const professionalReviewCount = documentAnalysis?.counts.professionalReviewDocuments ?? documents?.counts.professionalReviewDocuments ?? null
   const aiBacklogCount = documentAnalysis?.counts.pendingProfessionalReviewDocuments ?? documents?.counts.pendingProfessionalReviewDocuments ?? null
   const aiBacklogDetail = aiBacklogCount !== null && uniquePdfContentCount !== null && professionalReviewCount !== null
@@ -3181,6 +3237,7 @@ function App() {
     '#cases': { title: text.casesWorkspaceTitle, copy: text.casesWorkspaceCopy },
     '#positions': { title: text.positionsWorkspaceTitle, copy: text.positionsWorkspaceCopy },
     '#entities': { title: text.entitiesWorkspaceTitle, copy: text.entitiesWorkspaceCopy },
+    '#public-records': { title: text.publicRecordsWorkspaceTitle, copy: text.publicRecordsWorkspaceCopy },
     '#policy': { title: text.policyWorkspaceTitle, copy: text.policyWorkspaceCopy },
     '#calendar': { title: text.calendarWorkspaceTitle, copy: text.calendarWorkspaceCopy },
   }
@@ -3191,6 +3248,7 @@ function App() {
     { href: '#cases', label: text.navCases, icon: <BriefcaseBusiness size={17} />, metric: formatNumber(dashboard.metrics.monitoredCases, language) },
     { href: '#positions', label: text.navPositions, icon: <UserRoundCheck size={17} />, metric: formatNumber(litigationPositions?.counts.total ?? 0, language) },
     { href: '#entities', label: text.navEntities, icon: <GitBranch size={17} />, metric: formatNumber(dashboard.metrics.monitoredEntities, language) },
+    { href: '#public-records', label: text.navPublicRecords, icon: <Radio size={17} />, metric: '2017–23' },
     { href: '#policy', label: text.navPolicy, icon: <Landmark size={17} />, metric: formatNumber(dashboard.policyWatch.length, language) },
     { href: '#calendar', label: text.navCalendar, icon: <CalendarClock size={17} />, metric: formatNumber(proceduralCalendar?.items.length ?? 0, language) },
   ]
@@ -3471,6 +3529,10 @@ function App() {
               {!litigationPositionsLoading && <button type="button" onClick={() => void loadLitigationPositions(language)}>{text.retry}</button>}
             </section>
           )
+        )}
+
+        {workspaceView === '#public-records' && (
+          <PublicRecordsView language={language} />
         )}
 
         {workspaceView === '#documents' && ['files', 'review'].includes(documentWorkspaceTab) && (documentAnalysis || documentAnalysisLoading || documentAnalysisError) && (
@@ -4162,6 +4224,354 @@ function ExternalLinks({ sourceIds, sources, label, compact = false }: { sourceI
       ))}
     </div>
   )
+}
+
+function PublicRecordsView({ language }: { language: Language }) {
+  const copy = language === 'zh' ? {
+    chronology: '时间边界',
+    archiveNote: '本板块为封存历史索引，不再等待未来直播更新；2023 年 3 月 15 日后的新增信息进入司法案卷监测。',
+    firstRecord: '历史直播起点',
+    finalRecord: '最后直播日',
+    casePhase: '被捕与案件阶段开始',
+    casePhaseDetail: '2023 年 3 月 15 日起，司法进展转入案卷时间线。',
+    officialCaseSource: '查看 DOJ 案件来源',
+    indexed: '可访问记录',
+    period: '历史期间',
+    unresolved: '未找到可用副本',
+    platforms: '可用外部平台',
+    yearDistribution: '年度记录分布',
+    search: '搜索日期、标题、转载账号或关键词',
+    allYears: '全部年份',
+    newest: '新到旧',
+    oldest: '旧到新',
+    allPlatforms: '全部',
+    results: '条记录',
+    loading: '正在读取历史索引',
+    retry: '重试',
+    empty: '当前筛选没有可显示记录。',
+    loadMore: '加载更多',
+    sourceCopy: '来源副本',
+    repost: '历史转载',
+    platformPost: '历史平台帖子',
+    sourceUploader: '发布 / 转载账号',
+    sourceTitle: '平台标题',
+    originalTitle: '原始标题',
+    duration: '时长',
+    completeness: '完整性',
+    verification: '核验状态',
+    verifiedLink: '链接和平台元数据已核验',
+    longForm: '长视频 / 可能为完整版',
+    excerpt: '节选或短片段',
+    claimedFull: '发布者标注为完整版',
+    unknown: '待通过备用副本核对',
+    openSource: '打开转载副本',
+    alternatives: '备用副本',
+    evidenceBoundary: '证据边界',
+    evidenceBoundaryCopy: '这些内容记录公开言论和历史背景，不等于法院认定其中陈述属实。案件事实仍以法院文件和正式案卷为准。',
+  } : {
+    chronology: 'Chronology boundary',
+    archiveNote: 'This is a closed historical index, not a feed awaiting future livestreams. New developments after March 15, 2023 belong in docket monitoring.',
+    firstRecord: 'Historical livestream period begins',
+    finalRecord: 'Final livestream date',
+    casePhase: 'Arrest and case phase begins',
+    casePhaseDetail: 'From March 15, 2023, judicial developments continue in the docket timeline.',
+    officialCaseSource: 'Open DOJ case source',
+    indexed: 'Accessible records',
+    period: 'Historical period',
+    unresolved: 'No accessible copy',
+    platforms: 'Available external platforms',
+    yearDistribution: 'Records by year',
+    search: 'Search date, title, uploader, or keyword',
+    allYears: 'All years',
+    newest: 'Newest first',
+    oldest: 'Oldest first',
+    allPlatforms: 'All',
+    results: 'records',
+    loading: 'Loading the historical index',
+    retry: 'Retry',
+    empty: 'No records match the current filters.',
+    loadMore: 'Load more',
+    sourceCopy: 'Source copy',
+    repost: 'Historical repost',
+    platformPost: 'Historical platform post',
+    sourceUploader: 'Publisher / repost account',
+    sourceTitle: 'Platform title',
+    originalTitle: 'Original title',
+    duration: 'Duration',
+    completeness: 'Completeness',
+    verification: 'Verification status',
+    verifiedLink: 'Link and platform metadata checked',
+    longForm: 'Long-form / potentially complete',
+    excerpt: 'Excerpt or short segment',
+    claimedFull: 'Labeled complete by the publisher',
+    unknown: 'Needs comparison with an alternate copy',
+    openSource: 'Open repost copy',
+    alternatives: 'Alternate copies',
+    evidenceBoundary: 'Evidence boundary',
+    evidenceBoundaryCopy: 'These records document public statements and historical context. They do not establish that assertions made in a video are true. Case facts remain controlled by court records and the formal docket.',
+  }
+  const platformLabels: Record<string, string> = {
+    all: copy.allPlatforms,
+    youtube: 'YouTube',
+    gettr: 'GETTR',
+    rumble: 'Rumble',
+    odysee: 'Odysee',
+    x: 'X',
+  }
+  const [library, setLibrary] = useState<PublicRecordLibrary | null>(null)
+  const [query, setQuery] = useState('')
+  const [year, setYear] = useState('all')
+  const [platform, setPlatform] = useState('all')
+  const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
+  const [selectedId, setSelectedId] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [error, setError] = useState('')
+  const [retryNonce, setRetryNonce] = useState(0)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const handle = window.setTimeout(async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const params = new URLSearchParams({ lang: language, q: query, year, platform, sort, limit: '60', offset: '0' })
+        const response = await apiFetch(`/api/public-records?${params}`, { signal: controller.signal })
+        if (!response.ok) throw new Error(`API ${response.status}`)
+        const payload = await response.json() as PublicRecordLibrary
+        setLibrary(payload)
+        setSelectedId((current) => payload.records.some((record) => record.id === current) ? current : payload.records[0]?.id ?? '')
+      } catch (fetchError) {
+        if (controller.signal.aborted) return
+        setError(fetchError instanceof Error ? fetchError.message : String(fetchError))
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
+      }
+    }, query ? 280 : 0)
+    return () => {
+      window.clearTimeout(handle)
+      controller.abort()
+    }
+  }, [language, platform, query, retryNonce, sort, year])
+
+  const selected = library?.records.find((record) => record.id === selectedId) ?? library?.records[0] ?? null
+  const maxYearCount = Math.max(1, ...(library?.summary.yearCounts ?? []).map((item) => item.count))
+  const yearOptions = [
+    { value: 'all', label: copy.allYears },
+    ...(library?.summary.yearCounts ?? []).map((item) => ({ value: item.year, label: `${item.year} (${formatNumber(item.count, language)})` })),
+  ]
+
+  async function loadMoreRecords() {
+    if (!library?.hasMore || loadingMore) return
+    setLoadingMore(true)
+    setError('')
+    try {
+      const params = new URLSearchParams({
+        lang: language,
+        q: query,
+        year,
+        platform,
+        sort,
+        limit: String(library.limit),
+        offset: String(library.records.length),
+      })
+      const response = await apiFetch(`/api/public-records?${params}`)
+      if (!response.ok) throw new Error(`API ${response.status}`)
+      const payload = await response.json() as PublicRecordLibrary
+      setLibrary((current) => current ? {
+        ...payload,
+        offset: 0,
+        records: [...current.records, ...payload.records.filter((record) => !current.records.some((existing) => existing.id === record.id))],
+      } : payload)
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : String(fetchError))
+    } finally {
+      setLoadingMore(false)
+    }
+  }
+
+  const completenessLabel = (value: string) => ({
+    long_form: copy.longForm,
+    excerpt: copy.excerpt,
+    publisher_claims_full: copy.claimedFull,
+    unknown: copy.unknown,
+  })[value] ?? copy.unknown
+
+  return (
+    <section className="public-record-workspace">
+      <div className="public-record-boundary">
+        <div className="public-record-boundary-heading">
+          <History size={18} />
+          <div>
+            <span>{copy.chronology}</span>
+            <small>{copy.archiveNote}</small>
+          </div>
+        </div>
+        <div className="public-record-boundary-track">
+          <div>
+            <span>2017.01.26</span>
+            <strong>{copy.firstRecord}</strong>
+          </div>
+          <div>
+            <span>2023.03.14</span>
+            <strong>{copy.finalRecord}</strong>
+          </div>
+          <div className="case-phase-marker">
+            <span>2023.03.15</span>
+            <strong>{copy.casePhase}</strong>
+            <small>{copy.casePhaseDetail}</small>
+            <a href={safeExternalHref('https://www.justice.gov/usao-sdny/pr/ho-wan-kwok-also-known-miles-guo-and-william-je-charged-orchestrating-over-1-billion')} target="_blank" rel="noreferrer">
+              {copy.officialCaseSource}<ArrowUpRight size={12} />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="public-record-summary" aria-label={copy.indexed}>
+        <div><Radio size={17} /><span>{copy.indexed}</span><strong>{formatOptionalNumber(library?.summary.totalRecords ?? null, language)}</strong></div>
+        <div><History size={17} /><span>{copy.period}</span><strong>2017–2023</strong></div>
+        <div><Link2 size={17} /><span>{copy.unresolved}</span><strong>{formatOptionalNumber(library?.summary.unresolvedSourceLeads ?? null, language)}</strong></div>
+        <div><PlayCircle size={17} /><span>{copy.platforms}</span><strong>{Object.values(library?.summary.platformCounts ?? {}).filter((count) => count > 0).length || '—'}</strong></div>
+      </div>
+
+      <div className="public-record-year-chart" aria-label={copy.yearDistribution}>
+        <div className="public-record-year-chart-label"><Activity size={16} /><span>{copy.yearDistribution}</span></div>
+        <div className="public-record-year-bars">
+          {(library?.summary.yearCounts ?? []).map((item) => (
+            <button
+              type="button"
+              className={year === item.year ? 'active' : ''}
+              onClick={() => setYear((current) => current === item.year ? 'all' : item.year)}
+              aria-pressed={year === item.year}
+              title={`${item.year}: ${formatNumber(item.count, language)}`}
+              key={item.year}
+            >
+              <span><i style={{ height: `${Math.max(8, Math.round(item.count / maxYearCount * 100))}%` }} /></span>
+              <strong>{item.year}</strong>
+              <small>{formatNumber(item.count, language)}</small>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="public-record-toolbar">
+        <label className="search-box public-record-search">
+          <Search size={17} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} />
+        </label>
+        <CustomSelect
+          className="public-record-select"
+          value={year}
+          options={yearOptions}
+          onChange={setYear}
+          icon={<CalendarClock size={16} />}
+          ariaLabel={copy.allYears}
+        />
+        <CustomSelect
+          className="public-record-select"
+          value={sort}
+          options={[{ value: 'newest', label: copy.newest }, { value: 'oldest', label: copy.oldest }]}
+          onChange={(value) => setSort(value === 'oldest' ? 'oldest' : 'newest')}
+          icon={<ArrowDownUp size={16} />}
+          ariaLabel={copy.newest}
+        />
+      </div>
+
+      <div className="public-record-platforms" role="group" aria-label={copy.platforms}>
+        {['all', 'youtube', 'gettr', 'rumble', 'odysee', 'x'].filter((item) => item === 'all' || (library?.summary.platformCounts[item] ?? 0) > 0).map((item) => (
+          <button type="button" className={platform === item ? 'active' : ''} onClick={() => setPlatform(item)} key={item}>
+            {platformLabels[item]}
+            {item !== 'all' && library?.summary.platformCounts[item] ? <span>{formatNumber(library.summary.platformCounts[item], language)}</span> : null}
+          </button>
+        ))}
+      </div>
+
+      {error && <div className="catalog-error"><AlertTriangle size={16} /><span>{error}</span><button type="button" onClick={() => setRetryNonce((current) => current + 1)}>{copy.retry}</button></div>}
+
+      <div className="public-record-grid">
+        <div className="public-record-list-pane">
+          <div className="public-record-list-heading">
+            <span>{formatOptionalNumber(library?.total ?? null, language)} {copy.results}</span>
+            {loading && <Loader2 className="spin" size={16} />}
+          </div>
+          {loading && !library ? (
+            <div className="public-record-loading"><Loader2 className="spin" size={20} /><span>{copy.loading}</span></div>
+          ) : library?.records.length ? (
+            <div className="public-record-list">
+              {library.records.map((record) => (
+                <button type="button" className={record.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(record.id)} key={record.id}>
+                  <time>{formatDate(record.date, language)}</time>
+                  <strong>{record.title}</strong>
+                  {record.originalTitle && record.originalTitle !== record.title && <small>{record.originalTitle}</small>}
+                  <span><b>{platformLabels[record.primarySource.platform]}</b>{record.primarySource.uploader || copy.repost}</span>
+                </button>
+              ))}
+              {library.hasMore && (
+                <button className="public-record-load-more" type="button" onClick={loadMoreRecords} disabled={loadingMore}>
+                  {loadingMore ? <Loader2 className="spin" size={16} /> : <Plus size={16} />}{copy.loadMore}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="public-record-empty">{copy.empty}</div>
+          )}
+        </div>
+
+        <article className="public-record-detail">
+          {selected ? (
+            <>
+              <div className="public-record-detail-head">
+                <div>
+                  <span>{formatDate(selected.date, language)} · {platformLabels[selected.primarySource.platform]}</span>
+                  <h3>{selected.title}</h3>
+                  {selected.originalTitle && selected.originalTitle !== selected.title && <p><b>{copy.originalTitle}</b>{selected.originalTitle}</p>}
+                </div>
+                <a className="public-record-open" href={safeExternalHref(selected.primarySource.url)} target="_blank" rel="noreferrer">
+                  <PlayCircle size={16} />{copy.openSource}<ArrowUpRight size={13} />
+                </a>
+              </div>
+              <p className="public-record-summary-copy">{selected.summary}</p>
+
+              <dl className="public-record-facts">
+                <div><dt>{copy.sourceCopy}</dt><dd>{selected.primarySource.role === 'historical_platform_post' ? copy.platformPost : copy.repost}</dd></div>
+                <div><dt>{copy.sourceUploader}</dt><dd>{selected.primarySource.uploader || '—'}</dd></div>
+                <div><dt>{copy.duration}</dt><dd>{formatPublicRecordDuration(selected.primarySource.durationSec, language)}</dd></div>
+                <div><dt>{copy.completeness}</dt><dd>{completenessLabel(selected.completeness)}</dd></div>
+                <div><dt>{copy.verification}</dt><dd>{copy.verifiedLink}</dd></div>
+                <div><dt>{copy.sourceTitle}</dt><dd>{selected.primarySource.sourceTitle || selected.originalTitle || '—'}</dd></div>
+              </dl>
+
+              {selected.alternatives.length > 0 && (
+                <div className="public-record-alternatives">
+                  <h4>{copy.alternatives}</h4>
+                  {selected.alternatives.map((source) => (
+                    <a href={safeExternalHref(source.url)} target="_blank" rel="noreferrer" key={source.url}>
+                      <span><b>{platformLabels[source.platform]}</b>{source.uploader || copy.repost}</span>
+                      <ArrowUpRight size={13} />
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <div className="public-record-evidence-boundary">
+                <ShieldAlert size={17} />
+                <div><strong>{copy.evidenceBoundary}</strong><p>{copy.evidenceBoundaryCopy}</p></div>
+              </div>
+            </>
+          ) : <div className="public-record-empty">{copy.empty}</div>}
+        </article>
+      </div>
+    </section>
+  )
+}
+
+function formatPublicRecordDuration(seconds: number | null, language: Language) {
+  if (!seconds || seconds <= 0) return language === 'zh' ? '未记录' : 'Not recorded'
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  if (language === 'zh') return hours ? `${hours} 小时 ${minutes} 分` : `${minutes} 分 ${remainingSeconds} 秒`
+  return hours ? `${hours}h ${minutes}m` : `${minutes}m ${remainingSeconds}s`
 }
 
 function PolicyWorkspace({ policies, sources, text }: { policies: PolicyWatch[]; sources: SourceRecord[]; text: (typeof ui)[Language] }) {
@@ -5865,7 +6275,15 @@ function DocumentAnalysisView({
   const catalogRequestRef = useRef('')
   const catalogSequenceRef = useRef(0)
   const catalogAbortRef = useRef<AbortController | null>(null)
-  const stats = [
+  const catalogLanguageRef = useRef(language)
+  const stats = mode === 'files' ? [
+    { label: language === 'zh' ? '本地来源文件' : 'Local source files', value: library.counts.localAvailable },
+    { label: language === 'zh' ? '唯一 PDF 内容' : 'Unique PDF contents', value: library.counts.uniquePdfContents },
+    { label: language === 'zh' ? '逻辑资料记录' : 'Logical library records', value: catalogPage.total },
+    { label: text.extractedSnippets, value: library.counts.cachedExtractions },
+    { label: language === 'zh' ? '专业复核（唯一 PDF）' : 'Professional reviews (unique PDFs)', value: library.counts.professionalReviewDocuments },
+    { label: text.localRuleReadsDone, value: library.counts.cachedLocalRuleReads },
+  ] : [
     { label: text.localAvailable, value: library.counts.localAvailable },
     { label: text.translatedMetadata, value: library.counts.translatedMetadata },
     { label: text.extractedSnippets, value: library.counts.cachedExtractions },
@@ -5926,10 +6344,13 @@ function DocumentAnalysisView({
 
   useEffect(() => {
     if (catalogQuery.trim() || catalogPriority !== 'all' || catalogScope !== 'all') return
+    const languageChanged = catalogLanguageRef.current !== language
+    catalogLanguageRef.current = language
+    if (!languageChanged && catalogRows.length > library.catalogPage.limit) return
     setCatalogRows(library.catalog)
     setCatalogPage(library.catalogPage)
     setCatalogError('')
-  }, [catalogPriority, catalogQuery, catalogScope, library.generatedAt, library.catalog, library.catalogPage])
+  }, [catalogPriority, catalogQuery, catalogRows.length, catalogScope, language, library.generatedAt, library.catalog, library.catalogPage])
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -5942,16 +6363,16 @@ function DocumentAnalysisView({
 
   useEffect(() => {
     if (!catalogSearchStatus?.building && !catalogSearchStatus?.stale) return undefined
-    const handle = window.setInterval(() => void fetchCatalogPage(0, false), 1200)
+    if (catalogRows.length > catalogPage.limit) return undefined
+    const handle = window.setInterval(() => {
+      if (!catalogAbortRef.current) void fetchCatalogPage(0, false)
+    }, 1200)
     return () => window.clearInterval(handle)
-  }, [catalogSearchStatus?.building, catalogSearchStatus?.stale, fetchCatalogPage])
+  }, [catalogPage.limit, catalogRows.length, catalogSearchStatus?.building, catalogSearchStatus?.stale, fetchCatalogPage])
 
   function loadMoreCatalog() {
     if (catalogLoading) return
-    setCatalogRows((current) => {
-      void fetchCatalogPage(current.length, true)
-      return current
-    })
+    void fetchCatalogPage(catalogRows.length, true)
   }
 
   return (
@@ -6006,6 +6427,13 @@ function DocumentAnalysisView({
             </span>
           ))}
         </div>
+        {mode === 'files' && (
+          <p className="catalog-count-note">
+            {language === 'zh'
+              ? '来源副本和语言版本全部保留；文件库按法院案号与文件号合并展示，不把同一文件的多个来源计为多份案卷。'
+              : 'All source copies and language variants remain preserved. The library groups them by court docket and document number instead of counting one filing as several records.'}
+          </p>
+        )}
 
         {mode === 'review' && <div className="document-subhead">
           <FolderOpen size={15} />
