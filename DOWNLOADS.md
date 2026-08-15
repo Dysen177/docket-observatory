@@ -88,7 +88,7 @@
 
 ### 为什么安装包很大
 
-完整版不是空资料库。发布基线包含 1,834 份有效法院、机构和历史公开 PDF（约 1.56 GB），以及约 0.65 GB 的正文提取、现有译文与阅读辅助、文件解读、案件整体解读、关系数据和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积。建议至少预留 5 GB 空间。
+完整版不是空资料库。发布基线包含 1,838 份有效法院、机构和历史公开 PDF（约 1.57 GB），以及约 0.74 GB 的正文提取、现有译文与阅读辅助、文件解读、案件整体解读、关系数据和全文索引。Electron、OCR 语言模型和运行依赖还会增加体积；安装后的应用目录约 3 GB。建议至少预留 6 GB 空间。
 
 ### 常见问题
 
@@ -179,7 +179,7 @@ The image above is a clean English illustration of the final confirmation layout
 
 ### Why the installers are large
 
-The complete edition is not an empty library. Its baseline contains 1,834 valid public court, agency, and historical PDFs (about 1.56 GB), plus about 0.65 GB of extracted text, existing translations and reading assistance, document-level readings, case dossiers, relationship data, and full-text indexes. Electron, OCR language models, and runtime dependencies add more. Keep at least 5 GB free.
+The complete edition is not an empty library. Its baseline contains 1,838 valid public court, agency, and historical PDFs (about 1.57 GB), plus about 0.74 GB of extracted text, existing translations and reading assistance, document-level readings, case dossiers, relationship data, and full-text indexes. Electron, OCR language models, and runtime dependencies add more; the installed application directory is about 3 GB. Keep at least 6 GB free.
 
 ### Troubleshooting
 
