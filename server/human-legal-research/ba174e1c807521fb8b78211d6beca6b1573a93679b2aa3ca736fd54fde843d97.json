@@ -1,0 +1,68 @@
+{
+  "sha256": "ba174e1c807521fb8b78211d6beca6b1573a93679b2aa3ca736fd54fde843d97",
+  "caseId": "discovered-dcd-16379574",
+  "docNumber": "88",
+  "posture": "plaintiff_status_report",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "In Guo Wengui v. Clark Hill, the plaintiff reports that the civil case had been stayed after his bankruptcy filing, describes a bankruptcy motion to authorize ordinary-course professionals, and asks that the stay remain through a further status update by May 3, 2022 or an earlier bankruptcy ruling. This is the plaintiff's report and request, not an order extending the stay.",
+    "plainEnglish": "The case was paused, and the plaintiff told the judge that the bankruptcy court first needed to address whether his professionals could continue to be employed and paid. He asked to keep the pause. This paper reports and requests; it does not show that the judge granted the new request.",
+    "legalReading": [
+      "The report describes a March 4, 2022 minute order staying proceedings until further order and requiring a status report by April 3.",
+      "It states that bankruptcy counsel filed a March 22 motion covering this litigation and its counsel, with a hearing scheduled for April 13.",
+      "The plaintiff requests continued stay treatment and proposes a May 3 update deadline or earlier notice if the bankruptcy court rules."
+    ],
+    "caseConnections": [
+      "Read the March 4 minute order for the operative stay terms rather than relying only on the plaintiff's description.",
+      "Locate the bankruptcy employment motion, April 13 result, and the D.C. court's response to this status report."
+    ],
+    "whyItMatters": [
+      "It shows how the Connecticut bankruptcy affected prosecution of the separate malpractice-related civil action.",
+      "It identifies the professional-employment issue as the immediate reason for requesting continued pause."
+    ],
+    "verificationTasks": [
+      "Verify the bankruptcy motion and disposition on the Connecticut docket.",
+      "Find the next order or status report in Case 1:19-cv-03195."
+    ],
+    "riskFlags": [
+      "Descriptions of the bankruptcy motion and schedule are party representations.",
+      "The requested continuation is not granted by this filing.",
+      "The filing does not decide the civil claims against Clark Hill."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The plaintiff asked the D.C. court to maintain the stay while a bankruptcy professional-employment motion was pending.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The status report is not the court's ruling on the requested continuation.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "在 Guo Wengui v. Clark Hill 案中，原告报告称，其申请破产后该民事案已经中止；他说明破产程序中存在一项授权日常专业人员的动议，并请求维持中止，直至 2022 年 5 月 3 日前再次报告，或破产法院更早裁定。这是原告的报告和请求，不是延长中止的法院命令。",
+    "plainEnglish": "案件当时暂停了。原告告诉法官，破产法院需要先处理其律师等专业人员能否继续受聘和获得报酬，并请求继续暂停。本文件只是“汇报情况并提出请求”，没有证明法官已经批准。",
+    "legalReading": [
+      "报告描述 2022 年 3 月 4 日简短命令：本案中止直至另行命令，并要求 4 月 3 日前提交状态报告。",
+      "报告称破产律师于 3 月 22 日提交一项涵盖本案及本案律师的动议，听证定于 4 月 13 日。",
+      "原告请求继续中止，并建议在 5 月 3 日前更新，或在破产法院更早裁定时提前通知。"
+    ],
+    "caseConnections": [
+      "应直接阅读 3 月 4 日简短命令确定中止条款，而不能只依赖原告描述。",
+      "应查找破产专业人员动议、4 月 13 日结果以及哥伦比亚特区法院对本报告的处理。"
+    ],
+    "whyItMatters": [
+      "它说明康涅狄格破产程序如何影响另一起针对 Clark Hill 的民事案件。",
+      "它把专业人员聘用问题确定为请求继续暂停的直接原因。"
+    ],
+    "verificationTasks": [
+      "在康涅狄格破产案卷核验该动议及处理结果。",
+      "查找 Case 1:19-cv-03195 中下一份命令或状态报告。"
+    ],
+    "riskFlags": [
+      "关于破产动议和排期的描述属于当事方陈述。",
+      "本文件没有批准所请求的继续中止。",
+      "本文件没有裁判针对 Clark Hill 的民事主张。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "原告请求在破产专业人员聘用动议待决期间继续中止哥伦比亚特区民事案。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "状态报告不是法院对继续中止请求的裁定。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

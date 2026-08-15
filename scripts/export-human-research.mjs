@@ -88,7 +88,7 @@ function isDoc765(file) {
 
 function renderCase(caseId, research, lang) {
   const zh = lang === 'zh'
-  const title = zh ? `案件整体人工法律研究：${caseId}` : `Human legal research dossier: ${caseId}`
+  const title = zh ? `版本锁定案件法律复核：${caseId}` : `Version-locked case legal review: ${caseId}`
   return [
     `# ${title}`,
     '',

@@ -109,9 +109,14 @@ async function verifyPdf(filePath) {
     const header = Buffer.alloc(5)
     await handle.read(header, 0, 5, 0)
     if (header.toString('ascii') !== '%PDF-') throw new Error(`Invalid PDF header: ${filePath}`)
-    const tail = Buffer.alloc(Math.min(2048, info.size))
+    const tail = Buffer.alloc(Math.min(64 * 1024, info.size))
     await handle.read(tail, 0, tail.length, Math.max(0, info.size - tail.length))
-    if (!tail.toString('latin1').includes('%%EOF')) throw new Error(`Incomplete PDF trailer: ${filePath}`)
+    const eofOffset = tail.lastIndexOf(Buffer.from('%%EOF'))
+    if (eofOffset === -1) throw new Error(`Incomplete PDF trailer: ${filePath}`)
+    const trailingBytes = tail.subarray(eofOffset + 5)
+    if (trailingBytes.some((byte) => ![0x00, 0x09, 0x0a, 0x0c, 0x0d, 0x20].includes(byte))) {
+      throw new Error(`PDF contains substantive bytes after its final trailer: ${filePath}`)
+    }
   } finally {
     await handle.close()
   }

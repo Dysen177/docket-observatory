@@ -412,6 +412,10 @@ type DocumentLibrary = {
     skippedExisting: number
     localAvailable: number
     errors: number
+    officialOrRecapFiles: number
+    uniquePdfContents: number | null
+    professionalReviewDocuments: number | null
+    pendingProfessionalReviewDocuments: number | null
   }
   credentialRequired: Array<{ sourceId: string; reason: string; source: string | null }>
   sampleFiles: DocumentFile[]
@@ -615,6 +619,9 @@ type DocumentAnalysisLibrary = {
     cachedDocumentAi: number
     cachedLocalRuleReads: number
     humanResearchDocuments: number
+    uniquePdfContents: number
+    professionalReviewDocuments: number
+    pendingProfessionalReviewDocuments: number
     legalReadDocuments: number
     pendingLegalReadDocuments: number
     pendingLegalReadReasons: {
@@ -1558,8 +1565,8 @@ const ui = {
     metricRecentDetail: '以资料库最新日期为基准',
     metricVerify: '待官方核验',
     metricVerifyDetail: '镜像文件需由 PACER/RECAP 复核',
-    metricAiBacklog: '待补齐法律解读',
-    metricAiBacklogDetail: '仅统计尚未补齐缓存的本地文件，不代表全部文件没有解读',
+    metricAiBacklog: '待专业复核',
+    metricAiBacklogDetail: '按唯一 PDF 内容统计；本地规则初读不等于逐份专业复核',
     metricDeadline: '期限待核验',
     metricDeadlineDetail: '不得作为最终截止日依赖',
     metricOpenIssues: '开放法律问题',
@@ -1626,7 +1633,7 @@ const ui = {
     auditOfficialFiles: 'PACER / RECAP 本地文件',
     auditMetadataOnly: '仅元数据条目',
     auditPublicPdfMissing: '公开 PDF 未落地',
-    auditDownloadErrors: '待关系核验文件',
+    auditDownloadErrors: '自动发现文件',
     auditDocketTable: '独立案卷核对表',
     auditDiscoveryCandidates: '自动发现候选',
     auditLikelyFalseMatches: '已隔离的可能误匹配',
@@ -2146,8 +2153,8 @@ const ui = {
     metricRecentDetail: 'Relative to the latest library date',
     metricVerify: 'Needs official check',
     metricVerifyDetail: 'Mirror files awaiting PACER/RECAP confirmation',
-    metricAiBacklog: 'Legal reads to complete',
-    metricAiBacklogDetail: 'Only files missing a current cache; it does not mean every file lacks a legal read',
+    metricAiBacklog: 'Professional reviews pending',
+    metricAiBacklogDetail: 'Counted by unique PDF content; a local-rule first read is not an individual professional review',
     metricDeadline: 'Deadlines to verify',
     metricDeadlineDetail: 'Do not rely on these as final deadlines',
     metricOpenIssues: 'Open legal questions',
@@ -2214,7 +2221,7 @@ const ui = {
     auditOfficialFiles: 'Local PACER / RECAP files',
     auditMetadataOnly: 'Metadata-only entries',
     auditPublicPdfMissing: 'Public PDFs missing locally',
-    auditDownloadErrors: 'Pending relation review',
+    auditDownloadErrors: 'Auto-discovered files',
     auditDocketTable: 'Independent docket reconciliation',
     auditDiscoveryCandidates: 'Discovery candidates',
     auditLikelyFalseMatches: 'Quarantined likely false matches',
@@ -2376,7 +2383,7 @@ function documentAnalysisProviderLabel(status: DocumentAnalysisRecord['aiStatus'
     gemini: { zh: 'Google Gemini 正文解读', en: 'Google Gemini body analysis' },
     openai_compatible: { zh: '兼容接口正文解读', en: 'Compatible-provider body analysis' },
     ollama: { zh: '本机 Ollama 正文解读', en: 'Local Ollama body analysis' },
-    human_research: { zh: '人工法律研究', en: 'Human legal research' },
+    human_research: { zh: '版本锁定法律复核', en: 'Version-locked legal review' },
   }
   return labels[status.provider]?.[language] ?? status.mode
 }
@@ -2389,7 +2396,7 @@ function caseDossierProviderLabel(dossier: NonNullable<CaseDossier['aiDossier']>
     gemini: { zh: 'Google Gemini 案件总览', en: 'Google Gemini case dossier' },
     openai_compatible: { zh: '兼容接口案件总览', en: 'Compatible-provider case dossier' },
     ollama: { zh: '本机 Ollama 案件总览', en: 'Local Ollama case dossier' },
-    human_research: { zh: '人工法律研究总览', en: 'Human legal research dossier' },
+    human_research: { zh: '版本锁定案件复核', en: 'Version-locked case review' },
   }
   return labels[dossier.provider ?? '']?.[language]
     ?? (language === 'zh' ? '案件整体解读' : 'Case dossier')
@@ -2538,15 +2545,43 @@ function App() {
     document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en'
     document.title = language === 'zh' ? '案卷观察台' : 'Docket Observatory'
     void loadDashboard(language)
-    void loadDocuments(language).then(() => loadDocumentAnalysis(language))
-    void loadCompletenessAudit(language)
-    void loadRelationshipAudit(language)
-    void loadMonitoringProfile(language)
-    void loadAutomationRun(language)
-    void loadProceduralCalendar(language)
-    void loadLitigationPositions(language)
-    void loadSettings(language)
+    void loadDocuments(language)
   }, [language])
+
+  useEffect(() => {
+    if (activeHash.startsWith('#settings')) {
+      void loadSettings(language)
+      return
+    }
+
+    if (workspaceView === '#documents') {
+      void loadDocumentAnalysis(language)
+      if (documentWorkspaceTab === 'audit') {
+        void loadCompletenessAudit(language)
+        void loadRelationshipAudit(language)
+      }
+      if (documentWorkspaceTab === 'automation') void loadAutomationRun(language)
+      return
+    }
+
+    if (workspaceView === '#cases') {
+      void loadDocumentAnalysis(language)
+      void loadMonitoringProfile(language)
+      return
+    }
+
+    if (workspaceView === '#entities') {
+      void loadDocumentAnalysis(language)
+      return
+    }
+
+    if (workspaceView === '#positions') {
+      void loadLitigationPositions(language)
+      return
+    }
+
+    if (workspaceView === '#calendar') void loadProceduralCalendar(language)
+  }, [activeHash, documentWorkspaceTab, language, workspaceView])
 
   useEffect(() => {
     const updateActiveHash = () => setActiveHash(window.location.hash || '#timeline')
@@ -2714,6 +2749,7 @@ function App() {
   }
 
   async function loadCompletenessAudit(nextLanguage = language) {
+    setCompletenessAuditLoading(true)
     try {
       const response = await apiFetch(`/api/completeness-audit?lang=${nextLanguage}`)
       if (!response.ok) throw new Error(`API ${response.status}`)
@@ -2721,6 +2757,8 @@ function App() {
       setCompletenessAuditError('')
     } catch (fetchError) {
       setCompletenessAuditError(fetchError instanceof Error ? fetchError.message : String(fetchError))
+    } finally {
+      setCompletenessAuditLoading(false)
     }
   }
 
@@ -3114,7 +3152,7 @@ function App() {
   const okSourceCount = dashboard.sourceStatuses.filter((status) => status.status === 'ok').length
   const actionSourceCount = dashboard.sourceStatuses.filter((status) => ['limited', 'stale', 'needs_credentials', 'needs_implementation', 'error'].includes(status.status)).length
   const credentialGapCount = dashboard.sourceStatuses.filter((status) => status.status === 'needs_credentials').length
-  const officialOrRecapFileCount = documentAnalysis?.analytics.gaps.officialOrRecapFiles ?? null
+  const officialOrRecapFileCount = documentAnalysis?.analytics.gaps.officialOrRecapFiles ?? documents?.counts.officialOrRecapFiles ?? null
   const officialAgencyFileCount = documentAnalysis?.analytics.verificationDistribution.find((item) => item.key === 'official_agency')?.value ?? null
   const backupMirrorFileCount = documentAnalysis?.analytics.gaps.backupMirrorFiles ?? null
   const localDocumentCount = documents?.counts.localAvailable ?? documentAnalysis?.counts.localAvailable ?? null
@@ -3123,15 +3161,17 @@ function App() {
     const eventTime = new Date(`${event.date}T00:00:00`).getTime()
     return Number.isFinite(eventTime) && latestEventTime - eventTime <= 7 * 24 * 60 * 60 * 1000
   }).length
-  const aiBacklogCount = documentAnalysis?.counts.pendingLegalReadDocuments ?? null
-  const aiBacklogDetail = documentAnalysis
-    ? documentAnalysis.counts.pendingLegalReadDocuments === 0
+  const uniquePdfContentCount = documentAnalysis?.counts.uniquePdfContents ?? documents?.counts.uniquePdfContents ?? null
+  const professionalReviewCount = documentAnalysis?.counts.professionalReviewDocuments ?? documents?.counts.professionalReviewDocuments ?? null
+  const aiBacklogCount = documentAnalysis?.counts.pendingProfessionalReviewDocuments ?? documents?.counts.pendingProfessionalReviewDocuments ?? null
+  const aiBacklogDetail = aiBacklogCount !== null && uniquePdfContentCount !== null && professionalReviewCount !== null
+    ? aiBacklogCount === 0
       ? language === 'zh'
-        ? '全部本地文件已有人工研究、本地规则或生成式法律解读'
-        : 'Every local file has a human, deterministic, or generative legal read'
+        ? '全部唯一 PDF 内容均已完成版本锁定专业复核'
+        : 'Every unique PDF content has a version-locked professional review'
       : language === 'zh'
-        ? `${formatNumber(documentAnalysis.counts.pendingLegalReadReasons.analysis_cache_missing, language)} 份只缺解读缓存，${formatNumber(documentAnalysis.counts.pendingLegalReadReasons.extraction_cache_missing + documentAnalysis.counts.pendingLegalReadReasons.text_extraction_unavailable, language)} 份需先处理正文`
-        : `${formatNumber(documentAnalysis.counts.pendingLegalReadReasons.analysis_cache_missing, language)} need a read cache; ${formatNumber(documentAnalysis.counts.pendingLegalReadReasons.extraction_cache_missing + documentAnalysis.counts.pendingLegalReadReasons.text_extraction_unavailable, language)} need body-text processing first`
+        ? `${formatNumber(professionalReviewCount, language)} / ${formatNumber(uniquePdfContentCount, language)} 份唯一 PDF 已专业复核；其余仍可使用本地规则初读`
+        : `${formatNumber(professionalReviewCount, language)} / ${formatNumber(uniquePdfContentCount, language)} unique PDFs are professionally reviewed; local-rule first reads remain available for the rest`
     : text.metricAiBacklogDetail
   const deadlineVerificationCount = proceduralCalendar?.items.filter((item) => item.status === 'needs_verification').length ?? 0
   const openIssueCount = dashboard.portfolioAnalysis.openLoops.length
@@ -5463,7 +5503,7 @@ function CompletenessAuditView({
     { label: text.auditOfficialFiles, value: totals.officialOrRecapLocalFiles, tone: 'gold' },
     { label: text.auditMetadataOnly, value: totals.metadataOnlyEntries, tone: 'amber' },
     { label: text.auditPublicPdfMissing, value: totals.publiclyAvailableMissing, tone: 'red' },
-    { label: text.auditDownloadErrors, value: totals.pendingRelationReviewFiles ?? totals.untrackedLocalFiles ?? 0, tone: 'red' },
+    { label: text.auditDownloadErrors, value: totals.untrackedLocalFiles ?? 0, tone: 'red' },
   ]
 
   return (
@@ -5829,7 +5869,7 @@ function DocumentAnalysisView({
     { label: text.localAvailable, value: library.counts.localAvailable },
     { label: text.translatedMetadata, value: library.counts.translatedMetadata },
     { label: text.extractedSnippets, value: library.counts.cachedExtractions },
-    { label: language === 'zh' ? '人工研究文件' : 'Human-researched docs', value: library.counts.humanResearchDocuments },
+    { label: language === 'zh' ? '专业复核（唯一 PDF）' : 'Professional reviews (unique PDFs)', value: library.counts.professionalReviewDocuments },
     { label: text.queuedForAi, value: library.counts.cachedDocumentAi },
     { label: text.localRuleReadsDone, value: library.counts.cachedLocalRuleReads },
   ]

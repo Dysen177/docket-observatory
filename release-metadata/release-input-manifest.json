@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "appVersion": "0.1.1",
-  "generatedAt": "2026-08-15T00:26:34.942Z",
+  "generatedAt": "2026-08-15T10:43:38.129Z",
   "evidence": {
     "package-lock.json": {
       "bytes": 234366,
@@ -9,19 +9,19 @@
     },
     "output/release-review/corpus-risk-audit.json": {
       "bytes": 231586,
-      "sha256": "112e2e0cba8dbc8228c787b805fda3e090c96eda855dad506212e0919a7a0516"
+      "sha256": "91baa480c3225357374fd3a8ca74544c79c552dcb63a9daf4915df3c6f521060"
     },
     "release-metadata/corpus-review-decisions.json": {
       "bytes": 406179,
       "sha256": "b53f18815c6c4f9192ee1e3c58a2da4753458f52e6890b7b7fff20e69bebd701"
     },
     "release-metadata/corpus-manifest.json": {
-      "bytes": 2835104,
-      "sha256": "9dcfd781cc1f0bf8feb06ca6156a4f78912a6e15f9b60edd50e42eb2c07d7fb0"
+      "bytes": 2838746,
+      "sha256": "039efa6515813c970c7ed38024838edc7af188e45da8e8efd5d327ed6e81f967"
     },
     "release-metadata/seed-cache-manifest.json": {
-      "bytes": 3075817,
-      "sha256": "196f6599711461e6ead91dd1ec5e81db4f13ab4c18baa981fc94e5ece6de6a13"
+      "bytes": 3633149,
+      "sha256": "93a019bf6972db2106b984b71f345ca8e89222c11b9e1c3125968907501daf21"
     }
   }
 }

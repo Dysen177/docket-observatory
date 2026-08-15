@@ -1,0 +1,72 @@
+{
+  "sha256": "1d6f84c7f09c018ef533a431736e4760f0ac4662153a060d509b4b68a54fbf03",
+  "caseId": "discovered-dcd-15506078",
+  "docNumber": "233",
+  "posture": "government_declaration",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "SDNY Assistant U.S. Attorney Juliana N. Murray declares under penalty of perjury in the Michel criminal case that the Guo investigation began around May 2020, describes the original sealed March 2023 Guo indictment, and states that Guo prosecutors had no contact with Michel prosecutors until after that indictment and that Prakazrel Michel was never a witness, target, subject, or person of interest in the Guo case. These are sworn government representations, not findings by the Michel or Guo court.",
+    "plainEnglish": "A prosecutor is formally telling the Michel judge that the two prosecution teams and cases were not connected in the way apparently being questioned. Her declaration carries a penalty-of-perjury obligation, but it is still evidence from the government, not the judge's independent conclusion.",
+    "legalReading": [
+      "Murray identifies herself as an SDNY AUSA handling United States v. Kwok et al., 23 Cr. 118 (AT).",
+      "She states that the investigation began around May 2020 and summarizes the original sealed indictment as eleven counts returned around March 6, 2023.",
+      "Descriptions of alleged fraud, dates, Guo's background, and nonprofit organizations are expressly attributed to the Guo indictment and remain charging allegations at this stage.",
+      "Murray separately makes sworn knowledge statements about lack of pre-indictment contact between prosecution teams and Michel's absence from Guo-case investigative categories."
+    ],
+    "caseConnections": [
+      "The declaration was filed in United States v. Michel and should not be mistaken for a filing made on the Guo criminal docket.",
+      "Compare its historical count description with later superseding indictments, the verdict, and judgment in the Guo case."
+    ],
+    "whyItMatters": [
+      "It supplies a dated government statement distinguishing Michel from the Guo investigation.",
+      "It also fixes the government's stated investigation start and original-indictment history, subject to later superseding pleadings."
+    ],
+    "verificationTasks": [
+      "Review the Michel filing that prompted the declaration and the court's resulting order.",
+      "Authenticate Exhibit A separately and reconcile it with later Guo charging instruments."
+    ],
+    "riskFlags": [
+      "Sworn prosecutor representations are evidence, not court findings.",
+      "Indictment allegations are not adjudicated facts.",
+      "The declaration summarizes the original 2023 charges and is not the final trial count map."
+    ],
+    "findings": [
+      { "section": "summary", "text": "Murray states under penalty of perjury that the Guo investigation began around May 2020 and the sealed indictment was returned around March 6, 2023.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "She states that Michel was never a witness, target, subject, or person of interest in the Guo case and that the teams first contacted each other after the Guo indictment.", "confidence": "high", "pages": [2] },
+      { "section": "riskFlags", "text": "The declaration distinguishes sworn government knowledge statements from allegations merely quoted from the Guo indictment.", "confidence": "high", "pages": [1, 2] }
+    ]
+  },
+  "zh": {
+    "summary": "纽约南区助理联邦检察官 Juliana N. Murray 在 Michel 刑事案中承担伪证责任作出声明：Guo 调查约于 2020 年 5 月开始；她概述了 2023 年 3 月最初的密封 Guo 起诉书，并称 Guo 案检察官直到该起诉书提交后才与 Michel 案检察官联系，Prakazrel Michel 从未是 Guo 案的证人、侦查目标、调查对象或相关关注人员。这些是检方宣誓陈述，不是 Michel 案或 Guo 案法院的认定。",
+    "plainEnglish": "一名检察官正式告诉 Michel 案法官，两组检察官和两起案件不存在当时所质疑的那种联系。她需要承担伪证责任，但这仍然是政府一方提交的证据，不是法官独立得出的结论。",
+    "legalReading": [
+      "Murray 说明自己是负责 United States v. Kwok et al., 23 Cr. 118 (AT) 的纽约南区助理联邦检察官。",
+      "她称调查约于 2020 年 5 月开始，并把 2023 年 3 月 6 日左右作出的最初密封起诉书概述为 11 项罪名。",
+      "关于欺诈、行为日期、Guo 背景和非营利组织的内容均明确来自 Guo 起诉书，在该阶段仍是控罪指控。",
+      "Murray 另行作出宣誓知识陈述，涉及两组检察官在起诉前没有联系，以及 Michel 不属于 Guo 案任何相关调查类别。"
+    ],
+    "caseConnections": [
+      "本声明提交于 United States v. Michel，不应误认为是 Guo 刑事案卷中的文件。",
+      "应把其历史罪名概述与 Guo 案后续替代起诉书、陪审团裁决和正式判决比较。"
+    ],
+    "whyItMatters": [
+      "它提供了一份有明确日期的政府陈述，用于区分 Michel 与 Guo 调查。",
+      "它也记录政府所称调查起点和最初起诉历史，但后续替代诉状可能改变罪名结构。"
+    ],
+    "verificationTasks": [
+      "审阅 Michel 案中促使提交本声明的文件以及法院后续命令。",
+      "单独核验附件 A，并与 Guo 案后续控罪文件对照。"
+    ],
+    "riskFlags": [
+      "检察官宣誓陈述属于证据，不是法院认定。",
+      "起诉书中的指控不是已裁判事实。",
+      "本声明概述的是 2023 年最初罪名，不是最终审判罪名表。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "Murray 在承担伪证责任的前提下称，Guo 调查约于 2020 年 5 月开始，密封起诉书约于 2023 年 3 月 6 日作出。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "她称 Michel 从未是 Guo 案证人、侦查目标、调查对象或相关关注人员，且两组检察官在 Guo 起诉书提交后才联系。", "confidence": "high", "pages": [2] },
+      { "section": "riskFlags", "text": "本声明需要区分检方宣誓知识陈述与其转述的 Guo 起诉书指控。", "confidence": "high", "pages": [1, 2] }
+    ]
+  }
+}

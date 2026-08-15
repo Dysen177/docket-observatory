@@ -1,0 +1,28 @@
+{
+  "sha256": "ce672e5648eefe4b685d92a7592f0eea4fc6caac137427169aaeb7b210b74c9f",
+  "caseId": "discovered-ctb-68242670",
+  "docNumber": "42",
+  "posture": "court_order_counsel_withdrawal",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "The bankruptcy court granted Joseph W. Martini's motion and withdrew the appearances of Martini and Ivan Ladd-Smith as counsel for defendant Beile Li in adversary proceeding 24-05133. The court acted after a September 23, 2025 hearing and after Li filed a pro se appearance.",
+    "plainEnglish": "This order changes who represents Beile Li. Her two listed lawyers are no longer counsel in this adversary case, and the docket says she filed an appearance for herself. It does not decide whether Li or the trustee is right on the underlying claims.",
+    "legalReading": ["This is a signed procedural order granting ECF No. 34; unlike the underlying motion, the withdrawal itself is a court ruling.", "The order relies on the motion's stated good cause, the September 23 hearing, and Li's ECF No. 40 pro se appearance.", "The operative relief is limited to withdrawing Martini's and Ladd-Smith's appearances for Li; no claim, defense, liability, or remedy is adjudicated."],
+    "caseConnections": ["The order expressly connects to the withdrawal motion at ECF No. 34 and Li's pro se appearance at ECF No. 40 in adversary proceeding 24-05133.", "The caption connects the adversary proceeding to the Ho Wan Kwok chapter 11 case, No. 22-50073, but this page makes no ownership or merits finding."],
+    "whyItMatters": ["It identifies the representation status that controlled immediately after September 24, 2025.", "It prevents later filings from being misread as served through counsel whose appearances had already been withdrawn."],
+    "verificationTasks": ["Check the later adversary docket for substitute counsel, continued pro se status, and service orders.", "Use PACER or the RECAP docket to confirm any later amendment or reconsideration."],
+    "riskFlags": ["Counsel withdrawal is not a default, sanction, contempt finding, or merits judgment.", "A pro se appearance does not establish that Li validly waived any right or that all later service requirements were satisfied."],
+    "findings": [{"section":"summary","text":"The court granted the withdrawal motion and withdrew both listed attorneys' appearances for Beile Li.","confidence":"high","pages":[1]},{"section":"legalReading","text":"The order records a prior hearing and Li's pro se appearance as procedural context.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The order contains no ruling on the trustee's underlying claims or Li's liability.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "破产法院批准 Joseph W. Martini 的动议，并在附属诉讼 24-05133 中撤销 Martini 与 Ivan Ladd-Smith 作为被告 Beile Li 代理律师的出庭记录。法院是在 2025 年 9 月 23 日举行听证、且 Li 提交自行出庭通知后作出该命令。",
+    "plainEnglish": "这份命令只是在改变“谁代表 Beile Li”。两名律师不再代理她，案卷同时显示她已经自行出庭。它没有裁判 Li 和受托人谁在实体争议上胜诉。",
+    "legalReading": ["这是批准 ECF No. 34 的已签署程序性命令；与当事方提出的动议不同，律师退出这一结果已经由法院裁定。", "命令列出的程序基础包括动议中的正当理由、9 月 23 日听证，以及 Li 在 ECF No. 40 提交的自行出庭通知。", "命令的操作性救济仅限于撤销两名律师对 Li 的代理出庭，不裁判任何诉因、抗辩、责任或救济。"],
+    "caseConnections": ["命令明确关联本附属诉讼的 ECF No. 34 退出动议和 ECF No. 40 自行出庭通知。", "案名页把本附属诉讼与 Ho Wan Kwok 第 11 章主案 22-50073 相连，但本页没有作出所有权或实体认定。"],
+    "whyItMatters": ["它确定了 2025 年 9 月 24 日之后当时有效的代理状态。", "它有助于避免把后续文件误认为仍可通过已经退出的律师完成送达。"],
+    "verificationTasks": ["检查后续附属诉讼案卷，确认是否有替代律师、是否继续自行诉讼，以及后续送达命令。", "通过 PACER 或 RECAP 核对是否存在后续修订或复议。"],
+    "riskFlags": ["律师退出不等于缺席、制裁、藐视认定或实体判决。", "自行出庭通知本身不证明 Li 有效放弃任何权利，也不证明后续所有送达要求均已满足。"],
+    "findings": [{"section":"summary","text":"法院批准退出代理动议，并撤销两名律师对 Beile Li 的出庭代理。","confidence":"high","pages":[1]},{"section":"legalReading","text":"命令把先前听证和 Li 的自行出庭通知列为程序背景。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"命令没有裁判受托人的基础请求或 Li 的责任。","confidence":"high","pages":[1]}]
+  }
+}

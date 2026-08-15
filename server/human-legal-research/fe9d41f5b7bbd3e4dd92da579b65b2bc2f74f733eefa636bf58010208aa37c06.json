@@ -1,0 +1,66 @@
+{
+  "sha256": "fe9d41f5b7bbd3e4dd92da579b65b2bc2f74f733eefa636bf58010208aa37c06",
+  "caseId": "discovered-nysd-17452688",
+  "docNumber": "25",
+  "posture": "party_corporate_disclosure",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "Saraca Media Group Inc. stated on October 5, 2020 that it had no parent corporation and that no publicly held corporation owned 10% or more of its stock. The statement was filed by counsel in An v. GTV Media Group Inc. for Rule 7.1 conflict screening. It is a dated party representation, not a judicial finding about all ownership, affiliates, or control.",
+    "plainEnglish": "Saraca told the court it had no company above it and no public company owning a 10% block. That helps the judge check conflicts, but it does not reveal every private shareholder or decide who actually controlled the business.",
+    "legalReading": [
+      "The body makes two specific representations: no parent corporation and no publicly held corporation owning 10% or more of Saraca stock.",
+      "The form does not identify private shareholders, natural-person beneficial owners, subsidiaries, contractual control, or informal control.",
+      "Rule 7.1 disclosure does not adjudicate liability or bind the court to accept the corporate structure in a later contested issue."
+    ],
+    "caseConnections": [
+      "Read with GTV's same-day Doc 24, which states that privately held Saraca owned over 84% of GTV common stock.",
+      "Compare Saraca's April 2020 and April 2021 disclosures, keeping their wording, dates, and cases distinct."
+    ],
+    "whyItMatters": [
+      "Together with Doc 24, it places Saraca above GTV in the filing-side corporate structure while stating no parent above Saraca.",
+      "It supplies a useful dated relationship assertion without overstating it as a control judgment."
+    ],
+    "verificationTasks": [
+      "Check for amended Rule 7.1 disclosures and later evidence or rulings concerning Saraca's ownership and control.",
+      "Use corporate records or sworn ownership evidence before identifying private beneficial owners."
+    ],
+    "riskFlags": [
+      "This is a party statement, not a court finding.",
+      "No-parent and no-public-10% statements do not equal no private shareholders, affiliates, or controllers."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Saraca stated that it had no parent corporation and no publicly held corporation owned 10% or more of its stock.", "confidence": "high", "pages": [1] },
+      { "section": "caseConnections", "text": "The filing names GTV, Saraca, and Wengui Guo as defendants in the same action but does not adjudicate their relationships.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Saraca Media Group Inc. 于 2020 年 10 月 5 日声明其没有母公司，且没有上市公司持有其 10% 或以上股份。该声明由律师在 An 诉 GTV Media Group Inc. 案中依据规则第 7.1 条为利益冲突筛查提交。它是带有日期的当事方陈述，不是法院对全部所有权、关联关系或控制的认定。",
+    "plainEnglish": "Saraca 告诉法院：公司上面没有另一家母公司，也没有上市公司持有 10% 以上股份。这能帮助法官检查利益冲突，但没有列出所有私人股东，也不决定谁实际控制公司。",
+    "legalReading": [
+      "正文作出两项明确陈述：Saraca 没有母公司；没有上市公司持有 Saraca 10% 或以上股份。",
+      "表格没有列出私人股东、自然人受益所有人、子公司、合同控制或非正式控制。",
+      "规则第 7.1 条披露不裁判责任，也不意味着法院在后续争议中必须接受该公司结构。"
+    ],
+    "caseConnections": [
+      "应与 GTV 同日提交的 Doc 24 一起阅读；Doc 24 称非上市的 Saraca 持有 GTV 超过 84% 普通股。",
+      "可对照 Saraca 2020 年 4 月和 2021 年 4 月的披露，但应区分其措辞、日期和案件。"
+    ],
+    "whyItMatters": [
+      "结合 Doc 24，它在提交方公司结构中把 Saraca 放在 GTV 上方，同时称 Saraca 上方没有母公司。",
+      "它提供了有用的特定日期关系陈述，同时避免把它夸大成控制权判决。"
+    ],
+    "verificationTasks": [
+      "检查修订的规则第 7.1 条披露，以及后续涉及 Saraca 所有权和控制的证据或裁定。",
+      "在确定私人受益所有人前，应取得公司记录或宣誓所有权证据。"
+    ],
+    "riskFlags": [
+      "这是当事方声明，不是法院认定。",
+      "没有母公司及没有上市公司持股 10% 的陈述，不等于没有私人股东、关联方或控制人。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Saraca 声明其没有母公司，且没有上市公司持有其 10% 或以上股份。", "confidence": "high", "pages": [1] },
+      { "section": "caseConnections", "text": "文件把 GTV、Saraca 和 Wengui Guo 列为同案被告，但没有裁判三者关系。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

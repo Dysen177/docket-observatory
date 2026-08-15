@@ -1,0 +1,72 @@
+{
+  "sha256": "1a5398111a842ba4ab9b62a628af47fa3e3a1a5919c6701fa29ef18fe9f64f98",
+  "caseId": "sdny-23-cr-118",
+  "docNumber": "185",
+  "posture": "counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page filing states that Bradford L. Geyer entered an appearance for 3,345 Himalaya Exchange customers in United States v. Ho Wan Kwok et al. It labels Geyer's pro hac vice admission as pending and bears Jamie Scher's electronic signature. It is a lawyer-filed notice, not an order approving pro hac vice admission or a ruling on any customer's status, claim, ownership interest, or entitlement to relief.",
+    "plainEnglish": "This is comparable to counsel signing in on the case docket and identifying whom counsel says he represents. It does not mean the judge approved every procedural step or agreed that all 3,345 people are victims, owners, claimants, or entitled to funds.",
+    "legalReading": [
+      "The caption and docket header place the filing in SDNY criminal case 23 Cr. 118 and identify it as Document 185, filed December 6, 2023.",
+      "The notice states that Geyer appears for 3,345 Himalaya Exchange customers, while the signature block expressly says his pro hac vice status was pending.",
+      "The filing is signed electronically by Jamie Scher and lists both Scher and Geyer as attorneys for the described customer group.",
+      "A notice of appearance records counsel's asserted representation. It does not itself grant intervention, adjudicate standing, authenticate a customer list, or decide any forfeiture or restitution issue."
+    ],
+    "caseConnections": [
+      "Doc 183, filed the same day, separately records Jamie Scher's appearance for the same stated group; the two notices document counsel activity, not a judicial certification of the group.",
+      "The corpus contains a byte-distinct copy of this page under another discovery record with identical extracted text; those copies should be treated as duplicate evidence of one filing, not two independent events."
+    ],
+    "whyItMatters": [
+      "It fixes the date and limited procedural nature of Geyer's claimed appearance in the criminal docket.",
+      "It prevents the stated number 3,345 from being mistaken for a court-verified claimant or victim count."
+    ],
+    "verificationTasks": [
+      "Locate the corresponding pro hac vice motion and court order to determine whether and when Geyer's admission was approved.",
+      "Review later docket entries for any order defining the customer group's participation, standing, access, or forfeiture remedies."
+    ],
+    "riskFlags": [
+      "The 3,345 figure and representative capacity are counsel's statements in a notice, not judicial findings.",
+      "Pending pro hac vice status must not be reported as approved admission.",
+      "A notice of appearance does not establish customer ownership, loss, victim status, standing, or entitlement to recovery."
+    ],
+    "findings": [
+      {"section": "summary", "text": "Bradford L. Geyer filed a notice stating that he appeared for 3,345 Himalaya Exchange customers, with pro hac vice approval still pending.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The page is a counsel notice signed by Jamie Scher, not a court order or merits ruling.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "Nothing on the page judicially validates the size, identity, standing, or claims of the described customer group.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页文件称，Bradford L. Geyer 在 United States v. Ho Wan Kwok 等人的案件中，代表 3,345 名 Himalaya Exchange 客户登记出庭。文件注明 Geyer 的临时入庭许可（pro hac vice）仍待批准，并由 Jamie Scher 电子签署。它是律师提交的出庭通知，不是批准临时入庭的法院命令，也不裁判任何客户的身份、请求、所有权或取得救济的资格。",
+    "plainEnglish": "可以把它理解成律师在案件案卷上“签到并说明自己代表谁”。这不等于法官已经批准所有程序步骤，更不等于法院认定这 3,345 人全部是受害人、财产所有人、合格申请人或有权取得资金。",
+    "legalReading": [
+      "案名页和案卷页眉把文件定位于纽约南区刑事案 23 Cr. 118；它是 2023 年 12 月 6 日提交的 Document 185。",
+      "通知称 Geyer 代表 3,345 名 Himalaya Exchange 客户出庭，但签名栏明确写明其临时入庭资格仍待批准。",
+      "文件由 Jamie Scher 电子签署，签名栏同时把 Scher 和 Geyer 列为该客户群体的律师。",
+      "出庭通知只记录律师主张的代理关系，不会自行准许介入、裁判 standing、认证客户名单，也不处理没收或赔偿实体问题。"
+    ],
+    "caseConnections": [
+      "同日提交的 Doc 183 另行记录 Jamie Scher 代表同一所称群体出庭；两份通知证明律师进行了程序性登记，不是法院对群体的认证。",
+      "资料库中另一发现记录保存了正文完全相同但二进制哈希不同的副本；这些副本应作为同一文件的重复证据处理，不能计成两次独立司法事件。"
+    ],
+    "whyItMatters": [
+      "它确定了 Geyer 在刑事案卷中主张出庭的日期和有限程序性质。",
+      "它能防止把 3,345 这一申报数字误写成法院核验的申请人或受害人总数。"
+    ],
+    "verificationTasks": [
+      "查找对应的 pro hac vice 动议和法院命令，确认 Geyer 是否以及何时获准临时入庭。",
+      "检查后续案卷是否有界定该客户群体参与方式、standing、材料访问或没收救济的命令。"
+    ],
+    "riskFlags": [
+      "3,345 人及代理关系来自律师通知中的陈述，不是法院认定。",
+      "临时入庭许可待批准，不能表述为已经批准。",
+      "出庭通知不证明客户所有权、损失、受害人身份、standing 或获偿资格。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "Bradford L. Geyer 提交通知，称代表 3,345 名 Himalaya Exchange 客户出庭，但其临时入庭许可仍待批准。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "该页是 Jamie Scher 签署的律师出庭通知，不是法院命令或实体裁判。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该页没有司法核验所称客户群体的人数、身份、standing 或请求。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

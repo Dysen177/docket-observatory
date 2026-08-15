@@ -3,28 +3,15 @@ import { createReadStream } from 'node:fs'
 import { mkdir, readFile, readdir, realpath, rename, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import {
-  DOMMatrix,
-  ImageData,
-  Path2D,
-} from '@napi-rs/canvas'
-import { createWorker, OEM, PSM } from 'tesseract.js'
 import { runtimeSetting } from './settings-store.js'
 import { atomicWriteJson } from './atomic-write.js'
-
-// Electron exposes a browser-like process marker to pdfjs. Install the Node
-// canvas primitives before loading pdf-parse so the same extractor works in
-// the main process on Windows, macOS, and Linux.
-if (!globalThis.DOMMatrix) globalThis.DOMMatrix = DOMMatrix
-if (!globalThis.ImageData) globalThis.ImageData = ImageData
-if (!globalThis.Path2D) globalThis.Path2D = Path2D
-const { PDFParse } = await import('pdf-parse')
 
 const extractionCacheVersion = 8
 const require = createRequire(import.meta.url)
 const extractionQueue = []
 let activeExtractions = 0
 let extractionCacheIndexPromise = null
+let pdfParserPromise = null
 const maximumConcurrentExtractions = boundedInteger(
   process.env.GUO_INTEL_MAX_CONCURRENT_PDF_EXTRACTIONS,
   1,
@@ -104,10 +91,10 @@ async function performPdfExtraction(file, options = {}) {
   if (cachedEntry) {
     const cached = cachedEntry.payload
     if (cachedEntry.filePath !== cachePath || cached.signature?.path !== signature.path || cached.signature?.mtimeMs !== signature.mtimeMs) {
-      const migrated = { ...cached, signature }
-      await atomicWriteJson(cachePath, migrated, { directoryMode: 0o700 })
-      rememberExtractionCache(cachePath, migrated)
-      return migrated
+      // The cache key is content-addressed. Duplicate docket records may point
+      // to different local paths for the same PDF, so persistently rewriting
+      // the shared cache signature would create an endless invalidation loop.
+      return { ...cached, signature }
     }
     return cached
   }
@@ -121,6 +108,7 @@ async function performPdfExtraction(file, options = {}) {
       throw new Error('PDF failed the manifest SHA-256 integrity check.')
     }
     signature.contentSha256 = contentSha256
+    const PDFParse = await loadPdfParser()
     parser = new PDFParse({ data })
     const result = await parser.getText({ first: pageLimit })
     const pageSnippets = buildPageSnippets(result.pages, charLimit)
@@ -247,6 +235,7 @@ async function extractWithLocalOcr(parser, pageLimit, charLimit) {
   const englishData = require('@tesseract.js-data/eng')
   const chineseData = require('@tesseract.js-data/chi_sim')
   const langPath = await ensureBundledLanguageDirectory([englishData, chineseData])
+  const { createWorker, OEM, PSM } = await import('tesseract.js')
   const worker = await createWorker(`${englishData.code}+${chineseData.code}`, OEM.LSTM_ONLY, {
     langPath,
     cacheMethod: 'none',
@@ -273,6 +262,25 @@ async function extractWithLocalOcr(parser, pageLimit, charLimit) {
   } finally {
     await worker.terminate()
   }
+}
+
+async function loadPdfParser() {
+  if (!pdfParserPromise) {
+    pdfParserPromise = (async () => {
+      // Electron exposes a browser-like process marker to pdfjs. Install the
+      // Node canvas primitives before loading pdf-parse on any desktop OS.
+      const { DOMMatrix, ImageData, Path2D } = await import('@napi-rs/canvas')
+      if (!globalThis.DOMMatrix) globalThis.DOMMatrix = DOMMatrix
+      if (!globalThis.ImageData) globalThis.ImageData = ImageData
+      if (!globalThis.Path2D) globalThis.Path2D = Path2D
+      const { PDFParse } = await import('pdf-parse')
+      return PDFParse
+    })().catch((error) => {
+      pdfParserPromise = null
+      throw error
+    })
+  }
+  return pdfParserPromise
 }
 
 async function ensureBundledLanguageDirectory(languages) {

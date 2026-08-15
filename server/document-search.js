@@ -103,6 +103,92 @@ export async function warmDocumentSearchIndex(manifest) {
   return { schemaVersion: searchIndexVersion, generatedAt: index.generatedAt, coverage: index.coverage }
 }
 
+export async function getDocumentSearchProcessingSnapshot(manifest, language = 'zh') {
+  const indexState = await currentDocumentSearchIndex(manifest)
+  const index = indexState.index
+
+  const files = (manifest?.files ?? []).filter((file) => localFileStatuses.has(file?.status) && file?.url)
+  const fileByUrl = new Map(files.map((file) => [file.url, file]))
+  const legalReadProviders = new Set(['human_research', 'local_rules', 'openai', 'anthropic', 'gemini', 'openai_compatible', 'ollama'])
+  const analysisIdentities = new Set()
+  const extractedIdentities = new Set()
+  const analysisProviders = new Map()
+  const translations = []
+  const sourceAlreadyTarget = []
+  const assistiveTranslations = []
+  const generatedTranslations = []
+  const redactedTranslations = []
+
+  for (const document of index.documents ?? []) {
+    const documentFiles = (document.sources ?? [])
+      .map((source) => fileByUrl.get(source.sourceUrl))
+      .filter(Boolean)
+    if (document.original) {
+      for (const file of documentFiles) extractedIdentities.add(`${file.url}|${file.sha256 ?? ''}`)
+    }
+
+    for (const analysis of document.analyses ?? []) {
+      if (analysis.language !== language) continue
+      const provider = analysis.provider ?? 'unknown'
+      for (const file of documentFiles) {
+        const identity = `${file.url}|${file.sha256 ?? ''}`
+        if (legalReadProviders.has(provider)) analysisIdentities.add(identity)
+      }
+      analysisProviders.set(`${document.contentSha256}|${provider}`, provider)
+    }
+
+    for (const translation of document.translations ?? []) {
+      if (translation.language !== language) continue
+      translations.push(translation)
+      if (translation.status === 'assistive_only') assistiveTranslations.push(translation)
+      else if (translation.status === 'no_translation_needed') sourceAlreadyTarget.push(translation)
+      else if (translation.status === 'translated' && translation.coverage === 'complete' && translation.contentIntegrity === 'redacted') redactedTranslations.push(translation)
+      else if (translation.status === 'translated') generatedTranslations.push(translation)
+    }
+  }
+
+  const pendingLegalReadReasons = {
+    analysis_cache_missing: 0,
+    extraction_cache_missing: 0,
+    text_extraction_unavailable: 0,
+    stale_source_sha: 0,
+  }
+  for (const file of files) {
+    const identity = `${file.url}|${file.sha256 ?? ''}`
+    if (analysisIdentities.has(identity)) continue
+    if (extractedIdentities.has(identity)) pendingLegalReadReasons.analysis_cache_missing += 1
+    else pendingLegalReadReasons.extraction_cache_missing += 1
+  }
+
+  return {
+    extracted: new Set(extractedIdentities).size,
+    uniquePdfContents: index.coverage?.uniquePdfContents ?? index.documents?.length ?? 0,
+    indexedOriginals: index.coverage?.indexedOriginals ?? 0,
+    completeOriginals: index.coverage?.completeOriginals ?? 0,
+    partialOriginals: index.coverage?.partialOriginals ?? 0,
+    ocrOriginals: index.coverage?.ocrOriginals ?? 0,
+    documentAi: [...analysisProviders.values()].filter((provider) => ['openai', 'anthropic', 'gemini', 'openai_compatible', 'ollama'].includes(provider)).length,
+    localRuleDocumentReads: [...analysisProviders.values()].filter((provider) => provider === 'local_rules').length,
+    humanResearchDocuments: [...analysisProviders.values()].filter((provider) => provider === 'human_research').length,
+    professionalReviewDocuments: [...analysisProviders.values()].filter((provider) => provider === 'human_research').length,
+    pendingProfessionalReviewDocuments: Math.max(
+      0,
+      Number(index.coverage?.uniquePdfContents ?? index.documents?.length ?? 0)
+        - [...analysisProviders.values()].filter((provider) => provider === 'human_research').length,
+    ),
+    legalReadDocuments: analysisIdentities.size,
+    pendingLegalReadDocuments: files.filter((file) => !analysisIdentities.has(`${file.url}|${file.sha256 ?? ''}`)).length,
+    pendingLegalReadReasons,
+    completeTranslations: generatedTranslations.filter((value) => value.coverage === 'complete').length,
+    sourceAlreadyTargetLanguage: sourceAlreadyTarget.filter((value) => value.coverage === 'complete').length,
+    redactedTranslations: redactedTranslations.length,
+    partialTranslations: generatedTranslations.filter((value) => value.coverage === 'partial').length,
+    assistiveTranslations: assistiveTranslations.length,
+    stale: indexState.stale,
+    building: indexState.building,
+  }
+}
+
 export function parseDocumentSearchQuery(value) {
   const normalizedInput = String(value ?? '').normalize('NFKC').trim()
   const truncated = normalizedInput.length > 240
@@ -301,7 +387,7 @@ async function buildDocumentSearchIndex(manifest, signature) {
       const file = currentByUrl.get(value?.sourceUrl)
       const sha256 = value?.sourceSha256 || file?.sha256
       if (value?.schemaVersion !== translationCacheVersion || !file || file.sha256 !== sha256) return null
-      if (!['translated', 'assistive_only'].includes(value?.status) || !translationPages(value).length) return null
+      if (!['translated', 'assistive_only', 'no_translation_needed'].includes(value?.status) || !translationPages(value).length) return null
       return { sha256, language: normalizedTargetLanguage(value.targetLanguage), entry: await indexedTranslation(value, cacheFile) }
     }),
     scanJsonDirectory('document-ai', async (value, cacheFile) => {
@@ -497,18 +583,26 @@ function documentMatchesBloom(document, tokens, scope) {
 
 async function searchIndexedBodies(index, query, scope, signal) {
   const hits = new Map()
-  const candidates = candidateDocumentIndexes(index, query, scope)
+  const queryTokens = queryIndexTokens(query)
+  const queryLanguage = searchQueryLanguage(query)
+  const candidates = candidateDocumentIndexes(index, query, scope, queryTokens)
   const results = await mapWithConcurrency(candidates, searchReadConcurrency, async (documentIndex) => {
     if (signal?.aborted) return null
     const document = index.documents[documentIndex]
     const matches = []
-    if (['all', 'original'].includes(scope) && document.original) {
+    const originalMayMatch = ['all', 'original'].includes(scope)
+      && document.original
+      && bloomContainsQuery(document.bloom.original, queryTokens)
+    if (originalMayMatch) {
       const body = await readSearchText(document.original.searchTextFile)
       const match = bestIndexedTextMatch(body, query, document.original.pageNumbers)
       if (match) matches.push(searchMatchForPage(document, document.original, match, 'body_original', 700))
     }
-    if (['all', 'translation'].includes(scope)) {
-      for (const translation of document.translations) {
+
+    const translationMayMatch = ['all', 'translation'].includes(scope)
+      && bloomContainsQuery(document.bloom.translation, queryTokens)
+    if (translationMayMatch && (scope === 'translation' || matches.length === 0)) {
+      for (const translation of entriesForQueryLanguage(document.translations, queryLanguage)) {
         const body = await readSearchText(translation.searchTextFile)
         const match = bestIndexedTextMatch(body, query, translation.pageNumbers)
         if (!match) continue
@@ -516,8 +610,11 @@ async function searchIndexedBodies(index, query, scope, signal) {
         matches.push(searchMatchForPage(document, translation, match, 'body_translation', qualityScore))
       }
     }
-    if (['all', 'analysis'].includes(scope)) {
-      for (const analysis of document.analyses) {
+
+    const analysisMayMatch = ['all', 'analysis'].includes(scope)
+      && bloomContainsQuery(document.bloom.analysis, queryTokens)
+    if (analysisMayMatch && (scope === 'analysis' || matches.length === 0)) {
+      for (const analysis of entriesForQueryLanguage(document.analyses, queryLanguage)) {
         const body = await readSearchText(analysis.searchTextFile)
         const match = bestIndexedChunkMatch(body, query)
         if (match) matches.push(searchMatchForAnalysis(document, analysis, match))
@@ -533,6 +630,20 @@ async function searchIndexedBodies(index, query, scope, signal) {
     for (const source of item.document.sources) hits.set(source.sourceUrl, item.result)
   }
   return hits
+}
+
+function searchQueryLanguage(query) {
+  const value = query.terms.map((term) => term.normalized).join(' ')
+  const hasHan = /\p{Script=Han}/u.test(value)
+  const hasLatin = /[a-z]/i.test(value)
+  if (hasHan === hasLatin) return null
+  return hasHan ? 'zh' : 'en'
+}
+
+function entriesForQueryLanguage(entries, language) {
+  if (!language) return entries
+  const matching = entries.filter((entry) => entry.language === language)
+  return matching.length ? matching : entries
 }
 
 async function readSearchText(cacheFile) {
@@ -561,8 +672,7 @@ function markActiveSearchIndexForRecovery() {
   activeIndex.signature = `recovery-required:${Date.now()}`
 }
 
-function candidateDocumentIndexes(index, query, scope) {
-  const tokens = queryIndexTokens(query)
+function candidateDocumentIndexes(index, query, scope, tokens = queryIndexTokens(query)) {
   if (!tokens.length) return index.documents.keys()
   return index.documents.map((document, documentIndex) => documentMatchesBloom(document, tokens, scope) ? documentIndex : -1).filter((value) => value >= 0)
 }

@@ -1,0 +1,68 @@
+{
+  "sha256": "7df1fcd19f8133e807a90659234d1b40a589d56be7a010f9626fae369e6b6b1a",
+  "caseId": "discovered-ctb-67664700",
+  "docNumber": "25",
+  "posture": "letter_docket_stub",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "The exact extracted body of this two-page PDF contains only docket footers identifying Case 23-05017, Doc 25, filed August 14, 2023. No substantive letter text is available in the extraction, so the subject, author, factual assertions, and requested relief cannot be body-verified from this local copy.",
+    "plainEnglish": "The local PDF has two pages, but the readable layer contains only the filing stamp. The docket title may say what the letter concerned, yet we cannot treat those details as if we read them in the letter until a legible official copy is obtained.",
+    "legalReading": [
+      "Both pages verify the case number, document number, filing and entry date, timestamp, and pagination only.",
+      "The extracted body contains no caption, letter text, signature, property description, party position, or requested court action.",
+      "No legal conclusion about 675 Ramapo Valley Road, estate ownership, possession, preservation, or injunctive relief can be drawn from the body."
+    ],
+    "caseConnections": [
+      "Use a legible PACER or RECAP copy to connect Doc 25 to the underlying TRO or preliminary-injunction proceedings.",
+      "Read later orders for any adjudicated treatment of the referenced property."
+    ],
+    "whyItMatters": [
+      "The limitation prevents docket metadata from being promoted to body-verified evidence.",
+      "The missing letter may be relevant to the property-preservation dispute once recovered."
+    ],
+    "verificationTasks": [
+      "Obtain a legible official copy or image-based OCR of both pages.",
+      "Compare it with the docket description and related motion and order entries."
+    ],
+    "riskFlags": [
+      "The substantive letter text is absent from the exact extracted page text.",
+      "Docket-title details are metadata, not verified body content here.",
+      "No property or injunction finding appears in the extractable body."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The two page footers identify Case 23-05017, Doc 25, filed and entered August 14, 2023.", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "No substantive letter content is present in the exact extracted text.", "confidence": "high", "pages": [1, 2] }
+    ]
+  },
+  "zh": {
+    "summary": "这份两页 PDF 的精确提取正文只有案卷页脚，确认 Case 23-05017、Doc 25 于 2023 年 8 月 14 日提交。提取内容没有信函正文，因此无法从本地副本正文核验主题、作者、事实陈述或所请求救济。",
+    "plainEnglish": "本地 PDF 虽然有两页，但可读文字层只有提交章。案卷标题可能说明信函涉及什么，但在取得清晰正式副本前，不能假装这些细节已经从信函正文读到。",
+    "legalReading": [
+      "两页只能核验案号、文件号、提交和录入日期、时间戳及页码。",
+      "提取正文没有案名、信函内容、签名、财产描述、当事方立场或请求法院采取的行动。",
+      "不能从正文得出有关 675 Ramapo Valley Road、破产财产所有权、占有、保护或禁令救济的法律结论。"
+    ],
+    "caseConnections": [
+      "应使用清晰 PACER 或 RECAP 副本，把 Doc 25 与基础临时限制令或初步禁令程序连接。",
+      "应以法院后续命令判断所涉财产是否受到任何裁判处理。"
+    ],
+    "whyItMatters": [
+      "明确限制可以防止把案卷元数据升级成经正文核验的证据。",
+      "取得缺失信函后，它可能与财产保护争议有关。"
+    ],
+    "verificationTasks": [
+      "取得清晰正式副本，或对两页图像重新 OCR。",
+      "与案卷描述及相关动议、命令条目比较。"
+    ],
+    "riskFlags": [
+      "精确提取文本中没有信函实体内容。",
+      "案卷标题细节在此只属于元数据，不是经正文核验的信息。",
+      "可提取正文没有任何财产或禁令认定。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "两页页脚确认 Case 23-05017 的 Doc 25 于 2023 年 8 月 14 日提交并录入。", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "精确提取文本中没有任何信函实体内容。", "confidence": "high", "pages": [1, 2] }
+    ]
+  }
+}

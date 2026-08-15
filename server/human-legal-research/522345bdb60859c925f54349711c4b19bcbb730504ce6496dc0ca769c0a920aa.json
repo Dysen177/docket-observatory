@@ -1,0 +1,68 @@
+{
+  "sha256": "522345bdb60859c925f54349711c4b19bcbb730504ce6496dc0ca769c0a920aa",
+  "caseId": "dconn-22-50073",
+  "docNumber": "100",
+  "posture": "certificate_of_service",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "Patrick M. Birney certifies that PAX filed and electronically noticed Doc 98, a reply supporting its automatic-stay position, and Doc 99, a motion for permission to exceed the page limit, on March 18, 2022. This certificate records filing and notice only; it does not adopt PAX's position or grant stay relief or extra pages.",
+    "plainEnglish": "This is the filing receipt for two PAX papers. It tells us the papers entered the system and registered users were notified. It does not tell us that the judge agreed with PAX.",
+    "legalReading": [
+      "Doc 98 is described as PAX's reply seeking confirmation that the automatic stay did not apply or, alternatively, relief under Bankruptcy Code section 362(d)(2).",
+      "Doc 99 is described as PAX's request to exceed the reply page limit.",
+      "The certificate reports CM/ECF notice but contains no ruling on stay applicability, stay relief, or page limits."
+    ],
+    "caseConnections": [
+      "Read Docs 98 and 99 for PAX's arguments and the requested page-limit relief.",
+      "Locate the corresponding court orders to determine whether the automatic stay applied and whether the page-limit request was granted."
+    ],
+    "whyItMatters": [
+      "It fixes the filing date and identifies two connected procedural papers.",
+      "The stay issue can affect whether outside litigation or enforcement may proceed, but this certificate does not resolve that issue."
+    ],
+    "verificationTasks": [
+      "Review the underlying stay motion, response, Doc 98, Doc 99, and the court's later orders as one procedural set.",
+      "Confirm whether additional service beyond CM/ECF was required."
+    ],
+    "riskFlags": [
+      "PAX's requested relief is a party position, not a court finding.",
+      "The certificate does not grant relief from the automatic stay.",
+      "The certificate does not grant the motion to exceed the page limit."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The certificate records CM/ECF filing and notice of Docs 98 and 99 on March 18, 2022.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "The referenced papers concern automatic-stay relief and permission to exceed a page limit, but this filing decides neither request.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Patrick M. Birney 证明，PAX 于 2022 年 3 月 18 日提交并通过电子系统通知了两份文件：Doc 98 是支持其自动中止立场的答复，Doc 99 是请求准许超过页数限制的动议。本证明只记录提交和通知；它不采纳 PAX 的立场，也不批准解除自动中止或超页。",
+    "plainEnglish": "这就是 PAX 两份文件的“提交回执”。它说明文件进入了法院系统，登记用户收到了通知；它不表示法官同意 PAX。",
+    "legalReading": [
+      "Doc 98 被描述为 PAX 的答复，请求确认自动中止不适用，或者作为替代，依据破产法第 362(d)(2) 条解除自动中止。",
+      "Doc 99 被描述为 PAX 请求允许答复超过页数限制的动议。",
+      "该证明只记载 CM/ECF 通知，没有裁决自动中止是否适用、是否解除中止或是否准许超页。"
+    ],
+    "caseConnections": [
+      "应阅读 Docs 98 和 99，了解 PAX 的论证和超页请求。",
+      "应查找对应的法院命令，确定自动中止问题和超页动议的实际结果。"
+    ],
+    "whyItMatters": [
+      "它确定了提交日期，并把两份相互关联的程序文件连接起来。",
+      "自动中止可能影响外部诉讼或执行能否继续，但本证明没有解决该问题。"
+    ],
+    "verificationTasks": [
+      "把基础自动中止动议、反对文件、Doc 98、Doc 99 和法院后续命令作为一个程序组核对。",
+      "确认是否还需要 CM/ECF 之外的其他送达。"
+    ],
+    "riskFlags": [
+      "PAX 请求的救济属于当事方立场，不是法院认定。",
+      "本证明没有解除自动中止。",
+      "本证明也没有批准超过页数限制的动议。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "该证明记录 Docs 98 和 99 于 2022 年 3 月 18 日通过 CM/ECF 提交并发出通知。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "所引用文件涉及自动中止救济和超页许可，但本文件没有裁决任何一项请求。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

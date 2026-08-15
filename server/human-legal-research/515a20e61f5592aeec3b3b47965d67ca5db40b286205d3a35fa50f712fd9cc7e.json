@@ -1,0 +1,72 @@
+{
+  "sha256": "515a20e61f5592aeec3b3b47965d67ca5db40b286205d3a35fa50f712fd9cc7e",
+  "caseId": "bkd-24-05057-amazon",
+  "docNumber": "36",
+  "posture": "defense_counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page notice states that Noam Biale of Sher Tremonte LLP appeared for defendant Bernardo Enriquez in adversary proceeding 24-05057 and requested notice of future pleadings and filings. It is a procedural appearance, not an answer, admission, defense on the merits, dismissal, or ruling concerning the Trustee's claims.",
+    "plainEnglish": "This page tells the court who represents one defendant and where to send future papers. It says nothing about whether the Trustee's allegations are true or whether Bernardo Enriquez is liable.",
+    "legalReading": [
+      "The caption links the adversary proceeding to Chapter 11 case 22-50073 and lists the Trustee as plaintiff and several entities and individuals, including Bernardo Enriquez, as defendants.",
+      "Biale states that he is admitted to practice in the court and appears for Enriquez, and asks to receive notice of future pleadings and filings.",
+      "The notice contains no response to any allegation, affirmative defense, counterclaim, settlement term, or requested merits relief.",
+      "A defense appearance prevents default-related confusion about counsel status but does not admit the complaint's allegations or establish any relationship, ownership, or liability stated elsewhere."
+    ],
+    "caseConnections": [
+      "The substantive dispute, if any, must be read from the complaint, answers, motions, evidence, and later orders in adversary proceeding 24-05057.",
+      "The caption's inclusion of Amazon.com, Inc., Hing Chi Ngok, Alex Hadjicharalambous, Bernardo Enriquez, Chunguang Han, and Mei Guo identifies named defendants only; it does not state the legal basis or outcome for each."
+    ],
+    "whyItMatters": [
+      "It establishes counsel of record for Enriquez as of September 17, 2024 and supports accurate procedural chronology.",
+      "It avoids treating a caption or appearance as proof of the Trustee's allegations."
+    ],
+    "verificationTasks": [
+      "Review the complaint and Enriquez's subsequent responsive pleading for the actual claims, admissions, denials, and defenses.",
+      "Check later docket entries for any withdrawal, substitution, dispositive ruling, settlement, default, or judgment."
+    ],
+    "riskFlags": [
+      "Named-defendant status is not a finding of liability.",
+      "Counsel's appearance is not an admission of any allegation.",
+      "This notice does not resolve ownership, control, estate property, damages, or recovery."
+    ],
+    "findings": [
+      {"section": "summary", "text": "Noam Biale appeared as counsel for defendant Bernardo Enriquez and requested notice of future filings.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The page is limited to counsel status and service; it contains no answer, defense, or court ruling.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The caption and appearance do not establish liability or any ownership or control relationship.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页通知称，Sher Tremonte LLP 的 Noam Biale 在附属诉讼 24-05057 中代表被告 Bernardo Enriquez 出庭，并请求接收此后诉状和提交文件的通知。它是程序性出庭，不是答辩、承认、实体抗辩、驳回或对受托人请求的裁定。",
+    "plainEnglish": "该页只告诉法院“谁代表其中一名被告，以及今后材料送到哪里”。它没有说明受托人的指控是否真实，也没有认定 Bernardo Enriquez 是否承担责任。",
+    "legalReading": [
+      "案名页把附属诉讼与第 11 章案 22-50073 关联，并列明受托人为原告，Bernardo Enriquez 等多名个人和实体为被告。",
+      "Biale 称自己已获准在本院执业，现代表 Enriquez 出庭，并请求接收以后所有诉状和提交文件的通知。",
+      "通知没有回应任何指控，不含积极抗辩、反诉、和解条款或实体救济请求。",
+      "被告律师出庭有助于明确代理和送达状态，但不会承认起诉状中的主张，也不会证明其他文件所称的关系、所有权或责任。"
+    ],
+    "caseConnections": [
+      "任何实体争议都应从附属诉讼 24-05057 的起诉状、答辩、动议、证据和后续命令中读取。",
+      "案名页列出 Amazon.com, Inc.、Hing Chi Ngok、Alex Hadjicharalambous、Bernardo Enriquez、Chunguang Han 和 Mei Guo，只证明他们是列名被告，不说明针对每人的法律依据或结果。"
+    ],
+    "whyItMatters": [
+      "它确认截至 2024 年 9 月 17 日 Enriquez 的案卷律师，并支持准确的程序时间线。",
+      "它避免把案名页或律师出庭误当成受托人指控的证明。"
+    ],
+    "verificationTasks": [
+      "查阅起诉状和 Enriquez 后续答辩文件，确认实际请求、承认、否认和抗辩。",
+      "检查后续案卷是否有撤回、替换律师、终局动议裁定、和解、缺席或判决。"
+    ],
+    "riskFlags": [
+      "被列为被告不等于法院认定承担责任。",
+      "律师出庭不等于承认任何指控。",
+      "该通知不解决所有权、控制、破产财产、损害赔偿或追回问题。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "Noam Biale 代表被告 Bernardo Enriquez 出庭，并请求接收以后提交文件的通知。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "该页只处理律师身份和送达，不含答辩、抗辩或法院裁定。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "案名页和出庭通知不证明责任，也不证明任何所有权或控制关系。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

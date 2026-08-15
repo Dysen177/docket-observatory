@@ -1,0 +1,70 @@
+{
+  "sha256": "3f2a505aea2b47993fa4f6b9b8d6b88d8f60861da12023148ebb76320004147d",
+  "caseId": "az-voice-of-guo",
+  "docNumber": "26",
+  "posture": "affidavit_of_electronic_service",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "Tracy Nolan swears that, under the court's August 5, 2021 order, she sent specified case papers by Discord direct message to @Sara#0821 at about 5:39 p.m. Eastern on August 12, 2021 to serve Sara Wei, also known as Lihong Wei Lafrenz. The affidavit is sworn service evidence, not a merits ruling or an independent judicial determination that service was valid.",
+    "plainEnglish": "This is the sender's sworn account of electronic delivery. It says what was sent, when, and to which Discord account. The judge's authorization and any later service ruling determine the legal effect; the affidavit itself does not prove the lawsuit's claims.",
+    "legalReading": [
+      "Nolan identifies herself as an adult nonparty employed by plaintiffs' counsel and invokes ECF No. 24 as authority for Discord service.",
+      "The listed materials include the summons, class-action complaint, civil cover sheet, two June 23 orders, and the August 5 order.",
+      "The affidavit states that Exhibit 1 is a screenshot of the direct-message conversation used to effect service.",
+      "The extracted document says service occurred August 12 but states that the affidavit was sworn August 11; that facial sequence requires checking the official image and docket record."
+    ],
+    "caseConnections": [
+      "Read with Doc 26-1 for the submitted screenshot and ECF No. 24 for the precise authorized method.",
+      "Locate later appearances, service challenges, default entries, and rulings to determine the procedural effect."
+    ],
+    "whyItMatters": [
+      "Alternative electronic service can trigger response and default procedures when properly authorized and completed.",
+      "The apparent date issue and account-authentication limits are important before relying on the affidavit as conclusive proof."
+    ],
+    "verificationTasks": [
+      "Inspect the official image to confirm whether the notary date reads August 11 and reconcile it with the claimed August 12 service.",
+      "Authenticate the Discord account and transmission metadata if service was contested."
+    ],
+    "riskFlags": [
+      "OCR obscures some caption, signature, and notary characters.",
+      "The affidavit is the affiant's sworn evidence, not a court finding of service validity.",
+      "The extracted dates place notarization before the stated service and require source verification."
+    ],
+    "findings": [
+      { "section": "summary", "text": "Nolan states that she sent the listed papers to @Sara#0821 by Discord on August 12, 2021 under ECF No. 24.", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "The page states an August 12 service date but an August 11 sworn date, creating a facial chronology issue.", "confidence": "high", "pages": [2] }
+    ]
+  },
+  "zh": {
+    "summary": "Tracy Nolan 宣誓称，她依据法院 2021 年 8 月 5 日命令，于 2021 年 8 月 12 日美国东部时间下午约 5:39，通过 Discord 私信向 @Sara#0821 发送指定案件文件，以送达 Sara Wei（又名 Lihong Wei Lafrenz）。该宣誓书属于宣誓送达证据，不是实体裁判，也不是法院对送达有效性的独立认定。",
+    "plainEnglish": "这份文件是发送人对电子送达过程的宣誓说明：发了什么、何时发送、发到哪个 Discord 账号。法律效果要看法官授权和后续送达裁定；宣誓书本身不证明诉讼主张成立。",
+    "legalReading": [
+      "Nolan 说明自己是成年非当事人，受雇于原告律师，并援引 ECF No. 24 作为 Discord 送达依据。",
+      "所列材料包括传票、集体诉讼起诉状、民事封面表、两份 6 月 23 日命令和 8 月 5 日命令。",
+      "宣誓书称附件 1 是据称完成送达的私信对话截图。",
+      "提取文件称送达发生在 8 月 12 日，却称宣誓发生在 8 月 11 日；这一表面时间顺序需要核对正式图像和案卷。"
+    ],
+    "caseConnections": [
+      "应与 Doc 26-1 截图附件和 ECF No. 24 的具体授权方式一起阅读。",
+      "应查找后续出庭、送达异议、缺席登记和裁定，确定其程序效果。"
+    ],
+    "whyItMatters": [
+      "经适当授权并完成的替代电子送达，可能启动回应和缺席程序。",
+      "在把该宣誓书作为确定证据前，必须处理表面日期问题和账号认证限制。"
+    ],
+    "verificationTasks": [
+      "检查正式图像，确认公证日期是否为 8 月 11 日，并与所称 8 月 12 日送达核对。",
+      "如送达受到争议，应认证 Discord 账号和传输元数据。"
+    ],
+    "riskFlags": [
+      "OCR 使部分案名、签名和公证字符不清。",
+      "宣誓书是宣誓人的证据，不是法院关于送达有效性的认定。",
+      "提取日期显示公证早于所称送达，需要核验来源。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "Nolan 称其依据 ECF No. 24，于 2021 年 8 月 12 日通过 Discord 向 @Sara#0821 发送所列文件。", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "文件记载 8 月 12 日送达，却记载 8 月 11 日宣誓，存在表面时间顺序问题。", "confidence": "high", "pages": [2] }
+    ]
+  }
+}

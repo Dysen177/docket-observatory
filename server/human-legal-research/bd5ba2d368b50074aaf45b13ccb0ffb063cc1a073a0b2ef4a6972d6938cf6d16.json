@@ -1,0 +1,70 @@
+{
+  "sha256": "bd5ba2d368b50074aaf45b13ccb0ffb063cc1a073a0b2ef4a6972d6938cf6d16",
+  "caseId": "discovered-nysd-67012234",
+  "docNumber": "132",
+  "posture": "briefing_schedule_order",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "Judge Analisa Torres sets a briefing schedule for Ho Wan Kwok's motion seeking to stay the Connecticut bankruptcy cases and related adversary proceedings. The government was directed to oppose or state no opposition by September 21, 2023, and the defendant could reply by October 5, 2023. The order schedules briefing; it does not grant a stay or decide the motion.",
+    "plainEnglish": "The judge did not stop the bankruptcy cases in this document. She set dates for each side to submit written arguments before the court decided whether to do so. It is a timetable, not the answer to the motion.",
+    "legalReading": [
+      "The order describes the defendant's requested relief as a stay of In re Ho Wan Kwok, the jointly administered Genever cases, and related adversary proceedings.",
+      "The government received a September 21, 2023 deadline to oppose or advise that it did not oppose; the defense received an October 5, 2023 reply deadline.",
+      "No finding is made on authority to issue a stay, likelihood of success, harm, bankruptcy jurisdiction, or the merits of any bankruptcy dispute."
+    ],
+    "caseConnections": [
+      "Read ECF Nos. 129-131 for the defense motion and supporting materials.",
+      "Locate the government's response, any reply, and the later disposition to determine whether any stay was entered and for what period."
+    ],
+    "whyItMatters": [
+      "The motion links the criminal case procedurally to the Connecticut bankruptcy and Genever proceedings.",
+      "The order prevents a false timeline entry stating that the bankruptcy proceedings were stayed on August 31, 2023."
+    ],
+    "verificationTasks": [
+      "Find and review the submissions due September 21 and October 5, 2023.",
+      "Find the final order resolving ECF No. 129 and check whether later events mooted or narrowed the request."
+    ],
+    "riskFlags": [
+      "This is only a briefing schedule.",
+      "The order does not stay any bankruptcy case or adversary proceeding.",
+      "The court does not adopt either party's factual or legal position in this document."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The court set opposition and reply deadlines for the defendant's bankruptcy-stay motion.", "confidence": "high", "pages": [1] },
+      { "section": "caseConnections", "text": "The requested stay covered the Ho Wan Kwok and jointly administered Genever bankruptcy matters and related adversary proceedings.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The order does not grant the requested stay or decide the motion's merits.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Analisa Torres 法官为 Ho Wan Kwok 请求中止康涅狄格州破产案件及相关附属诉讼的动议设定书面辩论时间表。政府须在 2023 年 9 月 21 日前提交反对意见或表示不反对；被告可在 10 月 5 日前答复。这份命令只是排期，没有批准中止，也没有裁决动议。",
+    "plainEnglish": "这份文件里，法官并没有叫停破产案。她只是规定双方在什么日期前把书面理由交上来，之后法院才会决定。它是一张“交作业时间表”，不是动议的答案。",
+    "legalReading": [
+      "命令把被告请求的救济描述为中止 In re Ho Wan Kwok、合并管理的 Genever 案件及相关附属诉讼。",
+      "政府须在 2023 年 9 月 21 日前反对或告知不反对；辩方可在 10 月 5 日前提交答复。",
+      "命令没有就法院是否有权中止、胜诉可能性、损害、破产管辖权或任何破产争议实体问题作出认定。"
+    ],
+    "caseConnections": [
+      "应阅读 ECF Nos. 129-131，了解辩方动议和支持材料。",
+      "应查找政府回应、辩方答复和后续处理命令，确定是否最终签发中止以及中止期限。"
+    ],
+    "whyItMatters": [
+      "该动议在程序上把刑事案与康涅狄格破产案和 Genever 程序连接起来。",
+      "这份命令可以防止时间线错误地写成“破产程序已于 2023 年 8 月 31 日被中止”。"
+    ],
+    "verificationTasks": [
+      "查找并审阅 2023 年 9 月 21 日和 10 月 5 日到期的双方文件。",
+      "查找最终解决 ECF No. 129 的命令，并核对后续事件是否使请求失去实际意义或缩小范围。"
+    ],
+    "riskFlags": [
+      "这只是一份书面辩论排期命令。",
+      "该命令没有中止任何破产案或附属诉讼。",
+      "法院在本文件中没有采纳任何一方的事实或法律立场。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "法院为被告的破产中止动议设定了政府反对和辩方答复期限。", "confidence": "high", "pages": [1] },
+      { "section": "caseConnections", "text": "所请求的中止涵盖 Ho Wan Kwok 破产案、合并管理的 Genever 案件及相关附属诉讼。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该命令没有批准中止，也没有裁判动议实体问题。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

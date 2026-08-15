@@ -1,0 +1,70 @@
+{
+  "sha256": "f1641aa2b9ba489a565d2a9054f485e9ae9c74c4b612eeebc02a2d07cf046221",
+  "caseId": "discovered-ctb-67664700",
+  "docNumber": "71",
+  "posture": "order_granting_emergency_status_conference",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "The bankruptcy court grants the Chapter 11 trustee's emergency motion only as set out in the order: it schedules an October 24, 2023 Zoom status conference to discuss preservation of estate property and directs counsel for Taurus Fund LLC and Greenwich Land, LLC to appear. It does not adjudicate ownership, impose the requested preservation remedy, or decide the underlying adversary claims.",
+    "plainEnglish": "The judge called an urgent meeting and required lawyers for two entities to attend. The order opens a courtroom discussion about protecting property; it does not itself decide who owns the property or who wins the lawsuits.",
+    "legalReading": [
+      "The caption links jointly administered Case 22-50073 with adversary proceedings 23-05017 and 23-05005 and references ECF No. 70.",
+      "The operative relief is a ZoomGov status conference at 1:00 p.m. on October 24 and mandatory appearance by Taurus Fund and Greenwich Land counsel.",
+      "Although the title references preservation of estate property and the court states good cause was shown, no specific asset freeze, turnover, ownership finding, contempt sanction, or injunction appears in this order."
+    ],
+    "caseConnections": [
+      "Read ECF No. 70 for the trustee's requested relief and asserted urgency.",
+      "Review the October 24 conference record and later orders for any actual preservation directives or ownership adjudication."
+    ],
+    "whyItMatters": [
+      "It establishes a cross-adversary procedural event involving Taurus Fund and Greenwich Land.",
+      "It prevents the granted status conference from being mislabeled as a final property or injunction ruling."
+    ],
+    "verificationTasks": [
+      "Collect the conference transcript or minute entry and all resulting orders.",
+      "Verify the judge's signature from the official image because the extracted signature line is unclear."
+    ],
+    "riskFlags": [
+      "Granting the motion here means granting an emergency conference, not all substantive preservation relief that may have been requested.",
+      "The order makes no final ownership or estate-property determination.",
+      "The extracted signature name is not reliably legible."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The court scheduled an emergency Zoom status conference for October 24, 2023 and ordered Taurus Fund and Greenwich Land counsel to appear.", "confidence": "high", "pages": [2] },
+      { "section": "caseConnections", "text": "The caption connects adversary proceedings 23-05017 and 23-05005 within the jointly administered bankruptcy cases.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The order contains no final ownership, turnover, contempt, or injunction determination.", "confidence": "high", "pages": [2] }
+    ]
+  },
+  "zh": {
+    "summary": "破产法院仅按命令所列范围批准第 11 章受托人的紧急动议：安排 2023 年 10 月 24 日通过 Zoom 举行状态会议，讨论保护破产财产，并命令 Taurus Fund LLC 和 Greenwich Land, LLC 的律师出席。该命令没有裁判所有权、没有直接施加所请求的财产保护救济，也没有解决基础附属诉讼。",
+    "plainEnglish": "法官召开了一次紧急会议，并要求两家实体的律师参加。这相当于启动关于如何保护财产的法庭讨论，并不等于已经决定财产归谁或谁在诉讼中胜诉。",
+    "legalReading": [
+      "案名页把合并管理的 Case 22-50073 与附属诉讼 23-05017、23-05005 连接，并引用 ECF No. 70。",
+      "具有操作效力的救济是 10 月 24 日下午 1:00 举行 ZoomGov 状态会议，并强制 Taurus Fund 和 Greenwich Land 律师出席。",
+      "虽然标题提到保护破产财产，法院也称已说明正当理由，但本命令没有具体冻结资产、返还财产、所有权认定、藐视制裁或禁令。"
+    ],
+    "caseConnections": [
+      "应阅读 ECF No. 70，了解受托人具体请求和所称紧迫性。",
+      "应审阅 10 月 24 日会议记录及后续命令，确定是否实际签发财产保护措施或作出所有权裁判。"
+    ],
+    "whyItMatters": [
+      "它确立了一个同时涉及 Taurus Fund 和 Greenwich Land 的跨附属诉讼程序节点。",
+      "它可以防止把获准召开的状态会议误写成终局财产或禁令裁定。"
+    ],
+    "verificationTasks": [
+      "收集会议庭审记录或简短条目以及由此产生的全部命令。",
+      "从正式图像核验法官签名，因为提取的签名行不清。"
+    ],
+    "riskFlags": [
+      "这里的“批准动议”是批准举行紧急会议，不等于批准动议中可能请求的全部实体财产保护救济。",
+      "命令没有作出最终所有权或破产财产认定。",
+      "提取文本中的签名姓名无法可靠辨认。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "法院安排 2023 年 10 月 24 日紧急 Zoom 状态会议，并命令 Taurus Fund 和 Greenwich Land 律师出席。", "confidence": "high", "pages": [2] },
+      { "section": "caseConnections", "text": "案名页把附属诉讼 23-05017 和 23-05005 与合并管理的破产案连接。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本命令没有最终所有权、返还、藐视或禁令认定。", "confidence": "high", "pages": [2] }
+    ]
+  }
+}

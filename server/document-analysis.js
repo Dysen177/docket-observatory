@@ -15,8 +15,9 @@ import { documentVariantKey, documentVariantLabel } from './document-variant.js'
 import { relationshipForFile, relationshipTypeDefinition } from './relationship-audit.js'
 import { localAiAvailable, localAssistiveContentIntegrity, localAssistiveTranslateText, localAssistiveTranslationMode, localCaseDossierAnalysis, localDocumentAiResult, ollamaDocumentAnalysis, ollamaTranslateText } from './local-legal-ai.js'
 import { humanCaseResearch, humanDocumentResearch } from './human-legal-research.js'
+import { humanDocumentTranslation } from './human-translations.js'
 import { himalayaRestorationSearchAliases } from './himalaya-restoration.js'
-import { searchDocumentCatalog } from './document-search.js'
+import { getDocumentSearchProcessingSnapshot, searchDocumentCatalog } from './document-search.js'
 import { allCaseRecords, localizeDiscoveredCase } from './discovered-case-records.js'
 
 const documentAnalysisSchema = {
@@ -334,6 +335,7 @@ export async function buildDocumentAnalysis(manifest, state, lang = 'zh', option
   const cachePath = documentAnalysisCachePath(lang)
   const cached = await readJsonFile(cachePath)
   if (cached?.cacheSignature === cacheSignature) {
+    analysisMemoryCache.clear()
     analysisMemoryCache.set(cacheSignature, cached)
     return cached
   }
@@ -354,22 +356,33 @@ export async function buildDocumentAnalysis(manifest, state, lang = 'zh', option
 }
 
 async function performDocumentAnalysis(manifest, state, lang, options, cacheSignature) {
+  const timingStartedAt = Date.now()
+  let timingCheckpoint = timingStartedAt
+  const markTiming = (stage) => {
+    if (process.env.GUO_INTEL_PROFILE_ANALYSIS !== '1') return
+    const now = Date.now()
+    console.error(`[document-analysis] ${stage}: ${now - timingCheckpoint} ms (${now - timingStartedAt} ms total)`)
+    timingCheckpoint = now
+  }
   const files = Array.isArray(manifest.files) ? manifest.files : []
-  const extractionLimit = Number(options.extractionLimit ?? process.env.GUO_INTEL_PDF_TEXT_BATCH_LIMIT ?? 18)
+  const enrichQueue = options.catalog === 'full' || options.includeSnippets === true
+  const extractionLimit = Number(options.extractionLimit ?? (enrichQueue ? process.env.GUO_INTEL_PDF_TEXT_BATCH_LIMIT ?? 18 : 0))
   const pageLimit = Number(options.pageLimit ?? runtimeSetting('pdfPageLimit'))
   const charLimit = Number(options.charLimit ?? runtimeSetting('pdfCharLimit'))
   const catalogLimit = boundedNumber(options.catalogLimit, 12, 100)
   const includeCatalogDetails = options.catalog === 'full'
   const includeCatalogSnippets = options.includeSnippets === true
+  const analysisContext = createDocumentAnalysisContext(state)
   const records = files
     .filter((file) => file.status !== 'error')
-    .map((file) => localDocumentAnalysis(file, state, lang))
+    .map((file) => localDocumentAnalysis(file, state, lang, analysisContext))
     .sort(compareAnalysisRecords)
 
   const errorRecords = files
     .filter((file) => file.status === 'error')
-    .map((file) => localDocumentAnalysis(file, state, lang))
+    .map((file) => localDocumentAnalysis(file, state, lang, analysisContext))
     .sort((a, b) => compareDocNumber(b.docNumber, a.docNumber))
+  markTiming('classify records')
 
   const queue = prioritizeDocumentQueue(records, options.limit ?? 18)
   const extractionByUrl = await extractPdfSnippetsForFiles(queue.map((record) => record.rawFile).filter(Boolean), {
@@ -377,8 +390,12 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
     pageLimit,
     charLimit,
   })
-  const enrichedQueue = await Promise.all(queue.map((record) => enrichRecordWithExtraction(record, extractionByUrl.get(record.sourceUrl), state, lang)))
+  const enrichedQueue = enrichQueue
+    ? await Promise.all(queue.map((record) => enrichRecordWithExtraction(record, extractionByUrl.get(record.sourceUrl), state, lang)))
+    : queue.map(publicDocumentRecord)
+  markTiming('prepare queue')
   const cacheInventory = await processingCacheInventory(manifest, state, lang)
+  markTiming('read processing inventory')
   const queueByUrl = new Map(enrichedQueue.map((record) => [record.sourceUrl, record]))
   const allCatalogRecords = [...records, ...errorRecords].sort(compareAnalysisRecords)
   const catalogRecords = allCatalogRecords.slice(0, catalogLimit)
@@ -387,6 +404,8 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
     if (includeCatalogDetails) return includeCatalogSnippets ? publicRecord : withoutSnippet(publicRecord)
     return compactCatalogRecord(publicRecord, lang)
   })
+  const caseDossiers = await buildCaseDossiers(records, state, lang, manifest)
+  markTiming('build case dossiers')
   const payload = {
     cacheSignature,
     generatedAt: new Date().toISOString(),
@@ -398,7 +417,7 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
     portfolioRead: documentPortfolioRead(records, state, lang, manifest),
     analytics: documentAnalytics(records, errorRecords, state, lang, manifest),
     automation: automationPlan(records, errorRecords, extractionByUrl, state, lang, cacheInventory, manifest),
-    caseDossiers: await buildCaseDossiers(records, state, lang, manifest),
+    caseDossiers,
     counts: {
       totalFiles: files.length,
       localAvailable: files.filter((file) => ['downloaded', 'downloaded_new_version', 'skipped_existing'].includes(file.status)).length,
@@ -409,6 +428,9 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
       cachedDocumentAi: cacheInventory.documentAi,
       cachedLocalRuleReads: cacheInventory.localRuleDocumentReads,
       humanResearchDocuments: cacheInventory.humanResearchDocuments,
+      uniquePdfContents: cacheInventory.uniquePdfContents,
+      professionalReviewDocuments: cacheInventory.professionalReviewDocuments,
+      pendingProfessionalReviewDocuments: cacheInventory.pendingProfessionalReviewDocuments,
       legalReadDocuments: cacheInventory.legalReadDocuments,
       pendingLegalReadDocuments: cacheInventory.pendingLegalReadDocuments,
       pendingLegalReadReasons: cacheInventory.pendingLegalReadReasons,
@@ -437,6 +459,7 @@ async function performDocumentAnalysis(manifest, state, lang, options, cacheSign
   }
 
   await writeAnalysisCache(payload, lang)
+  markTiming('write response cache')
   return payload
 }
 
@@ -448,6 +471,7 @@ export async function buildDocumentCatalog(manifest, state, lang = 'zh', options
     const cached = await readJsonFile(cachePath)
     if (cached?.cacheSignature === cacheSignature && Array.isArray(cached.records)) {
       index = cached
+      documentCatalogMemoryCache.clear()
       documentCatalogMemoryCache.set(cacheSignature, index)
     }
   }
@@ -614,11 +638,11 @@ async function localAnalyzeDocumentWithExtraction(file, state, lang) {
   return result
 }
 
-export function localDocumentAnalysis(file, state, lang = 'zh') {
+export function localDocumentAnalysis(file, state, lang = 'zh', context = null) {
   const displayTitle = cleanDisplayTitle(file.title)
   const displayFile = displayTitle === file.title ? file : { ...file, title: displayTitle }
   const exact = exactDocumentNoteFor(displayFile)
-  const matchedEvent = findMatchingEvent(displayFile, state)
+  const matchedEvent = findMatchingEvent(displayFile, state, context?.eventByFiling)
   const category = exact?.category ?? matchedEvent?.category ?? classifyDocument(displayFile)
   const priority = exact?.priority ?? matchedEvent?.severity ?? priorityForCategory(category)
   const topics = exact?.topics ?? relatedTopics(displayFile, category)
@@ -896,7 +920,7 @@ async function analyzeHumanDocument(file, research, state, lang) {
       researchQuality: researchQualityFor(file, extraction, lang),
       aiStatus: {
         ...local.aiStatus,
-        mode: lang === 'en' ? 'Human research locked, but body validation is unavailable' : '人工研究已锁定，但正文验证不可用',
+        mode: lang === 'en' ? 'Version-locked review exists, but body validation is unavailable' : '版本锁定复核已存在，但正文验证不可用',
         provider: null,
         generated: false,
         lastError: extraction?.warning ?? 'Body extraction unavailable.',
@@ -911,7 +935,7 @@ async function analyzeHumanDocument(file, research, state, lang) {
     ...applied,
     analysisLanguage: lang,
     generatedAt: research.reviewedAt ?? new Date().toISOString(),
-    model: lang === 'en' ? 'Human legal research v1' : '人工法律研究 v1',
+    model: lang === 'en' ? 'Version-locked legal review v1' : '版本锁定法律复核 v1',
     sourceUrl: file.url,
     sourceSha256: file.sha256 ?? null,
   }
@@ -942,7 +966,7 @@ function applyHumanResearch(record, research, lang, extraction = null) {
       provider: 'human_research',
       generated: true,
       confidence: 'high',
-      mode: lang === 'en' ? 'Version-locked human legal research' : '版本锁定人工法律研究',
+      mode: lang === 'en' ? 'Version-locked legal review' : '版本锁定法律复核',
       reviewedAt: research.reviewedAt ?? null,
     },
     analysisBasis: 'human_research',
@@ -971,12 +995,12 @@ function humanFindings(items, extraction) {
 function humanResearchQuality(key, lang) {
   const labels = lang === 'en'
     ? {
-        body_verified: ['Body fully reviewed', 'Version-locked human research cites the reviewed public PDF pages.'],
+        body_verified: ['Body fully reviewed', 'The version-locked legal review cites the reviewed public PDF pages.'],
         body_partial: ['Body partially reviewed', 'Human research is based on the available public pages; sealed or omitted content remains a material gap.'],
       }
     : {
-        body_verified: ['正文已完整审阅', '版本锁定人工研究引用了已审阅公开 PDF 页面。'],
-        body_partial: ['正文部分审阅', '人工研究基于现有公开页面；密封或省略内容仍是实质性缺口。'],
+        body_verified: ['正文已完整审阅', '版本锁定法律复核引用了已审阅公开 PDF 页面。'],
+        body_partial: ['正文部分审阅', '版本锁定法律复核基于现有公开页面；密封或省略内容仍是实质性缺口。'],
       }
   const [label, detail] = labels[key] ?? labels.body_verified
   return { key, label, detail }
@@ -1192,6 +1216,8 @@ function localizedCitations(record, extraction, translation, lang) {
 
 async function readCachedTranslation(file, extraction, lang) {
   if (!file || !extraction?.textHash) return null
+  const versionLocked = humanDocumentTranslation(file, extraction, lang)
+  if (versionLocked) return versionLocked
   const cacheKey = createHash('sha1')
     .update(JSON.stringify({
       version: translationCacheVersion,
@@ -1595,9 +1621,27 @@ function stableDocumentId(file) {
     : `${file.caseId || 'case'}-file-${sourceHash}`
 }
 
-function findMatchingEvent(file, state) {
+function createDocumentAnalysisContext(state) {
+  const eventByFiling = new Map()
+  for (const event of state?.events ?? []) {
+    const filingNumber = normalizeDocketNumber(event.filingNumber)
+    if (!event.caseId || !filingNumber) continue
+    const key = `${event.caseId}|${filingNumber}`
+    if (!eventByFiling.has(key)) eventByFiling.set(key, event)
+  }
+  return { eventByFiling }
+}
+
+function findMatchingEvent(file, state, eventByFiling = null) {
   if (!file.docNumber) return null
   const documentNumber = normalizeDocketNumber(file.docNumber)
+  if (eventByFiling) {
+    const exact = eventByFiling.get(`${file.caseId}|${documentNumber}`)
+    if (exact) return exact
+    const parentNumber = documentNumber.split('-')[0]
+    if (!parentNumber || parentNumber === documentNumber) return null
+    return eventByFiling.get(`${file.caseId}|${parentNumber}`) ?? null
+  }
   const exact = state.events.find((event) => event.caseId === file.caseId && normalizeDocketNumber(event.filingNumber) === documentNumber)
   if (exact) return exact
   const parentNumber = documentNumber.split('-')[0]
@@ -2716,107 +2760,11 @@ async function buildCaseDossiers(records, state, lang, manifest) {
 
 async function processingCacheInventory(manifest = null, state = null, lang = 'zh') {
   const root = analysisCacheDir()
-  const [extractions, translations, documentAi, caseAi] = await Promise.all([
-    readJsonDirectoryEntries(path.join(root, 'pdf-text')),
-    readJsonDirectoryEntries(path.join(root, 'translations')),
-    readJsonDirectoryEntries(path.join(root, 'document-ai')),
-    readJsonDirectoryEntries(path.join(root, 'case-ai')),
+  const [searchSnapshot, caseAi] = await Promise.all([
+    getDocumentSearchProcessingSnapshot(manifest, lang),
+    readJsonDirectoryEntries(path.join(root, 'case-ai'), compactCaseAiInventoryValue),
   ])
   const files = (manifest?.files ?? []).filter((file) => file?.status !== 'error' && file?.url)
-  const currentByUrl = new Map(files.map((file) => [file.url, file]))
-  const currentByPath = new Map(files.filter((file) => file.path).map((file) => [path.resolve(file.path), file]))
-  const currentBySha = new Map(files.filter((file) => file.sha256).map((file) => [file.sha256, file]))
-  const currentDocumentCache = (value) => {
-    const file = currentByUrl.get(value?.sourceUrl)
-    if (!file) return false
-    return !file.sha256 || value?.sourceSha256 === file.sha256
-  }
-  const currentExtractionCache = (value) => {
-    const cachedSha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
-    if (cachedSha256 && currentBySha.has(cachedSha256)) return true
-    const signaturePath = value?.signature?.path
-    const file = signaturePath ? currentByPath.get(path.resolve(signaturePath)) : null
-    if (!file) return false
-    return !file.sha256 || cachedSha256 === file.sha256
-  }
-  const fileForExtractionCache = (value) => {
-    const cachedSha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
-    if (cachedSha256 && currentBySha.has(cachedSha256)) return currentBySha.get(cachedSha256)
-    const signaturePath = value?.signature?.path
-    return signaturePath ? currentByPath.get(path.resolve(signaturePath)) : null
-  }
-  const targetLanguage = lang === 'en' ? 'english' : 'chinese'
-  const languageMatches = (value) => String(value?.targetLanguage ?? '').toLowerCase().includes(targetLanguage)
-  const currentExtractions = extractions.map((entry) => entry.value).filter(currentExtractionCache)
-  const uniqueExtractions = uniqueCacheValues(
-    currentExtractions.filter((value) => value?.status === 'extracted'),
-    (value) => {
-      const file = fileForExtractionCache(value)
-      return documentCacheIdentity(file)
-    },
-  )
-  const currentTranslations = bestUniqueCacheValues(
-    translations.map((entry) => entry.value).filter((value) => value?.schemaVersion === translationCacheVersion
-      && currentDocumentCache(value)
-      && languageMatches(value)),
-    (value) => `${value.sourceUrl}|${value.sourceSha256 ?? ''}|${String(value.targetLanguage).toLowerCase()}`,
-    preferTranslationCache,
-  )
-  const generatedTranslations = currentTranslations.filter((value) =>
-    value?.status === 'translated'
-    && value?.coverage)
-  const sourceAlreadyTargetLanguage = currentTranslations.filter((value) =>
-    value?.status === 'no_translation_needed'
-    && value?.coverage)
-  const assistiveTranslations = currentTranslations.filter((value) => value?.status === 'assistive_only')
-  const currentDocumentAi = uniqueCacheValues(
-    documentAi.map((entry) => entry.value).filter((value) => currentDocumentCache(value)
-      && value?.aiStatus?.generated
-      && documentAnalysisLanguage(value) === lang),
-    (value) => `${value.sourceUrl}|${value.sourceSha256 ?? ''}|${value.aiStatus?.provider ?? 'unknown'}`,
-  )
-  const legalReadProviders = new Set(['human_research', 'local_rules', 'openai', 'anthropic', 'gemini', 'openai_compatible', 'ollama'])
-  const legalReadIdentities = new Set(currentDocumentAi
-    .filter((value) => legalReadProviders.has(value?.aiStatus?.provider))
-    .map((value) => {
-      const file = currentByUrl.get(value.sourceUrl)
-      return documentCacheIdentity(file)
-    }))
-  const extractedIdentities = new Set(uniqueExtractions.map((value) => {
-    const file = fileForExtractionCache(value)
-    return documentCacheIdentity(file)
-  }))
-  const unavailableExtractionIdentities = new Set(currentExtractions
-    .filter((value) => value?.status !== 'extracted')
-    .map((value) => {
-      const file = fileForExtractionCache(value)
-      return documentCacheIdentity(file)
-    }))
-  const staleLegalReadUrls = new Set(documentAi
-    .map((entry) => entry.value)
-    .filter((value) => legalReadProviders.has(value?.aiStatus?.provider)
-      && value?.aiStatus?.generated
-      && currentByUrl.has(value?.sourceUrl)
-      && !currentDocumentCache(value))
-    .map((value) => value.sourceUrl))
-  const pendingLegalReadFiles = files.filter((file) => !legalReadIdentities.has(documentCacheIdentity(file)))
-  const pendingLegalReadReasons = pendingLegalReadFiles.reduce((reasons, file) => {
-    const identity = documentCacheIdentity(file)
-    const reason = staleLegalReadUrls.has(file.url)
-      ? 'stale_source_sha'
-      : extractedIdentities.has(identity)
-        ? 'analysis_cache_missing'
-        : unavailableExtractionIdentities.has(identity)
-          ? 'text_extraction_unavailable'
-          : 'extraction_cache_missing'
-    reasons[reason] += 1
-    return reasons
-  }, {
-    analysis_cache_missing: 0,
-    extraction_cache_missing: 0,
-    text_extraction_unavailable: 0,
-    stale_source_sha: 0,
-  })
   const currentCases = allCaseRecords(state, manifest)
   const currentCaseIds = new Set(currentCases.map((caseRecord) => caseRecord.id))
   const caseById = new Map(currentCases.map((caseRecord) => [caseRecord.id, localizedCaseRecord(caseRecord, lang)]))
@@ -2832,34 +2780,25 @@ async function processingCacheInventory(manifest = null, state = null, lang = 'z
   const humanResearchDocuments = files.filter((file) => humanDocumentResearch(file, 'zh')).length
   const humanResearchCases = new Set(files.map((file) => file.caseId).filter((caseId) => humanCaseResearch(caseId, manifest, 'zh'))).size
   return {
-    extracted: uniqueExtractions.length,
-    documentAi: currentDocumentAi.filter((value) => [...cloudProviderIds, 'ollama'].includes(value?.aiStatus?.provider)).length,
-    localRuleDocumentReads: currentDocumentAi.filter((value) => value?.aiStatus?.provider === 'local_rules').length,
+    extracted: searchSnapshot.extracted,
+    documentAi: searchSnapshot.documentAi,
+    localRuleDocumentReads: searchSnapshot.localRuleDocumentReads,
     humanResearchDocuments,
-    legalReadDocuments: legalReadIdentities.size,
-    pendingLegalReadDocuments: pendingLegalReadFiles.length,
-    pendingLegalReadReasons,
+    uniquePdfContents: searchSnapshot.uniquePdfContents,
+    professionalReviewDocuments: searchSnapshot.professionalReviewDocuments,
+    pendingProfessionalReviewDocuments: searchSnapshot.pendingProfessionalReviewDocuments,
+    legalReadDocuments: searchSnapshot.legalReadDocuments,
+    pendingLegalReadDocuments: searchSnapshot.pendingLegalReadDocuments,
+    pendingLegalReadReasons: searchSnapshot.pendingLegalReadReasons,
     caseAi: currentCaseAi.filter((value) => [...cloudProviderIds, 'ollama'].includes(value?.provider)).length,
     localRuleCaseReads: currentCaseAi.filter((value) => value?.provider === 'local_rules').length,
     humanResearchCases,
-    completeTranslations: generatedTranslations.filter((value) => value.coverage === 'complete' && !['redacted', 'assistive_glossary'].includes(value.contentIntegrity)).length,
-    sourceAlreadyTargetLanguage: sourceAlreadyTargetLanguage.filter((value) => value.coverage === 'complete').length,
-    redactedTranslations: generatedTranslations.filter((value) => value.coverage === 'complete' && value.contentIntegrity === 'redacted').length,
-    partialTranslations: generatedTranslations.filter((value) => value.coverage === 'partial' || value.contentIntegrity === 'assistive_glossary').length,
-    assistiveTranslations: assistiveTranslations.length,
+    completeTranslations: searchSnapshot.completeTranslations,
+    sourceAlreadyTargetLanguage: searchSnapshot.sourceAlreadyTargetLanguage,
+    redactedTranslations: searchSnapshot.redactedTranslations,
+    partialTranslations: searchSnapshot.partialTranslations,
+    assistiveTranslations: searchSnapshot.assistiveTranslations,
   }
-}
-
-function documentCacheIdentity(file) {
-  return `${file?.url ?? ''}|${file?.sha256 ?? ''}`
-}
-
-function documentAnalysisLanguage(value) {
-  if (['zh', 'en'].includes(value?.analysisLanguage)) return value.analysisLanguage
-  const languageSample = [value?.aiStatus?.mode, value?.model, value?.summary, value?.plainEnglish]
-    .filter((item) => typeof item === 'string')
-    .join(' ')
-  return hasCjk(languageSample) ? 'zh' : 'en'
 }
 
 function uniqueCacheValues(values, keyFor) {
@@ -2869,29 +2808,6 @@ function uniqueCacheValues(values, keyFor) {
     if (key) unique.set(key, value)
   }
   return [...unique.values()]
-}
-
-function bestUniqueCacheValues(values, keyFor, preferCandidate) {
-  const unique = new Map()
-  for (const value of values) {
-    const key = keyFor(value)
-    if (!key) continue
-    const current = unique.get(key)
-    if (!current || preferCandidate(value, current)) unique.set(key, value)
-  }
-  return [...unique.values()]
-}
-
-function preferTranslationCache(candidate, current) {
-  const weight = (value) => {
-    if (['translated', 'no_translation_needed'].includes(value?.status) && value?.coverage === 'complete' && !['redacted', 'assistive_glossary'].includes(value?.contentIntegrity)) return 4
-    if (['translated', 'no_translation_needed'].includes(value?.status) && value?.coverage === 'complete') return 3
-    if (['translated', 'no_translation_needed'].includes(value?.status)) return 2
-    if (value?.status === 'assistive_only') return 1
-    return 0
-  }
-  return weight(candidate) > weight(current)
-    || weight(candidate) === weight(current) && String(candidate?.translatedAt ?? '') > String(current?.translatedAt ?? '')
 }
 
 function caseCacheMatchesCurrentEvidence(value, caseById, manifest, state, lang) {
@@ -2921,7 +2837,19 @@ function caseCacheIdentity(filename, caseIds) {
   return null
 }
 
-async function readJsonDirectoryEntries(directory) {
+function compactCaseAiInventoryValue(value) {
+  if (!value || typeof value !== 'object') return null
+  return {
+    schemaVersion: value.schemaVersion,
+    provider: value.provider ?? null,
+    text: typeof value.text === 'string' && value.text.trim() ? 'cached' : '',
+    evidenceIndex: Array.isArray(value.evidenceIndex)
+      ? value.evidenceIndex.map((record) => ({ id: record?.id ?? null })).filter((record) => record.id)
+      : [],
+  }
+}
+
+async function readJsonDirectoryEntries(directory, project = (value) => value, concurrency = 8) {
   let entries
   try {
     entries = await readdir(directory, { withFileTypes: true })
@@ -2929,9 +2857,19 @@ async function readJsonDirectoryEntries(directory) {
     if (error?.code === 'ENOENT') return []
     throw error
   }
-  return Promise.all(entries
+  const filenames = entries
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-    .map(async (entry) => ({ filename: entry.name, value: await readJsonFile(path.join(directory, entry.name)) })))
+    .map((entry) => entry.name)
+  const values = []
+  for (let index = 0; index < filenames.length; index += concurrency) {
+    const batch = await Promise.all(filenames.slice(index, index + concurrency).map(async (filename) => {
+      const value = await readJsonFile(path.join(directory, filename))
+      const compact = project(value, filename)
+      return compact ? { filename, value: compact } : null
+    }))
+    values.push(...batch.filter(Boolean))
+  }
+  return values
 }
 
 function casePlainReadEn(caseRecord, latestDirectEvent, latestRelatedEvent, highPriorityCount) {
@@ -3554,7 +3492,9 @@ async function documentAnalysisCacheSignature(manifest, state, lang, options) {
       catalog: options.catalog === 'full' ? 'full' : 'compact',
       includeSnippets: options.includeSnippets === true,
       catalogLimit: boundedNumber(options.catalogLimit, 12, 100),
-      extractionLimit: Number(options.extractionLimit ?? process.env.GUO_INTEL_PDF_TEXT_BATCH_LIMIT ?? 18),
+      extractionLimit: Number(options.extractionLimit ?? (options.catalog === 'full' || options.includeSnippets === true
+        ? process.env.GUO_INTEL_PDF_TEXT_BATCH_LIMIT ?? 18
+        : 0)),
       pageLimit: Number(options.pageLimit ?? runtimeSetting('pdfPageLimit')),
       charLimit: Number(options.charLimit ?? runtimeSetting('pdfCharLimit')),
       limit: Number(options.limit ?? 18),

@@ -1,0 +1,72 @@
+{
+  "sha256": "8ff0c99354165d8b1e3ed5e67fafcc5fecb61f0a64a88db66f0b0ce25ac60aef",
+  "caseId": "bkd-24-05246-wa-hf",
+  "docNumber": "11",
+  "posture": "court_order_withdrawing_counsel",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page bankruptcy-court order grants Avram E. Luft's motion to withdraw as counsel for Chapter 11 Trustee Luc A. Despins in adversary proceeding 24-05246 against WA & HF LLC. The court notes that other counsel remain for the Trustee and directs the Clerk to update the docket. It does not dismiss the adversary proceeding or decide any underlying claim.",
+    "plainEnglish": "One lawyer left the Trustee's legal team, but the team and lawsuit remained in place. This is a staffing order, not a decision about who wins the dispute.",
+    "legalReading": [
+      "The order is signed by the bankruptcy judge and is an operative court action, unlike a party-filed notice or motion.",
+      "The relief is narrow: Luft may withdraw from representing the Trustee in adversary proceeding 24-05246, and the Clerk must update the records.",
+      "The court expressly records that other counsel remain appearing for the Trustee, so the order does not leave the Trustee unrepresented on its face.",
+      "The order contains no findings on WA & HF LLC, estate ownership, liability, damages, avoidance, turnover, or any other merits issue."
+    ],
+    "caseConnections": [
+      "ECF No. 10 is the underlying withdrawal motion and would supply any fuller explanation offered by counsel; Doc 11 itself states only good cause and continued representation by other counsel.",
+      "The adversary proceeding is connected to jointly administered Chapter 11 case 22-50073, but this order is limited to counsel status in 24-05246."
+    ],
+    "whyItMatters": [
+      "It establishes the exact date and scope of Luft's withdrawal and confirms continuing counsel for the Trustee.",
+      "It prevents a counsel change from being misreported as abandonment, dismissal, or an adverse merits ruling."
+    ],
+    "verificationTasks": [
+      "Review ECF No. 10 if the reasons for withdrawal are material to a later procedural issue.",
+      "Check the subsequent docket for the counsel roster and later disposition of adversary proceeding 24-05246."
+    ],
+    "riskFlags": [
+      "The order grants only withdrawal of one attorney.",
+      "No inference about the merits, settlement, trustee authority, or estate ownership should be drawn from this page.",
+      "The caption's debtor and party descriptions are procedural identifiers, not new ownership findings."
+    ],
+    "findings": [
+      {"section": "summary", "text": "The court granted Avram E. Luft permission to withdraw as counsel for the Chapter 11 Trustee in adversary proceeding 24-05246.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The court expressly noted that other counsel remained for the Trustee and directed the Clerk to update its records.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The order does not dismiss the proceeding or decide any claim against WA & HF LLC.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页破产法院命令准许 Avram E. Luft 律师退出，不再在针对 WA & HF LLC 的附属诉讼 24-05246 中代表第 11 章受托人 Luc A. Despins。法院注明仍有其他律师代表受托人，并指示书记官更新案卷。该命令不驳回附属诉讼，也不裁判任何底层请求。",
+    "plainEnglish": "受托人律师团队中的一名律师退出，但团队和诉讼都继续存在。它解决的是“谁继续当律师”，不是“谁赢得案件”。",
+    "legalReading": [
+      "该命令由破产法官签署，属于具有操作效力的法院行为，不同于当事方自行提交的通知或动议。",
+      "救济范围很窄：Luft 可退出，不再在附属诉讼 24-05246 中代表受托人；书记官应更新记录。",
+      "法院明确记载仍有其他律师代表受托人出庭，因此从该命令本身看，受托人并未失去律师代理。",
+      "该命令没有就 WA & HF LLC、破产财产所有权、责任、损害赔偿、撤销、交付或其他实体问题作出认定。"
+    ],
+    "caseConnections": [
+      "ECF No. 10 是底层撤回代理动议；若需要了解律师提出的更完整理由，应查阅该动议。Doc 11 本身只写明存在正当理由且仍有其他律师。",
+      "该附属诉讼关联合并管理的第 11 章案 22-50073，但本命令只处理 24-05246 中的律师身份。"
+    ],
+    "whyItMatters": [
+      "它确定 Luft 撤回代理的准确日期和范围，并确认受托人仍有律师。",
+      "它防止把律师变动误报为放弃诉讼、案件被驳回或实体败诉。"
+    ],
+    "verificationTasks": [
+      "如撤回理由对后续程序问题重要，查阅 ECF No. 10。",
+      "检查后续案卷中的律师名单及附属诉讼 24-05246 的后续处理结果。"
+    ],
+    "riskFlags": [
+      "该命令只准许一名律师退出。",
+      "不得由此推断实体请求、和解、受托人权限或破产财产所有权。",
+      "案名页中的债务人和当事方描述是程序标识，不是新的所有权认定。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "法院准许 Avram E. Luft 在附属诉讼 24-05246 中退出，不再担任第 11 章受托人的律师。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "法院明确注明仍有其他律师代表受托人，并指示书记官更新记录。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该命令不驳回诉讼，也不裁判针对 WA & HF LLC 的任何请求。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

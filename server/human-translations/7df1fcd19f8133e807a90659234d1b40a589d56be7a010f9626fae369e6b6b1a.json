@@ -1,0 +1,19 @@
+{
+  "sourceSha256": "7df1fcd19f8133e807a90659234d1b40a589d56be7a010f9626fae369e6b6b1a",
+  "status": "complete",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "sourceTextHash": "5c1579c40a802024a1d9eaa95f878e48962cd9699b28c95091257025839f545a",
+  "charCount": 148,
+  "zh": [
+    {
+      "pageNumber": 1,
+      "sourceTextHash": "84959f222b4ecdb0886f344fe74a9e093ba1cdb0ffb18a62d36915e9e288e915",
+      "translatedText": "Case 23-05017，Doc 25，2023 年 8 月 14 日提交并录入，录入时间 09:55:42，第 1 页（共 2 页）。"
+    },
+    {
+      "pageNumber": 2,
+      "sourceTextHash": "0ed652c0e80a4cf8d69630d58adcf5921c4f542dbd1a25ae9491ba12b7ff608b",
+      "translatedText": "Case 23-05017，Doc 25，2023 年 8 月 14 日提交并录入，录入时间 09:55:42，第 2 页（共 2 页）。"
+    }
+  ]
+}

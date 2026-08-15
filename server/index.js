@@ -21,7 +21,7 @@ import { readRelationshipAudit, refreshRelationshipAudit } from './relationship-
 import { compareDocketNumbers, normalizeDocketNumber } from './docket-number.js'
 import { documentVariantKey } from './document-variant.js'
 import { ollamaGenerateJson } from './local-legal-ai.js'
-import { refreshDocumentSearchIndex, warmDocumentSearchIndex } from './document-search.js'
+import { getDocumentSearchProcessingSnapshot, refreshDocumentSearchIndex, warmDocumentSearchIndex } from './document-search.js'
 import { cloudGenerateText, cloudModelForPurpose, cloudProviderConfigured, cloudProviderLabel, isCloudAiProvider } from './cloud-ai.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -434,6 +434,12 @@ async function loadDocumentManifest() {
   try {
     const manifest = await loadRawDocumentManifest()
     const files = Array.isArray(manifest.files) ? manifest.files : []
+    let processingSnapshot = null
+    try {
+      processingSnapshot = await getDocumentSearchProcessingSnapshot(manifest, 'zh')
+    } catch {
+      // The document library remains usable while a missing or stale search index rebuilds.
+    }
     const availableFiles = files
       .filter((file) => file.status !== 'error')
       .sort((a, b) => compareDocumentOrder(b, a))
@@ -446,6 +452,7 @@ async function loadDocumentManifest() {
     const downloadedCount = files.filter((file) => file.status === 'downloaded').length
     const newVersionCount = files.filter((file) => file.status === 'downloaded_new_version').length
     const skippedExistingCount = files.filter((file) => file.status === 'skipped_existing').length
+    const localFiles = files.filter((file) => ['downloaded', 'downloaded_new_version', 'skipped_existing'].includes(file.status))
 
     return {
       available: true,
@@ -458,6 +465,10 @@ async function loadDocumentManifest() {
         newVersions: newVersionCount,
         localAvailable: downloadedCount + newVersionCount + skippedExistingCount,
         errors: totalErrorCount || manifest.counts?.errors || 0,
+        officialOrRecapFiles: localFiles.filter((file) => ['pacer', 'courtlistener-recap'].includes(file.sourceId)).length,
+        uniquePdfContents: processingSnapshot?.uniquePdfContents ?? null,
+        professionalReviewDocuments: processingSnapshot?.professionalReviewDocuments ?? null,
+        pendingProfessionalReviewDocuments: processingSnapshot?.pendingProfessionalReviewDocuments ?? null,
       },
       sourcePages: manifest.sourcePages,
       credentialRequired: manifest.credentialRequired,
@@ -674,7 +685,17 @@ function emptyDocumentManifest() {
     available: false,
     generatedAt: null,
     root: path.dirname(documentManifestPath),
-    counts: { collected: 0, downloaded: 0, skippedExisting: 0, localAvailable: 0, errors: 0 },
+    counts: {
+      collected: 0,
+      downloaded: 0,
+      skippedExisting: 0,
+      localAvailable: 0,
+      errors: 0,
+      officialOrRecapFiles: 0,
+      uniquePdfContents: null,
+      professionalReviewDocuments: null,
+      pendingProfessionalReviewDocuments: null,
+    },
     sourcePages: [],
     credentialRequired: [],
     sampleFiles: [],

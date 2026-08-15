@@ -1,0 +1,72 @@
+{
+  "sha256": "38fb3141848c9c54879823b21d2af547ffcd2dfa1e376a1f25fda009a798d757",
+  "caseId": "sdny-23-cr-118",
+  "docNumber": "183",
+  "posture": "counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page filing states that Jamie Scher, described as admitted in New York and SDNY, entered an appearance for 3,345 Himalaya Exchange customers in United States v. Ho Wan Kwok et al. It is a notice from counsel and does not certify the group, grant intervention, or decide restitution, forfeiture, ownership, or victim status.",
+    "plainEnglish": "This page records a lawyer's stated representation on the docket. It is not a judicial stamp confirming the customer count or deciding that everyone described has a valid claim.",
+    "legalReading": [
+      "The docket header identifies SDNY criminal case 23-cr-118, Document 183, filed December 6, 2023.",
+      "Scher states that he is admitted to practice in New York and SDNY and appears for 3,345 Himalaya Exchange customers.",
+      "The filing contains counsel's electronic signature and contact information but no judicial signature or order.",
+      "A notice of appearance does not itself establish standing, intervene in the criminal case, authenticate clients, or adjudicate financial rights."
+    ],
+    "caseConnections": [
+      "Doc 185, filed the same day, separately states Bradford Geyer's appearance for the same group with pro hac vice status pending.",
+      "Two additional byte-distinct copies of Doc 183 have identical extracted text and should be grouped as duplicate records of this filing."
+    ],
+    "whyItMatters": [
+      "It provides a reliable date for Scher's claimed appearance and the then-stated group size.",
+      "It keeps later claimant and forfeiture analysis from treating a procedural notice as substantive proof."
+    ],
+    "verificationTasks": [
+      "Review later docket orders addressing counsel participation, customer submissions, or ancillary forfeiture procedure.",
+      "Reconcile the stated 3,345 figure with later dated figures and underlying records rather than assuming equivalence."
+    ],
+    "riskFlags": [
+      "The stated customer count is not court-certified on this page.",
+      "No customer list or evidence of ownership is attached.",
+      "Duplicate copies are not independent corroboration."
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jamie Scher gave notice that he appeared for 3,345 Himalaya Exchange customers in the criminal case.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The filing is signed by counsel and contains no operative ruling from the court.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The page does not prove the identity, standing, ownership, loss, or entitlement of any customer.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页文件称，Jamie Scher 已获准在纽约州和 SDNY 执业，并在 United States v. Ho Wan Kwok 等人的案件中代表 3,345 名 Himalaya Exchange 客户出庭。它是律师通知，不认证该群体、不准许介入，也不裁判赔偿、没收、所有权或受害人身份。",
+    "plainEnglish": "该页记录律师在案卷上声明自己代表谁。它不是法院确认客户人数或认定所有所称客户都有有效请求的司法印章。",
+    "legalReading": [
+      "案卷页眉确认这是 SDNY 刑事案 23-cr-118 的 Document 183，于 2023 年 12 月 6 日提交。",
+      "Scher 称自己已获准在纽约州和 SDNY 执业，并代表 3,345 名 Himalaya Exchange 客户出庭。",
+      "文件包含律师电子签名和联系方式，但没有法官签名或法院命令。",
+      "出庭通知本身不证明 standing、不准许介入刑事案、不认证客户，也不裁判财产权利。"
+    ],
+    "caseConnections": [
+      "同日 Doc 185 另行称 Bradford Geyer 代表同一群体出庭，但其 pro hac vice 仍待批准。",
+      "Doc 183 另有两份二进制不同而提取正文完全相同的副本，应作为该文件的重复记录合并。"
+    ],
+    "whyItMatters": [
+      "它可靠记录 Scher 主张出庭的日期和当时申报的群体规模。",
+      "它能防止在后续申请人和没收分析中，把程序通知当成实体证据。"
+    ],
+    "verificationTasks": [
+      "检查后续案卷中涉及律师参与、客户提交或附属没收程序的命令。",
+      "将 3,345 这一数字与后续不同日期的数字和底层记录核对，不得直接视为同一口径。"
+    ],
+    "riskFlags": [
+      "该页中的客户人数未经法院认证。",
+      "文件没有附客户名单或所有权证据。",
+      "重复副本不是独立印证。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jamie Scher 通知法院其在刑事案中代表 3,345 名 Himalaya Exchange 客户出庭。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "该文件由律师签署，不含法院的操作性裁定。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该页不证明任何客户的身份、standing、所有权、损失或获偿资格。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

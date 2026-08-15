@@ -1,0 +1,66 @@
+{
+  "sha256": "ecbec03bcd3749c73d06cbafff1abe9a3b5707b3fe61afda9d04db6d5796727a",
+  "caseId": "discovered-nysd-7638268",
+  "docNumber": "53",
+  "posture": "executed_waiver_of_service",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "This executed waiver states that Guo Wengui, also known as Miles Kwok, waived formal service of the counterclaim summons after a request sent September 24, 2018. The form preserves defenses to the action, jurisdiction, and venue while waiving objections based on absence of summons or service, and requires a timely answer or Rule 12 motion. It is not an admission of liability or a merits ruling.",
+    "plainEnglish": "The signer agreed that a process server did not need to deliver the papers formally. In exchange, the response period follows the waiver rules. The lawsuit still had to be defended, and nearly all defenses remained available; only the complaint that formal service never happened was given up.",
+    "legalReading": [
+      "A Rule 4 waiver saves service expense and waives service-form objections, not defenses to the claims, personal jurisdiction, subject-matter jurisdiction, or venue as stated on the form.",
+      "The form says the waiver request was sent September 24, 2018 and requires an answer or Rule 12 motion within the applicable 60-day period, subject to the governing computation rules.",
+      "Failure to respond could support default procedures, but this document neither records a default nor establishes that a later response was untimely."
+    ],
+    "caseConnections": [
+      "Read the subsequent docket entries to determine what answer or Rule 12 motion followed and whether the court addressed service, jurisdiction, venue, or default.",
+      "The caption identifies Eastern Profit, Strategic Vision US, and Guo's counterclaim-defendant role; it does not resolve the counterclaims."
+    ],
+    "whyItMatters": [
+      "It establishes a service milestone and the starting point stated on the form for calculating the response period.",
+      "It prevents waiver of service from being misreported as waiver of substantive defenses."
+    ],
+    "verificationTasks": [
+      "Verify the next responsive pleading and any deadline orders on the official docket.",
+      "Check the original scan if the identity or authority of the signatory becomes disputed."
+    ],
+    "riskFlags": [
+      "Waiver of service is not an admission of the counterclaims.",
+      "OCR recovered the complete page but introduced minor character and signature-layout noise."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "The form waives objections based on absence of summons or service while expressly preserving other defenses and objections.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The filing does not record a merits ruling, default, or admission of liability.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份已签署的放弃书表明，Guo Wengui（又名 Miles Kwok）在 2018 年 9 月 24 日收到请求后，放弃反诉传票的正式送达。表格保留对诉讼、管辖权和审判地的抗辩，只放弃以没有传票或没有送达为由的异议，并要求按期提交答辩状或规则第 12 条动议。它不是责任承认，也不是实体裁判。",
+    "plainEnglish": "签署人同意不必再让送达员正式上门送文件，答复期限改按放弃送达规则计算。案件仍然可以全面抗辩，几乎所有抗辩都保留；放弃的只是“对方没有正式送达”这一项程序异议。",
+    "legalReading": [
+      "规则第 4 条的放弃送达用于节省送达费用；按表格文字，它放弃的是送达形式异议，不是对诉请、属人管辖、事项管辖或审判地的其他抗辩。",
+      "表格记载请求于 2018 年 9 月 24 日寄出，并要求在适用的 60 日期限内提交答辩状或规则第 12 条动议，具体仍受期限计算规则约束。",
+      "不按期答复可能引发缺席程序，但本文件没有记录缺席，也没有认定后续答复逾期。"
+    ],
+    "caseConnections": [
+      "应查看后续案卷，确认随后提交了何种答辩状或规则第 12 条动议，以及法院是否处理送达、管辖、审判地或缺席问题。",
+      "案名页显示 Eastern Profit、Strategic Vision US 以及郭作为反诉被告的程序身份，但不解决反诉实体。"
+    ],
+    "whyItMatters": [
+      "它确定了一个送达程序节点，并给出表格所载答复期限的起算日期。",
+      "它可以防止把放弃送达误写成放弃实体抗辩。"
+    ],
+    "verificationTasks": [
+      "在正式案卷中核验下一份答复文件和任何期限命令。",
+      "如签署人身份或授权有争议，应核对原始扫描件。"
+    ],
+    "riskFlags": [
+      "放弃送达不等于承认反诉。",
+      "OCR 恢复了完整页面，但个别字符和签名版面存在识别噪声。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "表格放弃以没有传票或没有送达为由的异议，同时明确保留其他抗辩和异议。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本文件没有记录实体裁判、缺席或责任承认。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

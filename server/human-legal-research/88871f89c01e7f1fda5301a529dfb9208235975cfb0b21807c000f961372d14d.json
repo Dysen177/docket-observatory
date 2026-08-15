@@ -1,0 +1,28 @@
+{
+  "sha256": "88871f89c01e7f1fda5301a529dfb9208235975cfb0b21807c000f961372d14d",
+  "caseId": "bkd-24-05021-bannon",
+  "docNumber": "40",
+  "posture": "notice_of_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "Jonathan A. Kaplan of Pullman & Comley, LLC entered an appearance as special litigation counsel for chapter 11 trustee Luc A. Despins in adversary proceeding 24-05021 against Bannon Strategic Advisors, Inc.",
+    "plainEnglish": "This is another lawyer-registration form for the trustee's side. It ensures Kaplan receives future case papers. It does not add a claim, decide a motion, or prove liability.",
+    "legalReading": ["Kaplan states that he is admitted or otherwise authorized to practice and requests notice of later pleadings and filings.", "His role is identified as special litigation counsel to the trustee in this adversary proceeding.", "No judicial action, party admission, evidence ruling, or merits disposition is recorded."],
+    "caseConnections": ["The notice follows Docs 38 and 39, which add two other Pullman & Comley attorneys for the trustee in the same proceeding.", "The caption places the adversary proceeding under the jointly administered Ho Wan Kwok chapter 11 matters, without deciding the defendant's relationship to any debtor."],
+    "whyItMatters": ["It completes the July-August 2026 sequence of three trustee-counsel appearances.", "It identifies Kaplan's Hartford service address and contact details."],
+    "verificationTasks": ["Check for a retention order defining special counsel's authorized scope and compensation.", "Track later withdrawals, substitutions, substantive motions, and final disposition."],
+    "riskFlags": ["The notice is a party filing, not a court order.", "Attorney participation cannot be used as evidence of the merits or of ownership and control relationships."],
+    "findings": [{"section":"summary","text":"Jonathan A. Kaplan appeared as special litigation counsel for trustee Luc A. Despins.","confidence":"high","pages":[1]},{"section":"caseConnections","text":"The notice is the third of three consecutive Pullman & Comley appearances in this docket sequence.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"It records no adjudication, admission, or evidentiary finding.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Pullman & Comley, LLC 的 Jonathan A. Kaplan 在受托人 Luc A. Despins 诉 Bannon Strategic Advisors, Inc. 的附属诉讼 24-05021 中，以第 11 章受托人特别诉讼律师身份出庭。",
+    "plainEnglish": "这是受托人一方又一份律师登记表，作用是让 Kaplan 收到以后的案件文件。它不增加诉因、不裁判动议，也不能证明责任。",
+    "legalReading": ["Kaplan 声明其已获准或获授权在本院执业，并请求接收后续诉状和提交文件通知。", "他的身份是本附属诉讼中受托人的特别诉讼律师。", "文件没有记录法院行动、当事方承认、证据裁定或实体处分。"],
+    "caseConnections": ["本通知在 Docs 38、39 之后提交；前两份文件分别增加同所另外两名受托人律师。", "案名页把本附属诉讼置于 Ho Wan Kwok 合并管理的第 11 章案件之下，但不裁判被告与任何债务人的关系。"],
+    "whyItMatters": ["它完成了 2026 年 7 月至 8 月三名受托人律师连续出庭的记录。", "它提供 Kaplan 的 Hartford 送达地址和联系信息。"],
+    "verificationTasks": ["查找确定特别律师授权和报酬范围的聘任命令。", "追踪后续退出、替换、实体动议和最终处分。"],
+    "riskFlags": ["本通知是当事方提交文件，不是法院命令。", "不能用律师参与情况证明案件实体或所有权、控制关系。"],
+    "findings": [{"section":"summary","text":"Jonathan A. Kaplan 作为受托人 Luc A. Despins 的特别诉讼律师出庭。","confidence":"high","pages":[1]},{"section":"caseConnections","text":"本通知是该段案卷中连续三份 Pullman & Comley 出庭通知的第三份。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"文件没有记录裁判、承认或证据认定。","confidence":"high","pages":[1]}]
+  }
+}

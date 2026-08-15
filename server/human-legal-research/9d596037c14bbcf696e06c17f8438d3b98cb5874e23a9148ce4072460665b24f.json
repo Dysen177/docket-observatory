@@ -1,0 +1,72 @@
+{
+  "sha256": "9d596037c14bbcf696e06c17f8438d3b98cb5874e23a9148ce4072460665b24f",
+  "caseId": "dconn-22-50073",
+  "docNumber": "3267",
+  "posture": "interested_party_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page bankruptcy form states that Jon P. Newton appeared for Rule of Law Society IV, Inc., described in the filing as an interested party, and demanded service of notices and papers under Bankruptcy Rules 2002 and 9007. It is a party-filed notice and service request, not an order recognizing a property interest, allowing a claim, or deciding standing.",
+    "plainEnglish": "The filing asks to put counsel on the case's distribution list so counsel receives future papers. Being added to the mail and notice flow is not the same as winning recognition of a legal or financial interest.",
+    "legalReading": [
+      "The form identifies bankruptcy case 22-50073 and is docketed as Document 3267 on June 20, 2024.",
+      "Newton states that he appears for Rule of Law Society IV, Inc., calls it an interested party, and requests broad service of notices, pleadings, motions, orders, and related papers.",
+      "Rules 2002 and 9007 govern notice procedure; invoking them does not itself adjudicate a proof of claim, ownership interest, estate liability, intervention, or substantive standing.",
+      "The standard extractor recovered only the docket header because the substantive form body is image-based. The body was separately read from a full-page local render with OCR; key names, rule numbers, requested service, date, signature, and contact block were recovered."
+    ],
+    "caseConnections": [
+      "This notice belongs to the main jointly administered bankruptcy record and should be distinguished from pleadings or orders concerning any particular Rule of Law Society IV transaction or property.",
+      "Any substantive role or claimed interest must be established from separate motions, proofs of claim, objections, stipulations, or court orders, not this service-demand form."
+    ],
+    "whyItMatters": [
+      "It establishes that counsel requested notice on behalf of Rule of Law Society IV, Inc. as of June 20, 2024.",
+      "It helps map participation without converting a procedural mailing request into a court-approved relationship or claim."
+    ],
+    "verificationTasks": [
+      "Visually compare the rendered page against the official PACER or RECAP copy because the embedded text layer omits the substantive form body.",
+      "Locate later filings or orders that actually address Rule of Law Society IV, Inc.'s claims, standing, ownership, or estate relationship."
+    ],
+    "riskFlags": [
+      "The phrase 'interested party' is the filer's characterization on this notice, not a judicial finding.",
+      "A demand for service does not allow a claim or establish ownership, liability, priority, or recovery.",
+      "The standard extraction text hash covers only the 75-character docket header; the translated body was recovered by supplemental full-page OCR and therefore warrants source-image verification."
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jon P. Newton filed an appearance and service demand for Rule of Law Society IV, Inc. in bankruptcy case 22-50073.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The form requests notices and papers under Bankruptcy Rules 2002 and 9007; it contains no court adjudication of a claim or interest.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The PDF text layer contains only the docket header; the substantive form was recovered from a rendered page with local OCR.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页破产法院表格称，Jon P. Newton 代表文件所称的利害关系人 Rule of Law Society IV, Inc. 出庭，并依据《联邦破产程序规则》第 2002 条和第 9007 条要求送达通知及文件。它是当事方提交的通知和送达请求，不是确认财产权、准许请求或裁判 standing 的法院命令。",
+    "plainEnglish": "这份文件相当于请求把律师加入案件的“收件人名单”，让其收到以后提交的材料。进入通知和邮件流，不等于法院承认某项法律或经济权利已经成立。",
+    "legalReading": [
+      "表格标明破产案 22-50073，于 2024 年 6 月 20 日作为 Document 3267 录入。",
+      "Newton 称其代表 Rule of Law Society IV, Inc. 出庭，把该公司称为利害关系人，并广泛要求送达通知、诉状、动议、命令及相关文件。",
+      "Rules 2002 和 9007 处理通知程序；援引这些规则不会自行裁判债权证明、所有权、破产财产责任、介入或实体 standing。",
+      "由于实质表格正文采用图像形式，标准提取器只取得案卷页眉。正文另经本地整页渲染 OCR 读取，关键姓名、规则编号、送达请求、日期、签名和联系方式均已恢复。"
+    ],
+    "caseConnections": [
+      "该通知属于主破产案卷，应与任何具体涉及 Rule of Law Society IV 交易或财产的诉状和命令区分。",
+      "任何实体角色或所主张权利，都必须从独立动议、债权证明、异议、协议或法院命令中确认，不能依赖本送达表格。"
+    ],
+    "whyItMatters": [
+      "它确认截至 2024 年 6 月 20 日，律师代表 Rule of Law Society IV, Inc. 请求接收案件通知。",
+      "它有助于绘制程序参与关系，同时不会把收件请求误写成法院认可的关系或请求。"
+    ],
+    "verificationTasks": [
+      "由于 PDF 内嵌文字层遗漏正文，应将渲染页面与 PACER 或 RECAP 正式副本进行视觉核对。",
+      "查找后续真正处理 Rule of Law Society IV, Inc. 的请求、standing、所有权或破产财产关系的文件和命令。"
+    ],
+    "riskFlags": [
+      "“利害关系人”是提交人在通知中的定性，不是法院认定。",
+      "送达要求不会准许债权，也不证明所有权、责任、优先权或获偿。",
+      "标准提取文本哈希只覆盖 75 个字符的案卷页眉；译文正文来自补充整页 OCR，因此仍应对照源图核验。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jon P. Newton 在破产案 22-50073 中代表 Rule of Law Society IV, Inc. 提交出庭和送达要求。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "表格依据 Bankruptcy Rules 2002 和 9007 请求接收通知和文件，不含对任何请求或权利的法院裁判。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "PDF 文字层只有案卷页眉；实质表格正文通过本地整页渲染 OCR 恢复。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

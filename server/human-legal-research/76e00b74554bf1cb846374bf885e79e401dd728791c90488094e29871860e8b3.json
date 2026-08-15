@@ -1,0 +1,68 @@
+{
+  "sha256": "76e00b74554bf1cb846374bf885e79e401dd728791c90488094e29871860e8b3",
+  "caseId": "discovered-nysb-63174755",
+  "docNumber": "12",
+  "posture": "motion_to_remand_or_abstain",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "PAX moves the New York bankruptcy court to remand this adversary action to the New York County Commercial Division or, alternatively, to abstain under 28 U.S.C. § 1334(c)(1). The two-page motion points to a separately filed memorandum and declaration for its grounds. It states PAX's requested forum relief and does not show that remand or abstention was granted.",
+    "plainEnglish": "PAX is asking that the dispute go back to the New York state commercial court, or that the bankruptcy court step aside. This is the request form, not the judge's answer; the detailed reasons are in separate papers.",
+    "legalReading": [
+      "The requested primary relief is remand to New York Supreme Court, New York County, Commercial Division, with Justice Ostrager identified as presiding.",
+      "The alternative request invokes discretionary abstention under 28 U.S.C. § 1334(c)(1).",
+      "The motion expressly incorporates a contemporaneous memorandum of law and Peter Friedman declaration that are not contained in this two-page PDF."
+    ],
+    "caseConnections": [
+      "Read the accompanying memorandum and declaration for jurisdictional facts and the remand or abstention analysis.",
+      "Locate the opposition, hearing record, and disposition before stating which forum retained the action."
+    ],
+    "whyItMatters": [
+      "Forum determines which court manages the dispute and which procedural framework applies.",
+      "The filing connects the prior New York commercial action with the bankruptcy-related adversary proceeding."
+    ],
+    "verificationTasks": [
+      "Collect and review the accompanying memorandum, declaration, and proposed order.",
+      "Find the order resolving remand or abstention and any resulting docket transfer."
+    ],
+    "riskFlags": [
+      "The motion's title and request are party positions, not a jurisdictional ruling.",
+      "The substantive grounds are outside this PDF.",
+      "Remand and discretionary abstention are distinct procedural routes and should not be conflated."
+    ],
+    "findings": [
+      { "section": "summary", "text": "PAX requests remand to New York County Commercial Division or, alternatively, discretionary abstention under section 1334(c)(1).", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "This filing does not contain the court's disposition or the full supporting analysis.", "confidence": "high", "pages": [1, 2] }
+    ]
+  },
+  "zh": {
+    "summary": "PAX 请求纽约破产法院把该附属诉讼发回纽约州最高法院纽约县商业庭，或者作为替代，依据 28 U.S.C. § 1334(c)(1) 回避审理。这份两页动议说明详细理由载于另行提交的法律备忘录和声明。它只表达 PAX 请求的法院选择救济，没有表明发回或回避已经获准。",
+    "plainEnglish": "PAX 的意思是：请把争议送回纽约州商业法院，或者请破产法院不要继续审理。这是“申请书”，不是法官的答案；详细理由在其他文件里。",
+    "legalReading": [
+      "首要请求是发回纽约州最高法院纽约县商业庭，文件注明由 Ostrager 法官主持。",
+      "替代请求援引 28 U.S.C. § 1334(c)(1) 的酌情回避审理。",
+      "动议明确引用同时提交的法律备忘录和 Peter Friedman 声明，但这两份材料不在本两页 PDF 中。"
+    ],
+    "caseConnections": [
+      "应阅读配套备忘录和声明，了解管辖事实及发回或回避分析。",
+      "在说明哪个法院最终保留案件前，应查找反对文件、听证记录和处理命令。"
+    ],
+    "whyItMatters": [
+      "审理法院会影响由谁管理争议以及适用何种程序框架。",
+      "该文件把原纽约商业诉讼与破产相关附属诉讼连接起来。"
+    ],
+    "verificationTasks": [
+      "收集并审阅配套法律备忘录、声明和拟议命令。",
+      "查找解决发回或回避请求的命令及任何后续案卷移转。"
+    ],
+    "riskFlags": [
+      "动议标题和请求属于当事方立场，不是管辖权裁定。",
+      "实体理由不在本 PDF 中。",
+      "发回与酌情回避是不同程序路径，不应混为一谈。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "PAX 请求发回纽约县商业庭，或作为替代，依据 § 1334(c)(1) 酌情回避审理。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本文件不包含法院处理结果，也不包含完整支持论证。", "confidence": "high", "pages": [1, 2] }
+    ]
+  }
+}

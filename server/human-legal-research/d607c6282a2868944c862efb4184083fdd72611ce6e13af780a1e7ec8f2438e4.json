@@ -1,0 +1,28 @@
+{
+  "sha256": "d607c6282a2868944c862efb4184083fdd72611ce6e13af780a1e7ec8f2438e4",
+  "caseId": "bkd-24-05021-bannon",
+  "docNumber": "39",
+  "posture": "notice_of_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "Irve J. Goldman of Pullman & Comley, LLC entered an appearance as special litigation counsel for chapter 11 trustee Luc A. Despins in adversary proceeding 24-05021 against Bannon Strategic Advisors, Inc.",
+    "plainEnglish": "This notice adds another lawyer for the trustee and requests copies of future filings. It is like updating the case's contact list; it does not decide the lawsuit or establish any company relationship.",
+    "legalReading": ["Goldman states that he is admitted or otherwise authorized to practice and appears for the trustee as special litigation counsel.", "The request for notice concerns future pleadings and filings and has procedural, not evidentiary, significance.", "The notice contains no court ruling and no admission by Bannon Strategic Advisors."],
+    "caseConnections": ["The filing follows Mayhew's Doc 38 appearance and precedes Kaplan's Doc 40 appearance in the same adversary proceeding.", "The debtor footnote connects the caption to the jointly administered chapter 11 cases but does not adjudicate ownership or control of the defendant."],
+    "whyItMatters": ["It documents trustee counsel participation as of July 29, 2026.", "It identifies Goldman's service contact for docket administration."],
+    "verificationTasks": ["Check the later docket for attorney withdrawal or substitution.", "Use substantive pleadings and orders, not this notice, to determine the case's claims and outcome."],
+    "riskFlags": ["Multiple trustee attorneys appearing does not imply that the trustee prevailed or that the matter became more serious.", "No merits, ownership, alter-ego, or liability finding appears on this page."],
+    "findings": [{"section":"summary","text":"Irve J. Goldman appeared as special litigation counsel for trustee Luc A. Despins.","confidence":"high","pages":[1]},{"section":"caseConnections","text":"This is one of three consecutive Pullman & Comley appearance notices in the same adversary proceeding.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The notice does not adjudicate any claim or company relationship.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Pullman & Comley, LLC 的 Irve J. Goldman 在受托人 Luc A. Despins 诉 Bannon Strategic Advisors, Inc. 的附属诉讼 24-05021 中，以第 11 章受托人特别诉讼律师身份出庭。",
+    "plainEnglish": "这份通知只是为受托人再增加一名律师，并要求收到以后提交文件的副本。它类似于更新案件联系人，不裁判诉讼，也不证明任何公司关系。",
+    "legalReading": ["Goldman 声明其已获准或获授权在本院执业，并作为受托人特别诉讼律师出庭。", "请求接收未来诉状和文件通知只有程序意义，不具有证明实体事实的作用。", "通知不含法院裁定，也不包含 Bannon Strategic Advisors 的任何承认。"],
+    "caseConnections": ["本文件位于 Mayhew 的 Doc 38 出庭通知之后、Kaplan 的 Doc 40 出庭通知之前，三者属于同一附属诉讼。", "债务人脚注把案名与合并管理的第 11 章案件相连，但不裁判被告的所有权或控制。"],
+    "whyItMatters": ["它记录了截至 2026 年 7 月 29 日受托人律师的参与情况。", "它提供 Goldman 的案卷送达联系信息。"],
+    "verificationTasks": ["检查后续案卷是否有律师退出或替换。", "必须依实体诉状和法院命令，而不是本通知，判断诉因和结果。"],
+    "riskFlags": ["多名受托人律师出庭，不表示受托人已经胜诉，也不表示案件在法律上更严重。", "本页没有实体、所有权、人格混同或责任认定。"],
+    "findings": [{"section":"summary","text":"Irve J. Goldman 作为受托人 Luc A. Despins 的特别诉讼律师出庭。","confidence":"high","pages":[1]},{"section":"caseConnections","text":"这是同一附属诉讼中连续三份 Pullman & Comley 出庭通知之一。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"通知不裁判任何诉因或公司关系。","confidence":"high","pages":[1]}]
+  }
+}

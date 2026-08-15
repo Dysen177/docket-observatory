@@ -1,0 +1,66 @@
+{
+  "sha256": "8b32ef52877a682328258cb775e493dd56ee5ff0933c701dcb1305952a9ced7a",
+  "caseId": "discovered-nysd-7638268",
+  "docNumber": "224",
+  "posture": "nonparty_counsel_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "Attorney Jeffrey S. Gavenman entered an appearance on December 23, 2019 for non-party Kin Ming 'William' Je and requested service of notices. The notice establishes counsel of record for that non-party at that time; it does not make Je a party, state why counsel appeared, or decide any claim.",
+    "plainEnglish": "This is a routing notice: it tells the court and the parties which lawyer should receive papers for a person who was not a named party. It does not say that the person was sued, testified, accepted responsibility, or won or lost anything.",
+    "legalReading": [
+      "A notice of appearance identifies counsel and a service address; it ordinarily creates no merits determination.",
+      "The document expressly calls Kin Ming 'William' Je a non-party and asks that notices be served on his counsel.",
+      "The filing gives no factual basis for the appearance and should not be used to infer subpoena status, testimony, control, liability, or cooperation."
+    ],
+    "caseConnections": [
+      "Review nearby docket entries for the subpoena, discovery dispute, deposition, or other event that prompted the non-party appearance.",
+      "Keep this civil-case representation record separate from Je's role or allegations in other proceedings."
+    ],
+    "whyItMatters": [
+      "It is a precise representation and service milestone.",
+      "It prevents a lawyer's appearance from being mistaken for evidence about the non-party's conduct."
+    ],
+    "verificationTasks": [
+      "Inspect the official docket before and after Doc 224 to identify the triggering matter and any later withdrawal or substitution of counsel.",
+      "Do not merge this appearance with representation in another case without a separate source."
+    ],
+    "riskFlags": [
+      "A non-party appearance is procedural and is not a merits ruling.",
+      "The document does not explain why the non-party needed counsel."
+    ],
+    "findings": [
+      { "section": "summary", "text": "Jeffrey S. Gavenman entered an appearance for non-party Kin Ming 'William' Je and requested service of notices.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The notice contains no finding about Je's conduct, liability, testimony, or party status beyond expressly identifying him as a non-party.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Jeffrey S. Gavenman 律师于 2019 年 12 月 23 日代表非当事人 Kin Ming “William” Je 登记出庭，并请求向其送达通知。该通知只确定当时该非当事人的登记律师，不会使 Je 自动成为本案当事人，也没有说明律师出庭原因或裁判任何请求。",
+    "plainEnglish": "这是一份“文件转送地址通知”：告诉法院和各方，一位未被列为当事人的人由哪位律师收取文件。它没有说这个人被起诉、已经作证、承认责任，或者在任何问题上胜诉或败诉。",
+    "legalReading": [
+      "出庭通知用于确定律师和送达地址，通常不产生实体裁判。",
+      "文件明确把 Kin Ming “William” Je 称为非当事人，并请求向其律师送达通知。",
+      "文件没有说明出庭的事实基础，不能据此推断是否收到传票、是否作证、是否控制某实体、是否承担责任或是否配合调查。"
+    ],
+    "caseConnections": [
+      "应查看相邻案卷，确认是否有传票、取证争议、证言录取或其他事件促使非当事人律师出庭。",
+      "本民事案中的代理记录应与 Je 在其他程序中的身份或指控分开。"
+    ],
+    "whyItMatters": [
+      "它准确记录了一次代理和送达程序节点。",
+      "它可以防止把律师出庭误当成有关非当事人行为的证据。"
+    ],
+    "verificationTasks": [
+      "检查 Doc 224 前后的正式案卷，确定触发事项以及之后是否有退庭或更换律师。",
+      "没有独立来源，不得把本次出庭与其他案件中的代理关系合并。"
+    ],
+    "riskFlags": [
+      "非当事人律师出庭属于程序事项，不是实体裁判。",
+      "文件没有解释非当事人为何需要律师。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "Jeffrey S. Gavenman 代表非当事人 Kin Ming “William” Je 登记出庭并请求接收通知。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "除明确称 Je 为非当事人外，本通知没有认定其行为、责任、证言或其他当事方身份。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

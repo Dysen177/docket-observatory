@@ -56,6 +56,28 @@ const pages = [
   },
 ]
 
+const verifiedPublicDocuments = [
+  {
+    sourceId: 'courtlistener-recap',
+    caseId: 'sdny-23-cr-118',
+    courtId: 'nysd',
+    court: 'S.D.N.Y.',
+    docketNumber: '1:23-cr-00118',
+    courtListenerDocketId: 67012234,
+    sourcePage: 'https://www.courtlistener.com/docket/67012234/81/21/united-states-v-guo/',
+    sourceLabel: 'S.D.N.Y. criminal case public RECAP document',
+    title: 'Doc 81-21 Exhibit C - Verified Amended Complaint dated August 26, 2019',
+    docNumber: '81-21',
+    filedAt: '2023-06-05',
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.nysd.595324/gov.uscourts.nysd.595324.81.21.pdf',
+    subdir: 'sdny-23-cr-118-recap',
+    recapDocumentId: 382559006,
+    pacerDocumentId: '127033474979',
+    pageCount: 120,
+    discoveryMethod: 'courtlistener_public_structured_search',
+  },
+]
+
 const credentialRequired = [
   {
     sourceId: 'pacer',
@@ -233,10 +255,17 @@ async function inspectPdf(filePath, priorRecord = null) {
       const header = Buffer.alloc(5)
       const { bytesRead } = await handle.read(header, 0, header.length, 0)
       if (bytesRead !== 5 || header.toString('ascii') !== '%PDF-') return { valid: false, sha256: '' }
-      const tailSize = Math.min(2048, fileInfo.size)
+      // Some valid court PDFs are block-padded with more than 2 KB of NUL
+      // bytes after %%EOF. Inspect a wider tail and only accept benign padding.
+      const tailSize = Math.min(65536, fileInfo.size)
       const tail = Buffer.alloc(tailSize)
       await handle.read(tail, 0, tailSize, Math.max(0, fileInfo.size - tailSize))
-      if (!tail.toString('latin1').includes('%%EOF')) return { valid: false, sha256: '' }
+      const eofOffset = tail.lastIndexOf(Buffer.from('%%EOF'))
+      if (eofOffset < 0) return { valid: false, sha256: '' }
+      const trailingBytes = tail.subarray(eofOffset + 5)
+      if (trailingBytes.some((byte) => ![0x00, 0x09, 0x0a, 0x0c, 0x0d, 0x20].includes(byte))) {
+        return { valid: false, sha256: '' }
+      }
     } finally {
       await handle.close()
     }
@@ -590,6 +619,7 @@ export async function runDocumentDownload(options = {}) {
   }
 
   const collected = []
+  collected.push(...verifiedPublicDocuments)
   let sourceRecords = [...(priorManifest?.sourceRecords ?? [])]
   const pageResults = []
   for (const page of pages) {

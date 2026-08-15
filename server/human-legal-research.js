@@ -1,4 +1,8 @@
+import { readFileSync } from 'node:fs'
+
 const reviewedAt = '2026-08-14T00:00:00.000+08:00'
+const externalResearchCache = new Map()
+const maximumCachedExternalResearch = 16
 
 const documentResearch = {
   'sdny-23-cr-118:19': report({
@@ -1063,6 +1067,356 @@ const documentResearch = {
       findings: [finding('summary', '上诉通知对 2026 年 7 月 2 日判决中的定罪和刑罚同时提出上诉。', [1])],
     },
   }),
+  'ca2-26-1853:15': report({
+    caseId: 'ca2-26-1853',
+    sha256: '2a247490751890832fa5cd7285540772d84327b48f4e5a273d4219d69efeef7f',
+    posture: 'appellate_transcript_information',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:00:00.000+08:00',
+    en: {
+      summary: 'This two-page Form B filing tells the Second Circuit that appellant Miles Guo was not ordering additional transcripts at that time. Counsel Joshua Dratel explained that much of the record, including the complete trial transcript, had already been produced and that he was simultaneously moving to withdraw. If withdrawal were granted, he proposed leaving any further transcript decision to successor counsel. This is an appellate record-management filing, not a merits brief or a ruling on counsel\'s withdrawal.',
+      plainEnglish: 'Think of Form B as a checklist for assembling the appeal file. Counsel said the main trial transcript was already available and did not order more material immediately because a possible new lawyer should first identify any gaps. That does not abandon the appeal, waive every transcript issue, prove the appellate record is complete, or show that the court approved the lawyer\'s request to leave the case.',
+      legalReading: [
+        'Page 1 is the Second Circuit criminal-appeal transcript form. The checked response is that no transcript was being ordered at that time, with an attached explanation; the form does not designate particular proceedings as unnecessary.',
+        'Page 2 gives two stated reasons: much of the transcript, including the entire trial, had already been produced, and counsel filed a same-day motion to be relieved. The second reason is expressly conditional on that motion being granted.',
+        'Under Federal Rule of Appellate Procedure 10(b), transcript arrangements help define the record needed for issues to be raised on appeal. This filing reports the then-current order decision; it does not itself settle later supplementation, record correction, or successor counsel\'s assessment.',
+        'The document contains no argument concerning conviction, sentence, forfeiture, evidentiary rulings, constitutional questions, or standards of review. No merits issue should be attributed to the appellant from this form.',
+        'The public appellate docket shows that the appearance form and Form B followed dismissal warnings, while a separate motion to be relieved was filed. The displayed docket through August 12, 2026 did not show an order granting withdrawal or a merits briefing schedule.',
+      ],
+      caseConnections: [
+        'Read this filing with SDNY Doc 862, which initiated the appeal from both conviction and sentence, and with SDNY Doc 864, whose public sentencing transcript omits sealed internal transcript pages 3-30.',
+        'Second Circuit Entries 12 and 13 warned that the appeal could be dismissed unless required forms were filed; Entries 14 and 15 supplied the appearance and transcript forms, and Entry 16 separately requested counsel\'s withdrawal.',
+        'Any later appellate brief, record-designation filing, transcript order, or order on representation controls over this preliminary snapshot.',
+      ],
+      whyItMatters: [
+        'It documents compliance with a required appellate filing and explains why no new transcript order was placed on August 5, 2026.',
+        'It prevents three overstatements: that the appeal was abandoned, that the complete appellate record was judicially confirmed, or that counsel had already been permitted to withdraw.',
+      ],
+      verificationTasks: [
+        'Continue monitoring Second Circuit docket 26-1853 for an order on Entry 16, any substitution of counsel, transcript supplementation, record correction, and the merits briefing schedule.',
+        'Compare the appellate record designation with the sealed omission in the publicly available sentencing transcript and do not infer the omitted material.',
+        'Authenticate future docket developments through PACER or CourtListener/RECAP and preserve both the filing date and later docket-update date separately.',
+      ],
+      riskFlags: [
+        '“Not ordering at this time” is not a waiver of the appeal and is not a judicial finding that no additional transcript could be necessary.',
+        'The withdrawal discussion is counsel\'s conditional explanation; the filing does not show that the court granted withdrawal.',
+        'A statement that the entire trial transcript had been produced does not establish that every pretrial, post-trial, sentencing, sealed, or ancillary transcript required for every possible issue was available.',
+      ],
+      findings: [
+        finding('summary', 'Counsel checked that no transcript was being ordered at that time and attached an explanation.', [1, 2]),
+        finding('legalReading', 'Counsel stated that much of the record, including the entire trial transcript, had already been produced.', [2]),
+        finding('legalReading', 'Counsel also stated that he was moving to be relieved and proposed allowing successor counsel to identify any missing or necessary transcripts if the motion were granted.', [2]),
+        finding('riskFlags', 'The document is neither a merits brief nor an order granting withdrawal and contains no appellate merits arguments.', [1, 2]),
+      ],
+    },
+    zh: {
+      summary: '这份两页 Form B 告知第二巡回：Miles Guo 的上诉律师当时不新增订购庭审记录。Joshua Dratel 解释，现有记录中的大部分内容已经制作，其中包括完整审判记录；同时他当天另行申请解除代理。如果该申请获准，他认为应由新律师判断是否还有记录缺失、是否为上诉所需。它是管理上诉案卷的程序文件，不是实体上诉书，也不是法院批准解除代理的命令。',
+      plainEnglish: '可以把 Form B 理解为整理“上诉材料包”的清单。律师的意思是：主要审判记录已经有了，自己又正在申请退出，因此暂时不要重复或盲目订购，让可能接手的新律师先检查缺口。它不等于放弃上诉，不等于放弃所有庭审记录问题，也不证明上诉案卷已经完整，更不表示法院已经同意律师退出。',
+      legalReading: [
+        '第 1 页是第二巡回刑事上诉庭审记录表。勾选结果是“目前不订购”，并附解释；表格没有把任何具体程序勾选为永远不需要。',
+        '第 2 页给出两个理由：大部分庭审记录（包括完整审判记录）已制作；律师同日申请解除代理。第二个理由明确以法院批准解除代理为前提。',
+        '依据《联邦上诉程序规则》10(b)，庭审记录安排关系到上诉所需案卷的组成。这份文件只说明当时的订购决定，并不排除以后补充记录、纠正案卷或由接任律师重新评估。',
+        '文件没有提出有关定罪、刑罚、没收、证据裁定、宪法问题或审查标准的任何论证。不得从 Form B 推导上诉人将提出哪些实体争点。',
+        '公开上诉案卷显示，出庭表和 Form B 是在法院发出可能驳回上诉的补件警告后提交；解除代理则是另一份动议。截至 2026 年 8 月 12 日公开显示的案卷，没有看到批准解除代理的命令，也没有看到实体书状排期。',
+      ],
+      caseConnections: [
+        '应与 SDNY Doc 862 一起阅读：Doc 862 对定罪和刑罚均提出上诉；还应对照 SDNY Doc 864，因为其公开量刑记录省略了已密封的内部页码第 3-30 页。',
+        '第二巡回 Entries 12、13 曾警告，如不提交必要表格，上诉可能被驳回；Entries 14、15 随后提交出庭表和 Form B，Entry 16 则另行申请解除代理。',
+        '以后出现的实体上诉书、案卷指定文件、庭审记录订单或代理关系命令，均优先于这份早期程序快照。',
+      ],
+      whyItMatters: [
+        '它记录了必要上诉表格的补交情况，并解释 2026 年 8 月 5 日为何没有新增订购庭审记录。',
+        '它能防止三种误读：上诉已经放弃、法院已经确认全部上诉案卷完整、律师已经获准退出。',
+      ],
+      verificationTasks: [
+        '继续监测第二巡回 26-1853 的 Entry 16 是否获裁定、是否更换律师、是否补充庭审记录或纠正案卷，以及实体书状排期。',
+        '把上诉案卷指定情况与公开量刑记录中的密封缺页对照，不得推测密封内容。',
+        '后续案卷应通过 PACER 或 CourtListener/RECAP 核验，并分别保存文件提交日期和来源页面更新日期。',
+      ],
+      riskFlags: [
+        '“目前不订购”不等于放弃上诉，也不是法院认定今后绝不需要更多庭审记录。',
+        '解除代理只是律师提出的附条件说明；本文件不能证明法院已经批准。',
+        '“完整审判记录已经制作”不等于所有审前、审后、量刑、密封或附属程序记录都已具备，也不等于足以支持所有潜在上诉问题。',
+      ],
+      findings: [
+        finding('summary', '律师勾选当时不订购庭审记录，并提交附件说明理由。', [1, 2]),
+        finding('legalReading', '律师说明大部分记录已经制作，其中包括完整审判记录。', [2]),
+        finding('legalReading', '律师还说明其正申请解除代理；如申请获准，应由接任律师判断是否缺少或需要其他记录。', [2]),
+        finding('riskFlags', '该文件不是实体上诉书，也不是批准解除代理的命令，其中没有实体上诉论证。', [1, 2]),
+      ],
+    },
+  }),
+  'edny-26-mc-2795:3': report({
+    caseId: 'edny-26-mc-2795',
+    sha256: 'a781d25e830828f456e86790347c783c823daa38afd4a630dd7aa7e245bf5e9a',
+    posture: 'court_order_section_1782_discovery',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:15:00.000+08:00',
+    en: {
+      summary: 'This one-page July 9, 2026 order grants Rui Hao\'s 28 U.S.C. § 1782 application to obtain testimony from Ho Wan Kwok, also known as Miles Guo, for use in a British Virgin Islands trial. The court found the three statutory prerequisites satisfied, stated that it had balanced the Intel discretionary factors, and directed MDC Brooklyn and the Federal Bureau of Prisons to arrange videoconference testimony on July 22 and 23, 2026.',
+      plainEnglish: 'A foreign lawsuit needed testimony from a person located in the United States. Section 1782 works like a legal bridge: a U.S. court can authorize evidence gathering here for use before a foreign tribunal. The judge opened that bridge and ordered the detention facility to arrange the video appearance. The order does not say who should win the British Virgin Islands case, whether the testimony was ultimately taken, or whether any particular statement was true.',
+      legalReading: [
+        'The court expressly found the three statutory § 1782 requirements: Kwok resided or was found in the Eastern District of New York, the discovery was for use before a foreign tribunal, and the application was made by an interested person.',
+        'The court also stated that it balanced the discretionary factors from Intel Corp. v. Advanced Micro Devices, Inc. The one-page order does not provide a factor-by-factor explanation, so no more detailed reasoning should be attributed to the court.',
+        'The operative relief was permission to take Kwok\'s testimony by videoconference on July 22 and 23, 2026 for a British Virgin Islands trial, plus a direction to MDC Brooklyn and the Bureau of Prisons to produce him for that remote testimony and coordinate with petitioner\'s counsel.',
+        '“Produce” in this context directs custodial officials to make the detained witness available for the ordered videoconference. It is not an order releasing him from custody or transferring ownership of property.',
+        'The caption and order treat Kwok as the testimony subject. The document does not establish that he was a party to the foreign case, identify the foreign causes of action, decide admissibility or credibility, or resolve any issue in the SDNY criminal case or direct appeal.',
+      ],
+      caseConnections: [
+        'The order identifies Kwok\'s then-current custody at MDC Brooklyn, which supplied the territorial basis for the Eastern District application; it does not alter the SDNY judgment or Second Circuit appeal.',
+        'A reliable cross-case account requires the § 1782 application and supporting papers, the British Virgin Islands pleadings or trial record, any testimony transcript or recording, and later compliance or modification filings.',
+        'Statements made in any resulting testimony would need separate authentication and context before being connected to criminal, bankruptcy, SEC, ownership, or entity-control issues.',
+      ],
+      whyItMatters: [
+        'It is a signed judicial order confirming that a foreign litigant obtained U.S. judicial assistance to seek Guo\'s testimony.',
+        'It establishes authorization and logistics only; it does not prove that testimony occurred or that the foreign tribunal adopted any testimony or factual claim.',
+      ],
+      verificationTasks: [
+        'Collect and review the underlying § 1782 application, declarations, proposed subpoena or questions, and any later EDNY compliance or modification filing.',
+        'Verify from the British Virgin Islands record whether the July 22-23 testimony occurred, how it was used, and whether the foreign tribunal issued any ruling concerning it.',
+        'Keep testimony statements, party allegations, and judicial findings in separate evidence categories if later materials are added.',
+      ],
+      riskFlags: [
+        'Granting § 1782 discovery is not a merits ruling in the foreign proceeding.',
+        'The order does not prove that the scheduled testimony occurred, was admitted, was credited, or affected the foreign trial.',
+        'The local corpus currently contains the order but not the application record or foreign case file, so the subject matter and adversarial positions remain incomplete.',
+      ],
+      findings: [
+        finding('summary', 'The court granted Rui Hao\'s § 1782 application to obtain Kwok\'s testimony for use in a British Virgin Islands trial.', [1]),
+        finding('legalReading', 'The court found the three statutory prerequisites satisfied and stated that it balanced the Intel factors.', [1]),
+        finding('legalReading', 'MDC Brooklyn and the Bureau of Prisons were directed to arrange videoconference testimony on July 22 and 23, 2026.', [1]),
+        finding('riskFlags', 'The order authorizes evidence gathering but does not decide the foreign case or establish that the testimony actually occurred.', [1]),
+      ],
+    },
+    zh: {
+      summary: '这份 2026 年 7 月 9 日的一页法院命令批准 Rui Hao 依据《美国法典》第 28 编第 1782 条提出的申请，允许其取得 Ho Wan Kwok（又名 Miles Guo）的证言，用于英属维尔京群岛的审判。法院认定三项法定条件成立，说明已权衡 Intel 案确立的酌情因素，并命令 MDC Brooklyn 和美国联邦监狱管理局安排 7 月 22 日、23 日的视频作证。',
+      plainEnglish: '可以把 § 1782 理解成一座“跨国取证桥梁”：境外诉讼需要美国境内人员的证据时，可以请求美国法院协助。法官在这里允许搭桥，并要求拘留设施安排视频出庭。但这份命令没有判断英属维尔京群岛案件谁胜谁负，也不能证明证言后来确实取得，更不能证明任何具体陈述真实。',
+      legalReading: [
+        '法院明确认定 § 1782 的三项法定前提：Kwok 居住于或可在纽约东区找到；证据用于外国审理机构的程序；申请由利害关系人提出。',
+        '法院还表示已权衡 Intel Corp. v. Advanced Micro Devices, Inc. 的酌情因素。由于一页命令没有逐项解释，不能替法院补写更详细的因素分析。',
+        '实际救济是允许在 2026 年 7 月 22 日、23 日通过视频会议取得 Kwok 的证言，用于英属维尔京群岛审判；同时命令 MDC Brooklyn 和联邦监狱管理局安排其远程作证，并与申请人律师协调。',
+        '本语境中的“produce”是要求羁押机关让被羁押的证人能够参加法院命令的视频作证，不是释放令，也不是财产移交命令。',
+        '案名页和命令把 Kwok 作为被取证对象。文件没有证明他是境外案件当事人，没有说明境外诉因，没有裁判证言可采性或可信度，也没有解决 SDNY 刑事案或直接上诉中的任何问题。',
+      ],
+      caseConnections: [
+        '命令记载 Kwok 当时被羁押于 MDC Brooklyn，这构成纽约东区处理申请的地域基础；它不改变 SDNY 判决或第二巡回上诉。',
+        '要形成可靠的跨案解读，还需取得 § 1782 申请及支持材料、英属维尔京群岛诉状或审判记录、证言文字或录像，以及后续履行或修改文件。',
+        '以后如取得证言，其中陈述必须独立核验并保留上下文，才能与刑事、破产、SEC、所有权或实体控制问题建立关联。',
+      ],
+      whyItMatters: [
+        '它是一份已签署法院命令，确认境外诉讼参与者获得美国司法协助，可以寻求郭文贵的证言。',
+        '它只确认授权和安排，不证明证言实际发生，也不证明境外法院采纳了任何证言或事实主张。',
+      ],
+      verificationTasks: [
+        '收集并审阅底层 § 1782 申请、声明、拟议传票或问题，以及纽约东区后续履行或修改文件。',
+        '从英属维尔京群岛案卷核验 7 月 22-23 日证言是否实际取得、如何使用，以及境外法院是否就其作出裁定。',
+        '以后新增材料时，应把证言陈述、当事方指控和法院认定分为不同证据类别。',
+      ],
+      riskFlags: [
+        '批准 § 1782 取证不等于对境外案件实体作出裁判。',
+        '命令不能证明预定证言已经发生、被采纳、被采信或影响了境外审判。',
+        '当前本地资料只有命令，没有底层申请记录和境外案件文件，因此取证主题及双方立场仍不完整。',
+      ],
+      findings: [
+        finding('summary', '法院批准 Rui Hao 的 § 1782 申请，允许取得 Kwok 的证言用于英属维尔京群岛审判。', [1]),
+        finding('legalReading', '法院认定三项法定前提成立，并说明已权衡 Intel 因素。', [1]),
+        finding('legalReading', 'MDC Brooklyn 和联邦监狱管理局被命令安排 2026 年 7 月 22 日、23 日的视频作证。', [1]),
+        finding('riskFlags', '命令授权取证，但没有裁判境外案件，也不能证明证言实际发生。', [1]),
+      ],
+    },
+  }),
+  'bkd-22-05032:214': report({
+    caseId: 'bkd-22-05032',
+    sha256: '36e722d925cc833991f1fcfc53192591978d3b8c851f3b37b67450de5f006043',
+    posture: 'district_court_bankruptcy_appeal_judgment',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:20:00.000+08:00',
+    en: {
+      summary: 'This one-page September 30, 2024 district-court judgment closes civil appeal 3:23-cv-00102 after the district court affirmed bankruptcy-court orders granting the appellees\' preliminary-injunction motion. Judgment was entered for Pacific Alliance Asia Opportunity Fund L.P. and Luc A. Despins. The judgment was then transmitted to adversary proceeding 22-05032 as Doc 214 on October 1, 2024.',
+      plainEnglish: 'This is the appeal\'s result sheet, not the full explanation. Guo challenged bankruptcy-court injunction orders; the district court left those orders in place, entered judgment for the opposing side, and closed the district-court appeal. “Case closed” here means this district-court appeal ended. It does not say that the entire bankruptcy case, every adversary claim, or every later appeal ended.',
+      legalReading: [
+        'The judgment identifies three linked dockets: main bankruptcy case 22-50073, adversary proceeding 22-5032, and district-court bankruptcy appeal 3:23-cv-00102.',
+        'It records that the district court had entered a September 30 order affirming bankruptcy-court orders that granted the appellees\' motion for a preliminary injunction. The separate 39-page order, transmitted as bankruptcy Doc 213, contains the reasoning and must control any issue-specific account.',
+        'The operative disposition is judgment for appellees and closure of the district-court civil appeal. The judgment does not state that the bankruptcy main case or all proceedings within adversary 22-5032 were closed.',
+        'An affirmance means the challenged bankruptcy orders remained in force at this appellate level. This one-page judgment does not describe the injunction terms, standards of review, factual findings, constitutional analysis, or any later appellate history.',
+        'The bankruptcy docket filed this district-court judgment one day later as Doc 214. The September 30 judgment date and October 1 bankruptcy-docket filing date serve different functions and should both be preserved.',
+      ],
+      caseConnections: [
+        'Read with bankruptcy Docs 133 and 134 for the preliminary-injunction decision and corrected order, and Doc 213 / district-court ECF 65 for the affirmance reasoning.',
+        'Read with adversary Doc 157 and the district-court docket to identify the appealed orders, issues presented, briefing, and any notice of further appeal.',
+        'The injunction dispute arose inside the broader Kwok bankruptcy, but this judgment should not be merged with criminal forfeiture, SEC remedies, or unrelated avoidance actions.',
+      ],
+      whyItMatters: [
+        'It is the operative judgment showing that Guo did not obtain reversal of the challenged preliminary-injunction orders at the district-court bankruptcy-appeal stage.',
+        'It prevents a docket-level ambiguity: the appeal was closed, but the document does not close the entire bankruptcy estate administration.',
+      ],
+      verificationTasks: [
+        'Complete page-by-page review of Doc 213 / ECF 65 before stating the district court\'s reasoning, standards of review, or treatment of each issue.',
+        'Review bankruptcy Docs 133 and 134 to state the exact injunction terms and identify which provisions were challenged and affirmed.',
+        'Check the district-court and Second Circuit dockets for any post-judgment motion, notice of appeal, mandate, or later modification.',
+      ],
+      riskFlags: [
+        'The judgment supplies the result but not the court\'s detailed reasoning.',
+        '“The case is closed” refers to civil appeal 3:23-cv-00102 and must not be reported as closure of bankruptcy case 22-50073.',
+        'A preliminary injunction regulates conduct before final merits resolution; affirmance of that injunction should not automatically be described as adjudication of every underlying claim.',
+      ],
+      findings: [
+        finding('summary', 'The district court entered judgment for Pacific Alliance Asia Opportunity Fund and Luc A. Despins and closed civil appeal 3:23-cv-00102.', [1]),
+        finding('legalReading', 'The judgment records a separate September 30 order affirming bankruptcy-court orders granting the appellees\' preliminary-injunction motion.', [1]),
+        finding('caseConnections', 'The document links bankruptcy case 22-50073, adversary proceeding 22-5032, and district-court appeal 3:23-cv-00102.', [1]),
+        finding('riskFlags', 'The judgment does not state that the main bankruptcy case was closed and does not reproduce the affirmance reasoning.', [1]),
+      ],
+    },
+    zh: {
+      summary: '这份 2024 年 9 月 30 日的一页地区法院判决结束了民事上诉案 3:23-cv-00102。地区法院维持破产法院批准被上诉人初步禁令动议的命令，并判 Pacific Alliance Asia Opportunity Fund L.P. 与 Luc A. Despins 胜诉。该判决随后于 10 月 1 日作为附属诉讼 22-05032 的 Doc 214 回传。',
+      plainEnglish: '可以把它理解成上诉的“结果页”，不是完整判决理由。郭对破产法院的禁令命令提出上诉；地区法院让这些命令继续有效，判对方胜诉，并关闭地区法院上诉案。这里的“结案”只表示这一级地区法院上诉结束，不表示整个破产主案、所有附属诉讼或后续上诉都结束。',
+      legalReading: [
+        '判决同时列出三个相互连接的案号：破产主案 22-50073、附属诉讼 22-5032、地区法院破产上诉案 3:23-cv-00102。',
+        '判决记载，地区法院已于 9 月 30 日签发另一份命令，维持破产法院批准被上诉人初步禁令动议的命令。回传为破产 Doc 213 的 39 页理由书才包含详细推理，涉及具体争点时应以该文件为准。',
+        '操作性结果是判被上诉人胜诉并关闭地区法院民事上诉案。判决没有写明破产主案或附属诉讼 22-5032 中全部程序均已关闭。',
+        '维持原裁定意味着在这一级上诉中，被挑战的破产法院命令继续有效。但一页判决没有说明禁令具体条款、审查标准、事实认定、宪法分析或后续上诉历史。',
+        '破产法院案卷次日把地区法院判决登记为 Doc 214。9 月 30 日是判决日期，10 月 1 日是回传到破产案卷的提交日期，两者作用不同，都应保存。',
+      ],
+      caseConnections: [
+        '应与破产 Docs 133、134 一起阅读，以确认初步禁令决定和更正命令；还应与 Doc 213 / 地区法院 ECF 65 一起阅读，以确认维持原裁定的理由。',
+        '应结合附属诉讼 Doc 157 和地区法院案卷，确定被上诉命令、上诉争点、双方书状及是否继续上诉。',
+        '本禁令争议发生在郭的破产程序内，但不得与刑事没收、SEC 救济或其他撤销权诉讼混为同一法律程序。',
+      ],
+      whyItMatters: [
+        '它是具有操作效力的判决，说明郭在地区法院破产上诉阶段没有获得对相关初步禁令命令的撤销。',
+        '它消除案卷层面的歧义：上诉案关闭，但文件没有关闭整个破产财产管理程序。',
+      ],
+      verificationTasks: [
+        '在陈述地区法院推理、审查标准或各项争点处理前，逐页完成 Doc 213 / ECF 65 的复核。',
+        '审阅破产 Docs 133、134，准确说明禁令条款，并确认哪些条款受到上诉及被维持。',
+        '检查地区法院和第二巡回案卷，确认是否有判后动议、继续上诉通知、mandate 或后续修改。',
+      ],
+      riskFlags: [
+        '该判决提供结果，但不包含法院详细理由。',
+        '“本案结案”指民事上诉案 3:23-cv-00102，不得写成破产主案 22-50073 已关闭。',
+        '初步禁令用于终局实体裁判前管理行为；维持初步禁令不能自动写成全部底层请求已经终局裁判。',
+      ],
+      findings: [
+        finding('summary', '地区法院判 Pacific Alliance Asia Opportunity Fund 与 Luc A. Despins 胜诉，并关闭民事上诉案 3:23-cv-00102。', [1]),
+        finding('legalReading', '判决记载另一份 9 月 30 日命令已维持破产法院批准被上诉人初步禁令动议的命令。', [1]),
+        finding('caseConnections', '文件连接破产主案 22-50073、附属诉讼 22-5032 和地区法院上诉案 3:23-cv-00102。', [1]),
+        finding('riskFlags', '判决没有写明破产主案已关闭，也没有重述维持原裁定的详细理由。', [1]),
+      ],
+    },
+  }),
+  'sdny-23-cr-118:132': report({
+    caseId: 'sdny-23-cr-118',
+    sha256: 'c9dcdcc7081cde8ed0cf6b0e4df7ab956e1af1fac830cb259f2664b1cecea4bb',
+    posture: 'court_order_briefing_schedule',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:30:00.000+08:00',
+    en: {
+      summary: 'This one-page August 31, 2023 order sets briefing deadlines on Ho Wan Kwok\'s motion asking the SDNY criminal court to stay the jointly administered Connecticut bankruptcy cases and related adversary proceedings. It required the government to oppose or state non-opposition by September 21 and allowed a defense reply by October 5. It did not grant or deny the requested stay.',
+      plainEnglish: 'The defense asked the criminal judge to pause the bankruptcy proceedings. This order only told the parties when to submit their arguments. It is a schedule, not a decision on whether the criminal court could or should stop the bankruptcy cases.',
+      legalReading: [
+        'The order identifies the requested reach of the motion: bankruptcy case 22-50073, the jointly administered Genever cases 22-50542 and 22-50592, and related adversary proceedings.',
+        'The only operative relief is a two-step briefing schedule. The government was required to oppose or advise that it did not oppose; the defense could reply.',
+        'Nothing in Doc 132 stays a bankruptcy deadline, invalidates a bankruptcy order, or determines jurisdiction, the automatic stay, criminal discovery, privilege, or constitutional issues.',
+        'The underlying defense motion and later disposition must be reviewed before reporting either side\'s legal theory or the result.',
+      ],
+      caseConnections: ['Connect this order to ECF 129-131 and the later ruling on the stay request.', 'The motion linked the criminal case to bankruptcy administration, but the two courts retained distinct proceedings and legal authority.'],
+      whyItMatters: ['It documents that a cross-court stay request was made and formally briefed.', 'It prevents the briefing order from being mistaken for an order that actually paused the bankruptcy cases.'],
+      verificationTasks: ['Review ECF 129-131, the government response, defense reply, and final disposition.', 'Check the bankruptcy dockets for any contemporaneous stay notice or independent bankruptcy-court action.'],
+      riskFlags: ['A briefing schedule is not a merits ruling.', 'The quoted stay request is the defense\'s requested relief, not a court finding.', 'No bankruptcy proceeding should be described as stayed on the basis of this document.'],
+      findings: [finding('summary', 'The court scheduled government opposition or non-opposition and an optional defense reply.', [1]), finding('legalReading', 'The motion sought a stay of identified Connecticut bankruptcy cases and related adversary proceedings.', [1]), finding('riskFlags', 'The order did not grant or deny a stay.', [1])],
+    },
+    zh: {
+      summary: '这份 2023 年 8 月 31 日的一页命令，为 Ho Wan Kwok 请求纽约南区刑事法院中止康涅狄格合并管理破产案及相关附属诉讼的动议设定书状期限。检方须在 9 月 21 日前反对或表明不反对，辩方可在 10 月 5 日前答复。命令没有批准或驳回中止请求。',
+      plainEnglish: '辩方请求刑事法官暂停破产程序；这份命令只是告诉双方“什么时候交意见”。它是排期表，不是法院已经决定是否有权或是否应当叫停破产案。',
+      legalReading: ['命令记录了动议请求覆盖的范围：破产案 22-50073、合并管理的 Genever 案 22-50542 和 22-50592，以及相关附属诉讼。', '命令唯一产生操作效力的内容是两阶段书状排期：检方必须反对或说明不反对，辩方可以答复。', 'Doc 132 没有暂停任何破产期限，没有撤销破产法院命令，也没有裁判管辖权、自动中止、刑事取证、特权或宪法问题。', '必须审阅底层辩方动议及后续处分，才能说明双方法律理论和结果。'],
+      caseConnections: ['应连接 ECF 129-131 及后来对中止请求的裁定。', '动议把刑事案与破产管理联系起来，但两个法院的程序和法律权限仍然不同。'],
+      whyItMatters: ['它证明跨法院中止请求确实提出并进入正式书状程序。', '它防止把排期命令误写成破产案已经暂停。'],
+      verificationTasks: ['审阅 ECF 129-131、检方回应、辩方答复和最终处分。', '检查破产案卷是否同期出现中止通知或破产法院独立行动。'],
+      riskFlags: ['书状排期不是实体裁定。', '命令引用的中止范围是辩方请求，不是法院认定。', '不能依据本文件声称任何破产程序已经被中止。'],
+      findings: [finding('summary', '法院安排检方反对或不反对意见及辩方可选答复的期限。', [1]), finding('legalReading', '动议请求中止所列康涅狄格破产案和相关附属诉讼。', [1]), finding('riskFlags', '命令没有批准或驳回中止。', [1])],
+    },
+  }),
+  'dconn-22-50073:1893': report({
+    caseId: 'dconn-22-50073',
+    sha256: '2dadd0092fffcdf7f4b2ae870f6d68445379a8e1260f48a6f00583fedd7868f3',
+    posture: 'court_order_to_show_cause',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:32:00.000+08:00',
+    en: {
+      summary: 'This June 7, 2023 bankruptcy order required GTV Media, Saraca Media Group, and attorney Aaron Mitchell to appear on July 18 and show cause why GTV and Saraca should not be held in civil contempt for failing to respond to court-authorized Rule 2004 subpoenas. It also directed the trustee to serve the order and file proof of service. It is not a contempt judgment.',
+      plainEnglish: 'The judge ordered the companies and lawyer to come to court and explain themselves. That is a serious procedural step, but it is the start of the contempt decision, not the end. The document does not itself say the companies were guilty of contempt or impose a sanction.',
+      legalReading: ['The trustee asserted that GTV and Saraca initially responded but had not responded since December 2022; that chronology remains the trustee\'s position recited by the court.', 'The court required entity representatives and Mitchell personally to appear and address possible civil contempt for noncompliance with Rule 2004 subpoenas.', 'The order contains service deadlines, which matter to notice and enforceability.', 'A later hearing record and order are required to determine whether contempt was found, compliance occurred, or sanctions were imposed.'],
+      caseConnections: ['Read with ECF 1805, the Luft declaration and exhibits, ECF 1826, and the July 18 hearing record.', 'The order concerns bankruptcy examination subpoenas and must not be reported as a criminal finding against Guo or the named entities.'],
+      whyItMatters: ['It identifies specific GTV and Saraca discovery-compliance issues in the bankruptcy investigation.', 'It preserves the difference between an order to show cause and an actual contempt adjudication.'],
+      verificationTasks: ['Locate the July 18, 2023 hearing transcript and resulting order.', 'Verify service, later production, any privilege ruling, and any sanctions.'],
+      riskFlags: ['No contempt finding or sanction appears in this order.', 'Trustee assertions are not automatically court findings.', 'Rule 2004 discovery is broad bankruptcy examination, not a merits judgment on ownership or liability.'],
+      findings: [finding('summary', 'GTV, Saraca, and attorney Mitchell were ordered to appear for a July 18 show-cause hearing.', [2]), finding('legalReading', 'The possible contempt concerned alleged failure to respond or comply with Rule 2004 subpoenas.', [1, 2]), finding('riskFlags', 'The order did not itself adjudicate contempt.', [2])],
+    },
+    zh: {
+      summary: '这份 2023 年 6 月 7 日破产法院命令要求 GTV Media、Saraca Media Group 及律师 Aaron Mitchell 于 7 月 18 日出庭，说明为何不应因 GTV 和 Saraca 未答复法院授权的 Rule 2004 传票而认定两家公司构成民事藐视法庭；同时要求受托人送达并提交送达证明。它不是藐视法庭判决。',
+      plainEnglish: '法官要求公司和律师到庭解释，这是严肃的程序步骤，但只是“是否藐视”的审理起点，不是最终答案。本文件没有认定两家公司已经藐视法庭，也没有处罚。',
+      legalReading: ['受托人主张 GTV 和 Saraca 起初曾答复，但自 2022 年 12 月起未再答复；法院在命令中转述这一时间线，不会自动把它变成最终事实认定。', '法院要求两家实体派代表、Mitchell 律师本人出庭，就 Rule 2004 传票不履行可能构成的民事藐视作出说明。', '命令还设定送达和送达证明期限，这关系到通知和后续执行。', '必须取得后续听证记录和命令，才能判断是否最终认定藐视、是否补充履行或是否处罚。'],
+      caseConnections: ['应与 ECF 1805、Luft 声明及附件、ECF 1826 和 7 月 18 日听证记录一起阅读。', '本命令涉及破产调查传票，不是对郭或相关实体作出的刑事认定。'],
+      whyItMatters: ['它确认破产调查中存在针对 GTV 与 Saraca 的具体取证履行争议。', '它保留“说明理由命令”与“最终藐视裁判”的关键区别。'],
+      verificationTasks: ['查找 2023 年 7 月 18 日听证记录和后续命令。', '核验送达、后续材料提供、特权裁定及任何处罚。'],
+      riskFlags: ['本命令没有认定藐视，也没有处罚。', '受托人主张不自动等于法院认定。', 'Rule 2004 属于范围较广的破产调查，不是所有权或责任实体判决。'],
+      findings: [finding('summary', '法院命令 GTV、Saraca 和 Mitchell 律师参加 7 月 18 日说明理由听证。', [2]), finding('legalReading', '可能的藐视问题来自被指称未答复或遵守 Rule 2004 传票。', [1, 2]), finding('riskFlags', '本命令没有自行裁判藐视成立。', [2])],
+    },
+  }),
+  'dconn-22-50073:1889': report({
+    caseId: 'dconn-22-50073',
+    sha256: 'edbe4ef08d112b1a9eb09e7e4b0dfe28605460297cad08d731bab4925fa6cb7c',
+    posture: 'court_order_sealing',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:35:00.000+08:00',
+    en: {
+      summary: 'This June 7, 2023 order granted the Chapter 11 trustee permission to file an unredacted motion to compel and specified privileged or potentially privileged exhibits under seal, while allowing redacted public and party copies. It preserved full statutory access for the United States Trustee and made the order immediately effective. It did not grant the underlying motion to compel or find any entity in contempt.',
+      plainEnglish: 'The judge decided how sensitive papers could be filed, not whether the accusations in those papers were correct. Complete versions went into the court\'s protected file; redacted versions could be used publicly. Think of it as deciding which envelope the evidence goes into, not deciding who wins the evidence dispute.',
+      legalReading: ['The order found good cause based on protective and privilege arrangements and authorized sealed, unredacted submission of specified materials.', 'The specified exhibits remain nonpublic unless a later court order permits access; redacted copies may be filed and served.', 'The United States Trustee retained statutory full access subject to § 107(c)(3)(B) obligations.', 'The order concerns filing access only and does not adjudicate subpoena compliance, privilege merits, contempt, ownership, or control.'],
+      caseConnections: ['Read with ECF 1806, the protective and privileges orders, the public redacted filing, and later access rulings.', 'Doc 1893 separately ordered a show-cause hearing; neither order alone establishes contempt.'],
+      whyItMatters: ['It explains why parts of the Rule 2004 dispute are unavailable in the public record.', 'It prevents sealed submission from being misreported as secret substantive relief or a contempt finding.'],
+      verificationTasks: ['Identify the redacted public counterparts and any later unsealing order.', 'Review the underlying motion and later merits disposition without inferring sealed content.'],
+      riskFlags: ['A sealing order is not a merits decision.', 'The public corpus is intentionally incomplete as to the sealed exhibits.', 'Do not disclose or infer privileged material from titles or surrounding filings.'],
+      findings: [finding('summary', 'The court authorized sealed unredacted filings and redacted public or party copies.', [1, 2]), finding('legalReading', 'The United States Trustee retained statutory full access subject to confidentiality obligations.', [2]), finding('riskFlags', 'The order did not decide the motion to compel or contempt.', [1, 2, 3])],
+    },
+    zh: {
+      summary: '这份 2023 年 6 月 7 日命令允许第 11 章受托人将未删节的强制履行动议及特定受特权或可能受特权保护的附件密封提交，同时允许提交和送达删节版本；美国受托人保留法定完整查阅权，命令立即生效。它没有批准底层强制履行动议，也没有认定任何实体藐视法庭。',
+      plainEnglish: '法官决定的是敏感文件应怎样提交，不是文件里的指控是否正确。完整版本放进法院受保护的档案，公开使用删节版本。可以把它理解成决定“证据装进哪种信封”，而不是决定证据争议谁胜谁负。',
+      legalReading: ['法院依据保护令和特权安排认定存在正当理由，允许特定材料以完整未删节形式密封提交。', '特定附件除非法院以后另行许可，应继续不向公众开放；可以提交和送达删节副本。', '美国受托人依据法律保留完整查阅权，同时承担 § 107(c)(3)(B) 的保密义务。', '命令只处理提交和访问方式，没有裁判传票履行、特权实体、藐视、所有权或控制关系。'],
+      caseConnections: ['应与 ECF 1806、保护令、特权命令、公开删节版本及后续访问裁定一起阅读。', 'Doc 1893 另行安排说明理由听证；两份命令都不能单独证明藐视成立。'],
+      whyItMatters: ['它解释了为何 Rule 2004 争议的一部分在公开案卷中不可见。', '它防止把密封提交误写成秘密实体救济或藐视认定。'],
+      verificationTasks: ['识别公开删节版本及任何后续解封命令。', '审阅底层动议和后续实体处分，不推测密封内容。'],
+      riskFlags: ['密封命令不是实体裁判。', '公开资料对密封附件存在有意保留的缺口。', '不得根据标题或周边文件披露或推测特权材料。'],
+      findings: [finding('summary', '法院允许密封提交未删节文件，并允许公开或向当事方提供删节副本。', [1, 2]), finding('legalReading', '美国受托人在承担保密义务的前提下保留法定完整查阅权。', [2]), finding('riskFlags', '命令没有裁判强制履行动议或藐视问题。', [1, 2, 3])],
+    },
+  }),
+  'discovered-nysd-71961885:15': report({
+    caseId: 'discovered-nysd-71961885',
+    sha256: '7d9a6cef4dc318c861d78e632a96847301fec565a66ea69ea53d198ea85ea185',
+    posture: 'court_order_status_report',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-15T16:38:00.000+08:00',
+    en: {
+      summary: 'This December 18, 2025 order in Dong v. GTV Media Group required the parties to report the status of a state-court motion seeking to compel SEC compliance with a subpoena. Although plaintiffs had filed a notice seeking voluntary dismissal without prejudice, the court directed the clerk not to close the removed federal matter pending a further order.',
+      plainEnglish: 'The plaintiffs tried to withdraw the federal subpoena dispute, but the judge did not treat the file as finished because no one had explained whether the underlying SEC subpoena issue was actually resolved. The court asked for a status letter and kept the case open. This is procedural housekeeping, not a ruling on the class action or the subpoena merits.',
+      legalReading: ['The SEC had removed the subpoena-enforcement dispute from the underlying state case under § 1442(a).', 'Plaintiffs invoked Rule 41(a)(1)(A)(i) to seek dismissal without prejudice, but the court required clarification of the underlying motion\'s status.', 'The operative directions were a December 19 status letter and an instruction not to close the federal case pending further order.', 'The order does not decide subpoena enforceability, SEC privilege or burden, class claims, GTV liability, or the state case merits.'],
+      caseConnections: ['The caption establishes a GTV-related action, but this order does not mention Guo or adjudicate any Guo-GTV ownership or control relationship.', 'Later status submissions and closure or remand orders are necessary to state the federal subpoena matter\'s outcome.'],
+      whyItMatters: ['It records an unresolved procedural link between the GTV class action and an SEC subpoena.', 'It prevents the voluntary-dismissal notice from being reported as an already effective final resolution.'],
+      verificationTasks: ['Collect the December 19 status letter and subsequent closure, remand, or subpoena order.', 'Verify the underlying state docket and the subpoena\'s requested subject matter before drawing cross-case conclusions.'],
+      riskFlags: ['The case remained open under this order.', 'No subpoena or class-action merits issue was decided.', 'The document supports company-level relevance only and does not establish a personal relationship finding concerning Guo.'],
+      findings: [finding('summary', 'The court required a status letter and directed that the federal case remain open.', [1]), finding('legalReading', 'The dispute concerned a subpoena served on the SEC in an underlying state action.', [1]), finding('riskFlags', 'The voluntary-dismissal notice did not, by this order alone, establish final closure or resolution.', [1])],
+    },
+    zh: {
+      summary: '这份 2025 年 12 月 18 日 Dong v. GTV Media Group 命令要求各方报告州法院案件中强制 SEC 遵守传票动议的状态。虽然原告已提交拟不妨碍以后再次提出的自愿撤诉通知，但法院命令书记官在进一步命令前不得关闭该联邦移送事项。',
+      plainEnglish: '原告试图撤回联邦法院里的 SEC 传票争议，但法官没有直接把档案关掉，因为没人说明底层 SEC 传票问题是否真的解决。法院要求交状态信，并让案件继续保持开放。这是程序管理，不是对集体诉讼或传票实体的裁判。',
+      legalReading: ['SEC 曾依据 § 1442(a) 把底层州法院案件中的传票强制履行争议移送联邦法院。', '原告援引 Rule 41(a)(1)(A)(i) 请求不妨碍再次提出的撤诉，但法院要求说明底层动议的实际状态。', '命令的操作性内容是要求 12 月 19 日提交状态信，并在进一步命令前不得关闭联邦案件。', '命令没有裁判传票是否可执行、SEC 的特权或负担、集体请求、GTV 责任或州法院案件实体。'],
+      caseConnections: ['案名页证明这是 GTV 相关诉讼，但命令没有提及郭，也没有裁判郭与 GTV 的所有权或控制关系。', '必须取得后续状态文件和关闭、发回或传票命令，才能说明联邦传票事项结果。'],
+      whyItMatters: ['它记录 GTV 集体诉讼与 SEC 传票之间尚未解决的程序连接。', '它防止把自愿撤诉通知误写成已经发生效力的最终解决。'],
+      verificationTasks: ['收集 12 月 19 日状态信及后续关闭、发回或传票命令。', '在建立跨案结论前，核验底层州法院案卷和传票请求主题。'],
+      riskFlags: ['依据本命令，案件当时仍保持开放。', '法院没有裁判传票或集体诉讼实体。', '文件只支持公司层面的相关性，不能证明关于郭个人关系的法院认定。'],
+      findings: [finding('summary', '法院要求提交状态信，并命令联邦案件继续开放。', [1]), finding('legalReading', '争议涉及底层州法院案件向 SEC 发出的传票。', [1]), finding('riskFlags', '仅凭自愿撤诉通知和本命令，不能认定案件已最终关闭或争议已解决。', [1])],
+    },
+  }),
   'sdny-23-cr-118:864': report({
     sha256: '5e4ab50292478d8cb604d85891a772f3fed09d2bd2f0c2896df55f90e7b7b582',
     posture: 'sentencing_transcript',
@@ -1840,6 +2194,90 @@ const documentResearch = {
 }
 
 const caseResearch = {
+  'ca2-26-1853': bilingualCase(
+    `Core conclusion
+- The direct criminal appeal is open in the Second Circuit. The notice of appeal reaches both conviction and sentence, but no merits brief or briefing schedule appears in the public docket reviewed through August 12, 2026. [SDNY Doc 862, p. 1; CA2 docket 26-1853]
+
+Current procedural posture
+- After dismissal warnings concerning required forms, counsel filed the appearance form and Form B. Form B states that no additional transcript was being ordered on August 5 because much of the record, including the complete trial transcript, had already been produced and because counsel simultaneously moved to withdraw. [CA2 Entries 12-16; Doc 15, pp. 1-2]
+- The public docket reviewed through August 12 shows the withdrawal motion and a later case-manager assignment, but no displayed order granting withdrawal. The identity of continuing or successor merits counsel must therefore remain marked as pending public confirmation. [CA2 Entries 16-17]
+
+What is and is not established
+- The appeal itself is established, and its notice covers conviction and sentence. The particular appellate claims, preservation record, standards of review, requested relief, and government responses are not yet established by merits briefs. [SDNY Doc 862, p. 1]
+- Form B is a record-management filing. It does not waive the appeal, confirm that every potentially necessary transcript exists, approve counsel's withdrawal, or disclose any merits theory. [CA2 Doc 15, pp. 1-2]
+
+Connection to the district-court record
+- The operative judgment records nine convictions, three acquittals, a total 360-month sentence, zero restitution and fine, a $900 assessment, and an $889 million forfeiture money judgment. Those are the current judgment baselines, not predictions about the appeal. [SDNY Doc 860, pp. 1-6]
+- The public sentencing transcript preserves court findings and objections but omits sealed internal transcript pages 3-30. Whether and how sealed material enters the appellate record must be tracked from later record filings and orders. [SDNY Doc 864, PDF pp. 2-3, 63-65]
+
+Watch next
+- Monitor the ruling on counsel's withdrawal, any substitution or CJA appointment, transcript or record supplementation, a scheduling order, merits briefs, sealed-record handling, oral argument, and disposition.
+- Do not describe a likely appellate outcome before the briefs and record identify the actual claims and applicable standards.
+
+Limitations
+This neutral procedural analysis uses the public CourtListener/RECAP docket and version-locked filings. A docket page can lag PACER, and absence from the public display is not proof that a sealed or newly filed item does not exist. This is legal information, not legal advice.`,
+    `核心结论
+- 刑事直接上诉已在第二巡回立案。上诉通知同时覆盖定罪和刑罚，但截至 2026 年 8 月 12 日核验的公开案卷，尚未显示实体上诉书或实体书状排期。[SDNY Doc 862，第 1 页；第二巡回案号 26-1853]
+
+当前程序状态
+- 法院曾因必要表格未提交而警告可能驳回上诉；之后律师提交了出庭表和 Form B。Form B 说明，2026 年 8 月 5 日没有新增订购庭审记录，因为大部分记录（包括完整审判记录）已经制作，而且律师同日申请解除代理。[第二巡回 Entries 12-16；Doc 15，第 1-2 页]
+- 截至 8 月 12 日核验的公开案卷显示了解除代理动议以及其后的案件管理员分配，但没有显示批准解除代理的命令。因此，后续究竟由原律师还是接任律师负责实体上诉，仍应标记为等待公开确认。[第二巡回 Entries 16-17]
+
+已经确认与尚未确认的事项
+- 已确认上诉存在，且通知范围包括定罪和刑罚。具体上诉理由、争点是否保留、审查标准、请求的救济及检方回应，尚未由实体书状确定。[SDNY Doc 862，第 1 页]
+- Form B 只是管理上诉案卷的程序文件。它不放弃上诉，不确认所有潜在必要记录都已具备，不批准律师退出，也不披露任何实体上诉理论。[第二巡回 Doc 15，第 1-2 页]
+
+与地区法院案卷的连接
+- 当前正式判决基准是九项定罪、三项无罪、总刑期 360 个月、赔偿与罚金均为 0、评估费 900 美元，以及 8.89 亿美元没收金钱判决。这些是现行判决内容，不是对上诉结果的预测。[SDNY Doc 860，第 1-6 页]
+- 公开量刑记录保留了法院认定和异议，但省略了已密封的庭审记录内部页码第 3-30 页。密封材料是否及如何进入上诉案卷，必须通过后续案卷文件和命令追踪。[SDNY Doc 864，PDF 第 2-3、63-65 页]
+
+后续观察
+- 追踪解除代理动议裁定、律师替换或 CJA 任命、庭审记录或案卷补充、排期命令、双方实体书状、密封材料处理、口头辩论及最终处分。
+- 在书状和案卷明确实际争点与审查标准前，不应预测上诉结果。
+
+分析限制
+本中立程序分析依据公开 CourtListener/RECAP 案卷及版本锁定文件。公开页面可能滞后于 PACER；公开页面没有显示某项文件，也不能证明密封或刚提交的文件绝对不存在。本内容属于法律信息，不是法律意见。`,
+    2,
+  ),
+  'edny-26-mc-2795': bilingualCase(
+    `Core conclusion
+- On July 9, 2026, the Eastern District of New York granted Rui Hao's § 1782 application to obtain Ho Wan Kwok's videoconference testimony for a British Virgin Islands trial and directed MDC Brooklyn and the Bureau of Prisons to arrange his appearance on July 22 and 23. [Doc 3, p. 1]
+
+Procedural posture
+- The collected record establishes a granted discovery-assistance application. It does not establish whether testimony occurred, whether the order was modified, or how the foreign tribunal treated any resulting evidence. [Doc 3, p. 1]
+
+Court-confirmed material
+- The court found the three statutory prerequisites satisfied and stated that it balanced the Intel discretionary factors. The short order does not provide a factor-by-factor explanation. [Doc 3, p. 1]
+- The order directed custodial officials to make Kwok available by videoconference; it did not release him, alter the SDNY criminal judgment, or decide the British Virgin Islands merits. [Doc 3, p. 1]
+
+Evidence gaps
+- The local corpus lacks the underlying application, supporting declarations, proposed discovery, any opposition, the testimony record, later EDNY compliance filings, and the British Virgin Islands pleadings and rulings.
+
+Watch next
+- Locate the complete EDNY application record and foreign docket, then verify whether the scheduled testimony occurred and separate witness statements from later judicial findings.
+
+Limitations
+This neutral analysis is limited to the signed one-page order. It is legal information, not legal advice, and it does not infer the content or effect of uncollected testimony.`,
+    `核心结论
+- 2026 年 7 月 9 日，纽约东区批准 Rui Hao 的 § 1782 申请，允许通过视频会议取得 Ho Wan Kwok 的证言，用于英属维尔京群岛审判，并命令 MDC Brooklyn 和联邦监狱管理局安排其于 7 月 22 日、23 日出庭。[Doc 3，第 1 页]
+
+程序状态
+- 已收集记录能证明美国法院批准了境外取证协助，但不能证明证言实际发生、命令是否修改，也不能证明境外法院如何处理任何取得的证据。[Doc 3，第 1 页]
+
+法院已确认材料
+- 法院认定三项法定条件成立，并说明已权衡 Intel 酌情因素；简短命令没有逐项解释。[Doc 3，第 1 页]
+- 命令要求羁押机关安排视频作证，不是释放令，不改变 SDNY 刑事判决，也不裁判英属维尔京群岛案件实体。[Doc 3，第 1 页]
+
+证据缺口
+- 本地资料缺少底层申请、支持声明、拟议取证内容、任何反对文件、证言记录、纽约东区后续履行文件，以及英属维尔京群岛诉状和裁定。
+
+后续观察
+- 查找完整纽约东区申请记录和境外案卷，核验证言是否按计划取得，并把证人陈述与后续法院认定分开。
+
+分析限制
+本中立分析仅覆盖已签署的一页命令，属于法律信息而非法律意见；不推测尚未收集证言的内容或作用。`,
+    1,
+  ),
   'sdny-23-cr-118': augmentCriminalCase(bilingualCase(
     `Core conclusion\n- The criminal case reached final judgment on July 2, 2026: nine convictions, three acquittals, a total 360-month sentence, zero restitution and fine, a $900 assessment, and an $889 million forfeiture money judgment. [Doc 860, pp. 1-6]\n\nProcedural posture\n- A notice of appeal covers both conviction and sentence; the merits must be taken from Second Circuit docket 26-1853 and later briefs, not from the notice itself. [Doc 862, p. 1]\n\nCourt-confirmed material\n- The court reduced the proposed forfeiture figure by $411 million to $889 million, denied the bankruptcy-asset seizure motion, reserved third-party ownership claims for § 853(n), and authorized remission because restitution was impracticable. [Doc 858, pp. 9, 17]\n- At sentencing, the court denied a full Fatico hearing, made factual findings by preponderance, found Guidelines loss above $550 million, and imposed a below-Guidelines 360-month total term. [Doc 864, PDF pp. 4-13, 57-60]\n\nContested positions\n- Doc 19 records the government's historical allegations, not findings, and it predates the S3 superseding indictment reflected in the judgment. [Doc 19, pp. 1-12]\n- Sentencing findings use a different standard and purpose from the jury verdict; they must not be restated as additional convictions. [Doc 864, PDF pp. 4, 9]\n\nCross-case connections\n- Criminal forfeiture overlaps factually with SEC/Fair Fund and bankruptcy recovery, but forfeiture, disgorgement, restitution, remission, and estate ownership remain distinct legal tracks. [Doc 858, pp. 9, 17]\n\nEvidence gaps\n- Core criminal PDFs are currently NFSC backup copies rather than PACER or RECAP-authenticated copies. Doc 864 transcript pages 3-30 are sealed and omitted; the cited Doc 864 page numbers above are PDF page numbers.\n\nWatch next\n- Track the Second Circuit briefing schedule and actual issues raised, any amended judgment, § 853(n) ancillary rulings, remission notices, and later district-court action after Doc 868.\n\nLimitations\nThis is neutral legal research based on version-locked public copies and page citations, not legal advice. It does not infer the contents of sealed records or predict the appeal.`,
     `核心结论\n- 刑事主案已于 2026 年 7 月 2 日形成正式判决：九项定罪、三项无罪、总刑期 360 个月、赔偿和罚金均为 0、评估费 900 美元，以及 8.89 亿美元没收金钱判决。[Doc 860，第 1-6 页]\n\n程序姿态\n- 上诉通知同时覆盖定罪和刑罚；实体争点必须以后续第二巡回 26-1853 案卷和书状为准，不能从通知本身推断。[Doc 862，第 1 页]\n\n法院已确认材料\n- 法院从拟议没收额中扣除 4.11 亿美元，确定 8.89 亿美元；驳回强制扣押破产资产动议，把第三方所有权留给 § 853(n) 程序，并因赔偿不切实际授权 remission。[Doc 858，第 9、17 页]\n- 量刑时，法院拒绝完整 Fatico 听证，按优势证据作事实认定，认定量刑指南损失超过 5.5 亿美元，并在指南以下判处总计 360 个月。[Doc 864，PDF 第 4-13、57-60 页]\n\n争议立场\n- Doc 19 记录检方历史指控，不是法院认定，而且早于正式判决所引用的 S3 替代起诉书。[Doc 19，第 1-12 页]\n- 量刑事实与陪审团裁决的标准和目的不同，不得把量刑认定写成新增定罪。[Doc 864，PDF 第 4、9 页]\n\n跨案件关联\n- 刑事没收与 SEC/Fair Fund 及破产追回存在事实重叠，但没收、返还、赔偿、remission 和破产财产所有权仍是不同法律程序。[Doc 858，第 9、17 页]\n\n证据缺口\n- 核心刑事 PDF 目前来自 NFSC 备用镜像，并非 PACER 或 RECAP 认证副本；Doc 864 的庭审记录内部页码第 3-30 页已密封并从公开 PDF 删除，上述 Doc 864 引用使用 PDF 页码。\n\n后续观察\n- 追踪第二巡回排期和实际提出的争点、任何修订判决、§ 853(n) 附属程序裁定、remission 通知及 Doc 868 后地区法院行动。\n\n分析限制\n本报告是基于版本锁定公开副本和页码引用的中立法律研究，不是法律意见；不推测密封内容，也不预测上诉结果。`,
@@ -1869,13 +2307,36 @@ const caseResearch = {
 
 export function humanDocumentResearch(file, lang = 'zh') {
   const key = documentResearchKey(file)
-  const value = documentResearch[key]
+  const value = documentResearch[key] ?? externalDocumentResearch(file?.sha256)
   if (!value || !file?.sha256 || value.sha256 !== file.sha256) return null
   return {
     ...value,
     content: lang === 'en' ? value.en : value.zh,
-    reviewedAt,
+    reviewedAt: value.reviewedAt ?? reviewedAt,
   }
+}
+
+function externalDocumentResearch(sourceSha256) {
+  if (!/^[a-f0-9]{64}$/.test(sourceSha256 ?? '')) return null
+  if (externalResearchCache.has(sourceSha256)) {
+    const cached = externalResearchCache.get(sourceSha256)
+    externalResearchCache.delete(sourceSha256)
+    externalResearchCache.set(sourceSha256, cached)
+    return cached
+  }
+  let value
+  try {
+    value = JSON.parse(readFileSync(new URL(`./human-legal-research/${sourceSha256}.json`, import.meta.url), 'utf8'))
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null
+    throw error
+  }
+  if (value.sha256 !== sourceSha256) throw new Error(`Version-locked legal review registry mismatch: ${sourceSha256}`)
+  externalResearchCache.set(sourceSha256, value)
+  if (externalResearchCache.size > maximumCachedExternalResearch) {
+    externalResearchCache.delete(externalResearchCache.keys().next().value)
+  }
+  return value
 }
 
 export function humanCaseResearch(caseId, manifest, lang = 'zh') {
@@ -1887,7 +2348,7 @@ export function humanCaseResearch(caseId, manifest, lang = 'zh') {
   return {
     available: true,
     generatedAt: reviewedAt,
-    model: lang === 'en' ? 'Human legal research v1' : '人工法律研究 v1',
+    model: lang === 'en' ? 'Version-locked legal review v1' : '版本锁定法律复核 v1',
     provider: 'human_research',
     text: lang === 'en' ? value.en : value.zh,
     evidenceCount: value.evidenceCount,
@@ -1905,7 +2366,7 @@ function report(value) {
   return {
     ...value,
     caseId: value.caseId ?? inferCaseId(value.sha256),
-    reviewedAt,
+    reviewedAt: value.reviewedAt ?? reviewedAt,
   }
 }
 
@@ -2021,6 +2482,6 @@ Adversarial sentencing record
   return {
     en: `${en}\n\n${value.en}`,
     zh: `${zh}\n\n${value.zh}`,
-    evidenceCount: value.evidenceCount + 21,
+    evidenceCount: value.evidenceCount + 22,
   }
 }

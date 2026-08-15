@@ -1,0 +1,28 @@
+{
+  "sha256": "d46bf6ce72b25b0b9a9260b76cf947a9c4eef69dccb487aa351857da1d125691",
+  "caseId": "discovered-wawd-59814324",
+  "docNumber": "3",
+  "posture": "party_declaration_supporting_removal",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "Daniel Podhaskie submitted a declaration under penalty of perjury in support of Saraca Media Group Inc.'s notice of removal. He states from personal knowledge that he is a New York resident, is a director of Saraca Media Group, and that Saraca is incorporated in Delaware with its principal place of business in New York.",
+    "plainEnglish": "This declaration supplies a few corporate-location facts for the effort to move the state case into federal court. It is sworn evidence from Saraca's director, but it is still a party witness's statement. The judge must decide what legal effect those facts have, and this page says nothing about the underlying dispute.",
+    "legalReading": ["The declaration is made under penalty of perjury and asserts personal knowledge, which gives it evidentiary form but does not make every statement a judicial finding.", "Podhaskie states Saraca's state of incorporation and principal place of business, facts commonly relevant to corporate citizenship; the removal notice must supply the actual jurisdictional theory.", "The declaration does not state that Wengui Guo owns or controls Saraca, does not describe the plaintiffs' claims, and does not decide removal jurisdiction."],
+    "caseConnections": ["The filing expressly supports Doc 1, the notice of removal, and identifies the originating King County Superior Court case as 20-2-12680-2 SEA.", "The caption names WA&HF LLC and Ruizheng An as plaintiffs and Saraca Media Group Inc. and Wengui Guo as defendants; party alignment alone does not prove a corporate relationship."],
+    "whyItMatters": ["It provides a dated, sworn source for Saraca's claimed Delaware incorporation and New York principal place of business.", "It helps evaluate removal without importing unsupported ownership conclusions."],
+    "verificationTasks": ["Read the notice of removal and state complaint to identify the asserted federal jurisdiction and citizenship allegations for every party.", "Check the later docket for remand, jurisdictional discovery, corporate records, or a final jurisdiction ruling."],
+    "riskFlags": ["A party declaration is evidence offered by that party, not a court finding.", "Director status is not the same as shareholder ownership, beneficial ownership, or exclusive control.", "This page does not disclose the citizenship of every LLC member and cannot alone establish complete diversity."],
+    "findings": [{"section":"summary","text":"Podhaskie states under penalty of perjury that Saraca is incorporated in Delaware and has its principal place of business in New York.","confidence":"high","pages":[1]},{"section":"legalReading","text":"He identifies himself as a Saraca director and a New York resident and states that the declaration is based on personal knowledge.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The declaration does not establish Guo's ownership or control of Saraca and is not a jurisdiction ruling.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Daniel Podhaskie 为支持 Saraca Media Group Inc. 的移送通知，在伪证罪处罚条款下提交声明。他根据亲身所知表示：自己是纽约州居民、Saraca Media Group 的董事；Saraca 在特拉华州注册成立，主要营业地点位于纽约州。",
+    "plainEnglish": "这份声明为把州法院案件移到联邦法院提供了几项公司所在地事实。它是 Saraca 董事作出的宣誓证据，但仍属于一方证人的陈述；这些事实在法律上产生什么效果要由法官判断，而且本页没有说明基础纠纷。",
+    "legalReading": ["声明依据伪证罪处罚条款作出，并称基于亲身所知，因此具有证据形式，但不自动变成法院认定。", "Podhaskie 陈述了 Saraca 的注册州和主要营业地点；这些通常与公司公民身份有关，但实际管辖理论必须从移送通知判断。", "声明没有表示 Wengui Guo 所有或控制 Saraca，没有描述原告诉因，也没有裁判移送管辖权。"],
+    "caseConnections": ["文件明确用于支持 Doc 1 移送通知，并注明州法院原案为 King County Superior Court 20-2-12680-2 SEA。", "案名页把 WA&HF LLC、Ruizheng An 列为原告，把 Saraca 和 Wengui Guo 列为被告；共同列为被告本身不能证明公司关系。"],
+    "whyItMatters": ["它是 Saraca 所称特拉华注册和纽约主要营业地点的一份有日期宣誓来源。", "它有助于分析移送，同时避免添加文件未支持的所有权结论。"],
+    "verificationTasks": ["阅读移送通知和州法院起诉状，确定实际主张的联邦管辖基础及每名当事方的公民身份。", "检查后续是否有发回、管辖权取证、公司记录或最终管辖裁定。"],
+    "riskFlags": ["当事方声明是该方提供的证据，不是法院认定。", "董事身份不等于股东所有权、受益所有权或排他控制。", "本页没有披露每个 LLC 成员的公民身份，不能单独证明完全多元管辖。"],
+    "findings": [{"section":"summary","text":"Podhaskie 在伪证罪处罚条款下陈述 Saraca 在特拉华注册、主要营业地点在纽约。","confidence":"high","pages":[1]},{"section":"legalReading","text":"他称自己是 Saraca 董事和纽约州居民，并表示声明基于亲身所知。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"声明不证明郭文贵所有或控制 Saraca，也不是管辖权裁定。","confidence":"high","pages":[1]}]
+  }
+}

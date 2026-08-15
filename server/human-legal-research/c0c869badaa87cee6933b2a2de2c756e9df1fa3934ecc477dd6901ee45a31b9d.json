@@ -1,0 +1,66 @@
+{
+  "sha256": "c0c869badaa87cee6933b2a2de2c756e9df1fa3934ecc477dd6901ee45a31b9d",
+  "caseId": "discovered-wawd-59814324",
+  "docNumber": "4",
+  "posture": "party_corporate_disclosure",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "Saraca Media Group Inc.'s counsel stated in the Western District of Washington on April 12, 2021 that Saraca was privately held and that no publicly held corporation owned more than 10% of its stock. The document is a Rule 7.1 and local-rule disclosure for conflict screening, not a court finding that Saraca had no private parent, affiliates, or controllers.",
+    "plainEnglish": "Saraca told this court that it was privately held and had no public-company shareholder above 10%. The form helps screen judicial conflicts; it does not list all private owners or settle who controlled the company.",
+    "legalReading": [
+      "The PDF body certifies two facts as a party representation: Saraca was privately held, and no publicly held corporation owned more than 10% of its stock.",
+      "Although the docket title summarizes 'no Corporate Parents and/or Affiliates,' the operative PDF does not expressly make that broader statement.",
+      "The filing does not adjudicate ownership, agency, alter ego, control, liability, or the relationship between Saraca and Wengui Guo."
+    ],
+    "caseConnections": [
+      "Compare this April 2021 representation with Saraca's October 2020 Doc 25 and GTV's October 2020 Doc 24 in the New York action.",
+      "The caption names WA&HF LLC and Ruizheng An as plaintiffs and Saraca and Wengui Guo as defendants, but party alignment does not establish a corporate relationship."
+    ],
+    "whyItMatters": [
+      "It provides a later, separate-court representation that Saraca was privately held with no public-company holder above 10%.",
+      "It highlights why relationship extraction must rely on the PDF body rather than an overbroad docket summary."
+    ],
+    "verificationTasks": [
+      "Check this docket for amendments and for substantive evidence about Saraca ownership or control.",
+      "Use state corporate records, cap tables, or sworn evidence before concluding that Saraca had no private parent or affiliates."
+    ],
+    "riskFlags": [
+      "Party certification is not a judicial finding.",
+      "The docket metadata is broader than the PDF's operative ownership statement."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Saraca stated that it was privately held and that no publicly held corporation owned more than 10% of its stock.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The PDF does not state that Saraca had no private parent or no affiliates.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Saraca Media Group Inc. 的律师于 2021 年 4 月 12 日在华盛顿西区联邦法院声明，Saraca 是非上市公司，且没有上市公司持有其超过 10% 的股份。该文件是依据规则第 7.1 条和地方规则进行利益冲突筛查的披露，不是法院认定 Saraca 没有私人母公司、关联方或控制人。",
+    "plainEnglish": "Saraca 告诉本法院：它是一家非上市公司，没有持股超过 10% 的上市公司股东。这张表帮助法官检查利益冲突，但没有列出全部私人所有人，也没有解决谁控制公司。",
+    "legalReading": [
+      "PDF 正文以当事方陈述方式证明两点：Saraca 是非上市公司；没有上市公司持有其超过 10% 的股份。",
+      "虽然案卷标题概括为“没有公司母公司和／或关联方”，但具有操作意义的 PDF 正文没有明确作出这一更广陈述。",
+      "本文件不裁判所有权、代理、人格混同、控制、责任或 Saraca 与 Wengui Guo 的关系。"
+    ],
+    "caseConnections": [
+      "可把本次 2021 年 4 月陈述与纽约案中 Saraca 2020 年 10 月 Doc 25、GTV 2020 年 10 月 Doc 24 对照。",
+      "案名页把 WA&HF LLC、Ruizheng An 列为原告，把 Saraca、Wengui Guo 列为被告，但诉讼阵营本身不证明公司关系。"
+    ],
+    "whyItMatters": [
+      "它提供了在另一法院较晚作出的独立陈述：Saraca 为非上市公司，没有上市公司持股超过 10%。",
+      "它说明关系提取必须以 PDF 正文为准，不能依赖范围过宽的案卷摘要。"
+    ],
+    "verificationTasks": [
+      "检查本案案卷中的修订文件，以及涉及 Saraca 所有权或控制的实体证据。",
+      "在认定 Saraca 没有私人母公司或关联方前，应使用州公司记录、股权表或宣誓证据。"
+    ],
+    "riskFlags": [
+      "当事方证明不是法院认定。",
+      "案卷元数据的范围比 PDF 正文中的所有权陈述更广。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Saraca 声明其为非上市公司，且没有上市公司持有其超过 10% 的股份。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "PDF 没有声明 Saraca 不存在私人母公司或关联方。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

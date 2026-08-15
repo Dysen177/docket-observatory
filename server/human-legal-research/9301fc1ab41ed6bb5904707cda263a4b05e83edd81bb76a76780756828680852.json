@@ -1,0 +1,72 @@
+{
+  "sha256": "9301fc1ab41ed6bb5904707cda263a4b05e83edd81bb76a76780756828680852",
+  "caseId": "discovered-nysd-67012234",
+  "docNumber": "183",
+  "posture": "counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page PDF states that Jamie Scher, described as admitted in New York and SDNY, entered an appearance for 3,345 Himalaya Exchange customers in criminal case 23 Cr. 118. It is a counsel-filed notice, not a court order certifying the customer group, granting intervention, or deciding any claim.",
+    "plainEnglish": "The notice says, in effect, 'I am counsel for this described group and want the docket to reflect that.' It does not say that the judge examined 3,345 customer files or ruled that those people own particular assets or must be paid.",
+    "legalReading": [
+      "The PDF body is stamped Case 1:23-cr-00118-AT, Document 183, filed December 6, 2023, even though this corpus copy has a discovery caseId.",
+      "Scher states that he is admitted in New York and SDNY and appears for 3,345 Himalaya Exchange customers.",
+      "The number and scope of representation are statements in counsel's notice; the page contains no judicial signature or operative court command.",
+      "Appearance does not itself establish party status, intervention, Article III standing, victim status, ownership, loss, or entitlement to forfeited property."
+    ],
+    "caseConnections": [
+      "The extracted text is identical to two other byte-distinct Doc 183 corpus copies and should be grouped as one logical filing.",
+      "Doc 185, filed the same day, concerns Bradford Geyer's stated appearance for the same group with pro hac vice approval pending."
+    ],
+    "whyItMatters": [
+      "It documents Scher's claimed representative role as of December 6, 2023.",
+      "It provides context for later customer submissions while preserving the distinction between representation and adjudication."
+    ],
+    "verificationTasks": [
+      "Check the official SDNY docket for any order governing Scher's participation or the filing rights of represented customers.",
+      "Reconcile later group-size figures and claimant records without assuming that the 3,345 figure was court-certified."
+    ],
+    "riskFlags": [
+      "Counsel's statement of admission and representation is not a judicial finding about the customers.",
+      "The notice does not attach or authenticate a client list.",
+      "Duplicate corpus copies must not be treated as separate appearances."
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jamie Scher filed a notice stating that he appeared for 3,345 Himalaya Exchange customers.", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "The PDF is a notice signed by counsel and contains no court order or merits ruling.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The page does not authenticate the client list or adjudicate standing, ownership, victim status, or recovery.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页 PDF 称，Jamie Scher 已获准在纽约州和纽约南区联邦地区法院执业，并在刑事案 23 Cr. 118 中代表 3,345 名 Himalaya Exchange 客户出庭。它是律师提交的通知，不是认证该客户群体、准许介入或裁判任何请求的法院命令。",
+    "plainEnglish": "这份通知相当于律师告诉法院：“我是这个所称群体的代理人，请在案卷中记录。”它没有说明法官审查过 3,345 份客户资料，也没有裁定这些人拥有特定资产或必须获得付款。",
+    "legalReading": [
+      "虽然该副本使用本地 discovered caseId，PDF 正文标注的是 Case 1:23-cr-00118-AT、Document 183，提交日期为 2023 年 12 月 6 日。",
+      "Scher 在文件中称自己已获准在纽约州和 SDNY 执业，并代表 3,345 名 Himalaya Exchange 客户出庭。",
+      "人数和代理范围来自律师通知中的陈述；该页没有法官签名，也没有法院的操作性命令。",
+      "出庭本身不证明当事人地位、介入、宪法 standing、受害人身份、所有权、损失或取得没收财产的权利。"
+    ],
+    "caseConnections": [
+      "该提取正文与另外两份二进制不同的 Doc 183 副本完全相同，应合并为一个逻辑文件。",
+      "同日 Doc 185 涉及 Bradford Geyer 代表同一所称群体出庭，其 pro hac vice 许可仍待批准。"
+    ],
+    "whyItMatters": [
+      "它记录了 Scher 截至 2023 年 12 月 6 日所主张的代理角色。",
+      "它为后续客户材料提供程序背景，同时保持代理关系与司法裁判之间的区别。"
+    ],
+    "verificationTasks": [
+      "检查正式 SDNY 案卷，确认是否有管理 Scher 参与方式或受代理客户提交权利的命令。",
+      "核对后续不同群体人数和申请记录，不得假定 3,345 已获法院认证。"
+    ],
+    "riskFlags": [
+      "律师对执业资格和代理关系的陈述，不是法院对客户的认定。",
+      "通知没有附上或认证客户名单。",
+      "资料库中的重复副本不能当作多次独立出庭。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "Jamie Scher 提交通知，称代表 3,345 名 Himalaya Exchange 客户出庭。", "confidence": "high", "pages": [1]},
+      {"section": "legalReading", "text": "该 PDF 是律师签署的通知，不含法院命令或实体裁判。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该页没有认证客户名单，也不裁判 standing、所有权、受害人身份或获偿资格。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

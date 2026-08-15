@@ -52,7 +52,7 @@
 | Workflow | What it provides |
 | --- | --- |
 | Docket monitoring | Refreshes allowlisted public feeds while online, discovers new or changed public material, and preserves source URLs, filing dates, and update status. |
-| PDF library | Bundles 1,834 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
+| PDF library | Bundles 1,838 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
 | Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, source type, and verification status in one document view. |
 | Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
 | Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
@@ -88,11 +88,15 @@ These screenshots are from the current application build.
 
 `v0.1.1` includes:
 
-- 1,864 material records;
-- 1,834 valid PDFs totaling 1,562,946,164 bytes;
-- 1,791 deduplicated PDF documents indexed for full-text search;
-- 14,244 local research-cache files totaling 645,323,762 bytes, including extracted text, existing translations and readings, relationship data, and search indexes;
-- 1,791 bilingual document-level legal readings and 131 bilingual case-level dossiers.
+- 1,865 material records;
+- 1,838 valid PDFs totaling 1,570,950,358 bytes;
+- all 1,795 SHA-256-deduplicated PDFs indexed for full-text search, with 1,770 complete and 25 partial original-text extractions;
+- a bilingual legal-reading baseline for every unique PDF: 88 version-locked professional editorial reviews and 1,707 deterministic local-rule first reads;
+- bilingual case-level dossiers for all 131 cases, totaling 262 language versions;
+- 67 reviewed complete Chinese translations, 1,685 assistive Chinese translations, and 43 retained Chinese-source documents; 48 PDFs meet both the complete-translation and professional-review standard;
+- 16,825 release seed-cache files totaling 735,603,674 bytes, covering extraction, translation and reading, relationship data, and search indexes.
+
+A “local-rule first read” supports offline search, procedural classification, and plain-language orientation. It is not generative AI and is not represented as page-by-page attorney review. The interface keeps it separate from “professional review” and preserves the original PDF, source, filing date, and limitations for verification.
 
 Automated publication checks flagged 240 files for possible privacy, sealing-language, or other risk indicators. All of those public files remain included; none was hidden, redacted, replaced, or excluded. The checks revalidated file structure, byte size, managed path, public HTTPS source, and source type, but they do not constitute page-by-page manual legal review. See the repository's [publication review](release-metadata/corpus-publication-review.md) and [per-file decisions](release-metadata/corpus-review-decisions.json).
 

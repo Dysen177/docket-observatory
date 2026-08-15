@@ -1,0 +1,68 @@
+{
+  "sha256": "7744fb17227bae37dafa8f8fa26d7247685e2c549e80347666adb8feb97a0297",
+  "caseId": "dconn-22-50073",
+  "docNumber": "436",
+  "posture": "transcript_request_docket_stub",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "The extractable body of this one-page PDF contains only the docket footer identifying Case 22-50073, Doc 436, filed May 26, 2022. It does not expose the substantive transcript-request form, so the request details cannot be verified from the PDF body reviewed here.",
+    "plainEnglish": "The local file is like a form whose visible text did not survive extraction: we can verify its case number, document number, filing time, and one-page length, but not the request written on the form. The docket description may supply more detail, yet it must remain labeled as metadata until checked against a legible official copy.",
+    "legalReading": [
+      "The exact extracted page text verifies only the case number, Doc 436, the May 26, 2022 filing and entry timestamp, and that the PDF is one page.",
+      "No hearing date, requesting party, transcript vendor, requested proceeding, or delivery terms appear in the extracted body.",
+      "A transcript request is ordinarily administrative and does not itself establish what occurred at the hearing or any judicial ruling."
+    ],
+    "caseConnections": [
+      "Use the official docket text and a legible copy of Doc 436 to identify the hearing for which a transcript was requested.",
+      "The actual transcript, if filed or obtained, is the source for what participants said; a request form is not a substitute for the transcript."
+    ],
+    "whyItMatters": [
+      "The limitation prevents docket metadata from being misreported as body-verified content.",
+      "Locating the corresponding transcript may provide a more complete record of oral argument and bench rulings."
+    ],
+    "verificationTasks": [
+      "Obtain a legible PACER or RECAP copy of Doc 436 and compare its form fields with the docket description.",
+      "Locate the referenced hearing entry and any resulting transcript on the docket."
+    ],
+    "riskFlags": [
+      "The substantive form fields are absent from the exact extracted page text.",
+      "Manifest or docket-title details are not body-verified by this PDF extraction.",
+      "A transcript request does not prove that a transcript was produced or that any particular ruling occurred."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The page footer identifies Case 22-50073, Doc 436, filed and entered on May 26, 2022, as a one-page document.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The extracted page contains no substantive transcript-request fields, so those details cannot be verified from this PDF body.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份一页 PDF 可提取的正文只有案卷页脚：Case 22-50073、Doc 436，于 2022 年 5 月 26 日提交。文件没有显现转录申请表的实体内容，因此本次不能从所审阅的 PDF 正文核验申请细节。",
+    "plainEnglish": "这份本地文件像一张“表格内容没有被成功读出的表单”：我们能确认案号、文件号、提交时间和总页数，但看不到表格里具体申请了什么。案卷标题可能提供更多信息，但在找到清晰正式副本前，只能把那些内容标成元数据，不能说已经由文件正文证实。",
+    "legalReading": [
+      "精确提取文本只能验证案号、Doc 436、2022 年 5 月 26 日的提交和录入时间，以及 PDF 共一页。",
+      "提取正文中没有听证日期、申请人、转录服务商、申请转录的程序或交付条件。",
+      "转录申请通常属于行政程序文件，本身不能证明听证中发生了什么，也不构成法院裁定。"
+    ],
+    "caseConnections": [
+      "应使用正式案卷文字和清晰的 Doc 436 副本，确定申请转录的是哪次听证。",
+      "如已提交或取得实际庭审记录，应以庭审记录判断参与者说了什么；转录申请表不能替代庭审记录。"
+    ],
+    "whyItMatters": [
+      "明确这项限制，可以防止把案卷元数据误写成已经由正文核实的内容。",
+      "找到对应庭审记录后，可能补充口头辩论和当庭裁定的完整信息。"
+    ],
+    "verificationTasks": [
+      "取得清晰的 PACER 或 RECAP Doc 436 副本，并将表单字段与案卷标题逐项比较。",
+      "查找其所引用的听证条目以及案卷中任何后续庭审记录。"
+    ],
+    "riskFlags": [
+      "精确提取页中没有实体表单字段。",
+      "清单或案卷标题中的细节没有得到本 PDF 正文的核验。",
+      "提交转录申请不等于庭审记录已经制作，也不证明法院作出了任何特定裁定。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "页脚确认这是 Case 22-50073 的 Doc 436，于 2022 年 5 月 26 日提交并录入，共一页。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "提取页没有转录申请的实体字段，因此不能从本 PDF 正文核验这些细节。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

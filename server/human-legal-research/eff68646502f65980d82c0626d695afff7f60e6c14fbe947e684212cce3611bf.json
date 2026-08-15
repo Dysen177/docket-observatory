@@ -1,0 +1,72 @@
+{
+  "sha256": "eff68646502f65980d82c0626d695afff7f60e6c14fbe947e684212cce3611bf",
+  "caseId": "sdny-23-cv-2200",
+  "docNumber": "17",
+  "posture": "issued_civil_summons",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "This is an electronic civil summons issued March 23, 2023 to Kin Ming Je, also known as William Je, in the SEC civil action. It directs the defendant to serve an answer or Rule 12 motion within the applicable period after service. Issuance is not proof that service occurred and is not a finding on the SEC's allegations.",
+    "plainEnglish": "A summons is the court-issued cover notice telling a defendant that a lawsuit exists and that a response will be due after proper service. It is not the complaint, proof of delivery, or a decision that anyone did anything wrong.",
+    "legalReading": [
+      "The summons identifies the SEC as plaintiff, Kin Ming Je as the addressee, Civil Action No. 23 Civ. 2200 (PGG), and Daniel Loss at the SEC's New York Regional Office as plaintiff's counsel.",
+      "The standard form states a 21-day response period after service, subject to the separate 60-day federal-government provisions described in Rule 12(a)(2) and (3).",
+      "The form warns that failure to respond may lead to default judgment and requires filing the answer or motion with the court.",
+      "The clerk's issuance does not establish the date or validity of service, jurisdiction, liability, or entitlement to relief."
+    ],
+    "caseConnections": [
+      "Read with the SEC complaint to understand the allegations and requested remedies.",
+      "Locate proof or waiver of service and later appearance or response filings to determine the actual response deadline and procedural outcome."
+    ],
+    "whyItMatters": [
+      "It identifies the defendant formally summoned in the civil enforcement action and the response framework.",
+      "Separating issuance from service avoids calculating deadlines from the wrong event."
+    ],
+    "verificationTasks": [
+      "Verify the summons and later service entry through PACER or RECAP.",
+      "Confirm whether service was personal, waived, substituted, or otherwise authorized and whether any deadline was extended."
+    ],
+    "riskFlags": [
+      "Issuance of a summons is not proof of service.",
+      "The summons contains no adjudication of the SEC's allegations.",
+      "The actual response deadline depends on legally effective service and any later court orders."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The Clerk issued a civil summons to Kin Ming Je in SEC v. Ho Wan Kwok, et al. on March 23, 2023.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "The form directs a response after service and warns of possible default for failure to respond.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The summons does not prove service and does not decide liability or any alleged fact.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这是 SEC 民事案件中于 2023 年 3 月 23 日向 Kin Ming Je（又名 William Je）签发的电子民事传票。它要求被告在有效送达后的适用期限内送达答辩或 Rule 12 动议。签发传票不等于已经完成送达，也不是对 SEC 指控的认定。",
+    "plainEnglish": "传票相当于法院签发的“诉讼通知封面”，告诉被告案件已经存在，并且在依法送达后需要回应。它不是起诉状本身，不是送达回执，也不是认定任何人有错的裁决。",
+    "legalReading": [
+      "传票列明原告为 SEC、收件被告为 Kin Ming Je、案号为 23 Civ. 2200 (PGG)，原告律师为 SEC 纽约地区办公室的 Daniel Loss。",
+      "标准表格说明通常自送达后 21 日内回应；对 Rule 12(a)(2) 和 (3) 所述联邦政府情形另列 60 日期限。",
+      "表格警告不回应可能导致缺席判决，并要求把答辩或动议提交法院。",
+      "书记官签发传票不证明送达日期或有效性，也不裁判管辖权、责任或救济权利。"
+    ],
+    "caseConnections": [
+      "应与 SEC 起诉状一起阅读，了解具体指控和所请求的救济。",
+      "应查找送达证明或送达放弃书以及后续出庭、回应文件，确定实际期限和程序结果。"
+    ],
+    "whyItMatters": [
+      "它明确了民事执法案中被正式签发传票的被告和回应框架。",
+      "区分“签发”和“送达”，可以避免从错误事件开始计算期限。"
+    ],
+    "verificationTasks": [
+      "通过 PACER 或 RECAP 核验传票及后续送达条目。",
+      "确认送达是亲自送达、放弃送达、替代送达还是其他获准方式，以及期限是否后来延长。"
+    ],
+    "riskFlags": [
+      "签发传票不等于证明已经完成送达。",
+      "传票没有裁判 SEC 的任何指控。",
+      "实际回应期限取决于法律上有效的送达和任何后续法院命令。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "书记官于 2023 年 3 月 23 日在 SEC v. Ho Wan Kwok 等案中向 Kin Ming Je 签发民事传票。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "表格要求在送达后作出回应，并警告不回应可能导致缺席。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该传票不证明已送达，也不裁判责任或任何被指控事实。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

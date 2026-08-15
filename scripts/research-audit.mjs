@@ -326,7 +326,7 @@ function renderMarkdown(data) {
     '',
     ...renderCounts(value.logicalAnalysisQuality),
     '',
-    '## 人工法律研究',
+    '## 版本锁定法律复核',
     '',
     `- 物理文件条目：${value.humanResearch.physicalDocuments}`,
     `- 逻辑文件：${value.humanResearch.logicalDocuments}`,

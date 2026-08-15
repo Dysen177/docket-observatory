@@ -832,8 +832,16 @@ const documentTitleExactZh = {
   '837': '文件 837：法院将量刑日期从 4 月 27 日延至 2026 年 6 月 29 日',
 }
 
+const legalTextZhCache = new Map()
+const legalTextZhCacheLimit = 10000
+const legalTextZhCacheMaxInput = 4096
+
 export function translateLegalTextToZh(value) {
   if (!value || typeof value !== 'string') return value
+  if (value.length <= legalTextZhCacheMaxInput) {
+    const cached = legalTextZhCache.get(value)
+    if (cached !== undefined) return cached
+  }
   let text = value
   text = text.replace(/^Latest Doc\s+(\d+)$/i, '最新文件 $1')
   text = text.replace(/^Doc\s+(\d+):/i, '文件 $1：')
@@ -850,6 +858,12 @@ export function translateLegalTextToZh(value) {
   text = text.replace(/\bNo\.\s*/g, '编号 ')
   text = text.replace(/PACER 官方案卷系统凭证/g, 'PACER 凭证')
   text = text.replace(/\s+/g, ' ').trim()
+  if (value.length <= legalTextZhCacheMaxInput) {
+    if (legalTextZhCache.size >= legalTextZhCacheLimit) {
+      legalTextZhCache.delete(legalTextZhCache.keys().next().value)
+    }
+    legalTextZhCache.set(value, text)
+  }
   return text
 }
 
@@ -1559,6 +1573,7 @@ export function localizePayload(payload, lang) {
             .replace('本地确定性法律规则分析（非生成式 AI）；OpenAI 为可选增强', 'Deterministic local legal rules (not generative AI); OpenAI is an optional enhancement')
             .replace(/^OpenAI 结构化分析（(.+)）$/, 'OpenAI structured analysis ($1)')
             .replace('本地确定性法律规则分析（非生成式 AI）；云端 AI 为可选增强', 'Deterministic local legal rules (not generative AI); cloud AI is an optional enhancement')
+            .replace('本地确定性法律规则分析（非生成式 AI）；云端或本机模型为可选增强', 'Deterministic local legal rules (not generative AI); cloud or local models are optional enhancements')
             .replace(/^云端 AI 结构化分析（(.+)）$/, 'Cloud AI structured analysis ($1)')
         : payload.aiMode,
     cases: payload.cases.map((item) => localizeCase(item, locale)),

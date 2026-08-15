@@ -1,0 +1,72 @@
+{
+  "sha256": "5c4cd99443ee542c6d6288e31dcdc35a750016025eedf93abd4d0e716a7467fc",
+  "caseId": "discovered-nysd-67013048",
+  "docNumber": "185",
+  "posture": "counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page PDF is a byte-distinct corpus copy of the SDNY Document 185 notice. Its body identifies criminal case 23 Cr. 118 and states that Bradford L. Geyer entered an appearance for 3,345 Himalaya Exchange customers, with pro hac vice approval pending. It is not a court ruling and does not establish any customer's legal status or entitlement.",
+    "plainEnglish": "The local catalog found another copy of the same sign-in notice. A second copy does not create a second appearance or turn counsel's stated customer count into a judicially verified number.",
+    "legalReading": [
+      "The PDF body, rather than the discovery case label, controls identification: it is stamped Case 1:23-cr-00118-AT, Document 185, filed December 6, 2023.",
+      "The notice says Geyer appears for 3,345 customers and expressly marks his pro hac vice status as pending.",
+      "Jamie Scher's electronic signature appears on the filing; the notice lists both Scher and Geyer in the attorney block.",
+      "The filing does not grant intervention, approve admission, adjudicate standing, authenticate clients, or decide restitution or forfeiture rights."
+    ],
+    "caseConnections": [
+      "Its extracted page text is identical to the copy cataloged as sdny-23-cr-118 Doc 185, although the PDF binaries have different SHA-256 values.",
+      "Read with Doc 183 for Jamie Scher's separate same-day appearance notice; neither document is a merits order."
+    ],
+    "whyItMatters": [
+      "It allows duplicate-aware indexing while preserving the integrity of this particular PDF binary.",
+      "It documents counsel's filing without inflating filing counts or claimant counts."
+    ],
+    "verificationTasks": [
+      "Reconcile the discovery record with the official SDNY docket and retain one logical-document grouping for the duplicate copies.",
+      "Locate any later pro hac vice approval and any order defining the group's procedural role."
+    ],
+    "riskFlags": [
+      "The discovery caseId is local catalog metadata; the PDF body identifies SDNY criminal case 23-cr-118.",
+      "The customer count and representative capacity are counsel statements, not findings.",
+      "Duplicate binaries with identical text must not be counted as independent judicial acts."
+    ],
+    "findings": [
+      {"section": "summary", "text": "The body is SDNY Document 185 and states that Geyer appeared for 3,345 customers while pro hac vice approval remained pending.", "confidence": "high", "pages": [1]},
+      {"section": "caseConnections", "text": "The extracted text matches the separately cataloged sdny-23-cr-118 Doc 185 copy exactly.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "This notice does not judicially establish admission, standing, customer identity, victim status, or recovery rights.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页 PDF 是纽约南区 Document 185 出庭通知的另一份二进制副本。正文标明刑事案 23 Cr. 118，并称 Bradford L. Geyer 代表 3,345 名 Himalaya Exchange 客户出庭，其 pro hac vice 许可仍待批准。它不是法院裁定，也不证明任何客户的法律身份或获偿资格。",
+    "plainEnglish": "本地资料库找到了同一份“律师签到通知”的另一副本。多一份副本不会产生第二次出庭，也不会把律师申报的客户人数变成法院核验数字。",
+    "legalReading": [
+      "识别文件应以 PDF 正文而非本地发现标签为准：正文标注 Case 1:23-cr-00118-AT、Document 185，提交日期为 2023 年 12 月 6 日。",
+      "通知称 Geyer 代表 3,345 名客户出庭，并明确注明其 pro hac vice 资格待批准。",
+      "文件带有 Jamie Scher 的电子签名，律师栏同时列出 Scher 和 Geyer。",
+      "该文件不准许介入、不批准临时入庭、不裁判 standing、不认证客户，也不决定赔偿或没收权利。"
+    ],
+    "caseConnections": [
+      "其提取页正文与归入 sdny-23-cr-118 Doc 185 的副本完全相同，但两个 PDF 的 SHA-256 不同。",
+      "应与 Jamie Scher 同日提交的 Doc 183 出庭通知一起阅读；两者都不是实体裁定。"
+    ],
+    "whyItMatters": [
+      "它既保留本 PDF 二进制的完整性，也支持按重复文件合并索引。",
+      "它记录律师提交行为，同时避免虚增文件事件数和申请人数。"
+    ],
+    "verificationTasks": [
+      "与正式 SDNY 案卷核对本地发现记录，并把重复副本归入一个逻辑文件组。",
+      "查找后续 pro hac vice 批准命令及界定该群体程序角色的任何裁定。"
+    ],
+    "riskFlags": [
+      "discovered caseId 是本地目录元数据；PDF 正文识别为 SDNY 刑事案 23-cr-118。",
+      "客户人数和代理关系是律师陈述，不是法院认定。",
+      "正文相同的不同二进制副本不能计算为独立司法行为。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "正文是 SDNY Document 185，称 Geyer 代表 3,345 名客户出庭，但 pro hac vice 仍待批准。", "confidence": "high", "pages": [1]},
+      {"section": "caseConnections", "text": "其提取正文与另行归档的 sdny-23-cr-118 Doc 185 副本完全一致。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该通知没有司法确认入庭资格、standing、客户身份、受害人身份或获偿权。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

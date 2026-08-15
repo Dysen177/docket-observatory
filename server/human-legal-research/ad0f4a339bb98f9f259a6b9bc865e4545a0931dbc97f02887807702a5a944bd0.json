@@ -1,0 +1,66 @@
+{
+  "sha256": "ad0f4a339bb98f9f259a6b9bc865e4545a0931dbc97f02887807702a5a944bd0",
+  "caseId": "discovered-nysd-17040907",
+  "docNumber": "3",
+  "posture": "party_corporate_disclosure",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "Saraca Media Group, Inc.'s counsel filed this Rule 7.1 statement in Saraca Media Group, Inc. v. Liehong Zhuang. The body reports 'NONE' for corporate parents, affiliates, or subsidiaries of Saraca that are publicly held. The wording supports a limited public-company disclosure; it is not a judicial finding or a complete ownership chart.",
+    "plainEnglish": "The form says Saraca's lawyer had no publicly traded parent, affiliate, or subsidiary to list for the judge's conflict check. It does not, by itself, map every private owner or every company connected to Saraca.",
+    "legalReading": [
+      "The filing's stated purpose is recusal screening under Rule 7.1, not adjudication of corporate control or liability.",
+      "The operative sentence asks for publicly held corporate parents, affiliates, or subsidiaries and answers 'NONE.'",
+      "The docket description says 'No Corporate Parent,' but the PDF body is narrower and should control any precise legal characterization."
+    ],
+    "caseConnections": [
+      "Compare this April 2020 statement with Saraca's October 2020 and April 2021 disclosures, while preserving their different wording and cases.",
+      "Use separate evidence for private parents, beneficial owners, subsidiaries, affiliates, or control relationships not disclosed by this form."
+    ],
+    "whyItMatters": [
+      "It records what Saraca's counsel disclosed for public-company conflict screening at this point in the case.",
+      "It warns against relying on a shortened docket title for a broader no-parent conclusion."
+    ],
+    "verificationTasks": [
+      "Check for amended Rule 7.1 statements and any corporate-relationship findings in the official docket.",
+      "Reconcile the PDF's limited public-company wording with other dated Saraca and GTV disclosures."
+    ],
+    "riskFlags": [
+      "Party disclosure is not a court finding.",
+      "The PDF does not provide a complete private ownership or control structure."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Counsel answered 'NONE' to the form's request for publicly held corporate parents, affiliates, or subsidiaries.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The PDF body does not support a complete no-affiliate or no-private-owner conclusion.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Saraca Media Group, Inc. 的律师在 Saraca Media Group, Inc. 诉 Liehong Zhuang 案中提交本规则第 7.1 条声明。PDF 正文对 Saraca 的上市公司母公司、关联方或子公司回答“无”。这只支持有限的上市公司披露，不是法院认定，也不是完整所有权结构图。",
+    "plainEnglish": "表格表示，为了让法官检查利益冲突，Saraca 的律师没有需要列出的上市母公司、关联方或子公司。仅凭这张表，不能画出 Saraca 的所有私人股东和全部关联公司。",
+    "legalReading": [
+      "文件所述目的，是依据规则第 7.1 条进行法官回避审查，不是裁判公司控制或责任。",
+      "正文要求列出上市的公司母公司、关联方或子公司，提交方回答“无”。",
+      "案卷标题写成“No Corporate Parent”，但 PDF 正文范围更窄；精确法律表述应以 PDF 正文为准。"
+    ],
+    "caseConnections": [
+      "可与 Saraca 2020 年 10 月和 2021 年 4 月的披露对照，但必须保留不同案件和不同措辞。",
+      "如要认定未在本表披露的私人母公司、受益所有人、子公司、关联方或控制关系，需要独立证据。"
+    ],
+    "whyItMatters": [
+      "它记录了 Saraca 律师在本案该时点为上市公司利益冲突筛查所作的披露。",
+      "它提醒不能仅凭缩写案卷标题得出范围更广的“没有母公司”结论。"
+    ],
+    "verificationTasks": [
+      "检查正式案卷中是否有修订的规则第 7.1 条声明或公司关系认定。",
+      "把 PDF 中有限的上市公司措辞与其他日期的 Saraca、GTV 披露逐项核对。"
+    ],
+    "riskFlags": [
+      "当事方披露不是法院认定。",
+      "PDF 没有提供完整的私人所有权或控制结构。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "对于表格要求列出的上市公司母公司、关联方或子公司，律师回答“无”。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "PDF 正文不支持完整的“无关联方”或“无私人所有人”结论。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

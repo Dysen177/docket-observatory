@@ -1,0 +1,72 @@
+{
+  "sha256": "39d50b468a308eb42d26a064ce57a61586457aa18cb2af9d88ee5c0cadb0f618",
+  "caseId": "discovered-nysd-67012234",
+  "docNumber": "185",
+  "posture": "notice_of_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "This notice states that Bradford L. Geyer of FormerFedsGroup.Com LLC entered an appearance as counsel for 3,345 Himalaya Exchange customers in the criminal case, with his pro hac vice status identified as pending. Jamie Scher of Myer and Scher LLP signed the filing. It is a counsel-appearance notice, not a ruling that the customers are victims, parties, a certified class, or entitled to relief.",
+    "plainEnglish": "This document tells the court, 'these lawyers say they represent this group of customers.' It does not prove the number of customers, approve a class action, decide anyone's losses, or decide whether the court will grant them any remedy.",
+    "legalReading": [
+      "The filing identifies the represented group as 3,345 Himalaya Exchange customers and lists contact and bar information for Jamie Scher and Bradford L. Geyer.",
+      "Geyer's pro hac vice status is expressly marked pending, so the notice should not be read as proof that temporary admission had already been granted.",
+      "A notice of appearance records asserted representation. It does not itself establish standing, intervention, victim status, claim validity, class certification, or recoverable loss."
+    ],
+    "caseConnections": [
+      "Locate the pro hac vice application and ruling to determine Geyer's admission status after December 6, 2023.",
+      "Review later customer submissions, victim filings, restitution or forfeiture proceedings, and any Himalaya Restoration litigation separately; each may use different eligibility and procedural standards."
+    ],
+    "whyItMatters": [
+      "It documents organized customer representation in the criminal docket at a specific time.",
+      "It provides a lead for tracing later filings concerning Himalaya Exchange customers without treating the notice as adjudication."
+    ],
+    "verificationTasks": [
+      "Confirm the notice and any pro hac vice disposition through PACER or RECAP.",
+      "Identify later filings by these attorneys and determine whether the stated customer count or representation scope changed.",
+      "Do not merge this criminal-case appearance with any civil class, bankruptcy claim, remission, or restoration process without document-level linkage."
+    ],
+    "riskFlags": [
+      "The 3,345 figure and representation statement are counsel's filing, not a court finding.",
+      "The notice does not establish that each customer is a victim, claimant, party, or member of a certified class.",
+      "Pro hac vice approval was pending on the face of the document."
+    ],
+    "findings": [
+      { "section": "summary", "text": "Counsel filed a notice asserting representation of 3,345 Himalaya Exchange customers in the criminal action.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "Bradford L. Geyer's pro hac vice status is identified as pending, and Jamie Scher signed the notice.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The notice is not a finding of customer count, victim status, class certification, standing, or entitlement to relief.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份通知称，FormerFedsGroup.Com LLC 的 Bradford L. Geyer 在该刑事案中登记出庭，代理 3,345 名 Himalaya Exchange 客户；文件同时注明其临时出庭许可仍待批准。Myer and Scher LLP 的 Jamie Scher 签署了文件。这是律师出庭通知，不是法院认定这些客户属于受害人、案件当事人、经认证的集体成员或有权获得救济。",
+    "plainEnglish": "这份文件只是律师告诉法院：“我们声称代理这批客户。”它不会证明客户人数、不会批准集体诉讼、不会认定每个人损失多少，也不会决定法院是否给予他们任何救济。",
+    "legalReading": [
+      "文件把被代理群体写为 3,345 名 Himalaya Exchange 客户，并列出 Jamie Scher 和 Bradford L. Geyer 的联系方式及律师登记信息。",
+      "文件明确写明 Geyer 的 pro hac vice 临时出庭许可待决，因此不能据此说当时已经获准。",
+      "出庭通知记录的是律师所主张的代理关系；它本身不确立诉讼资格、介入地位、受害人身份、请求有效性、集体认证或可追回损失。"
+    ],
+    "caseConnections": [
+      "应查找 pro hac vice 申请及裁定，确定 2023 年 12 月 6 日之后 Geyer 的准入状态。",
+      "应分别审阅后续客户文件、受害人材料、赔偿或没收程序以及任何 Himalaya Restoration 诉讼；这些程序可能适用不同资格和程序标准。"
+    ],
+    "whyItMatters": [
+      "它记录了特定时间点刑事案卷中有组织的客户代理情况。",
+      "它为追踪后续 Himalaya Exchange 客户文件提供线索，同时避免把律师通知误当成裁判。"
+    ],
+    "verificationTasks": [
+      "通过 PACER 或 RECAP 核验该通知和任何 pro hac vice 处理结果。",
+      "查找这些律师后续提交的文件，并确认客户数量或代理范围后来是否变化。",
+      "没有逐份文件连接时，不得把本刑事案出庭通知与民事集体诉讼、破产债权、remission 或 restoration 程序合并。"
+    ],
+    "riskFlags": [
+      "3,345 这一数字和代理声明来自律师提交的文件，不是法院认定。",
+      "通知没有证明每名客户都是受害人、请求人、案件当事人或经认证集体成员。",
+      "文件表面显示 pro hac vice 批准仍处于待决状态。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "律师提交通知，称其在刑事案中代理 3,345 名 Himalaya Exchange 客户。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "文件注明 Bradford L. Geyer 的临时出庭许可待决，并由 Jamie Scher 签署。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该通知不是对客户人数、受害人身份、集体认证、诉讼资格或救济权利的认定。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "sha256": "0e7b7969f7a3f59b8f0904366fe64b95bbf1026a40a1b7da3fd2fae10ecd0038",
+  "caseId": "discovered-nysd-17040907",
+  "docNumber": "13",
+  "posture": "clerks_judgment",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "This July 16, 2020 clerk's judgment implements the court's same-day order by granting defendant Liehong Zhuang's motion to dismiss in the action brought by Saraca Media Group, Inc. The judgment establishes the disposition reflected on its face, but it does not reproduce the court's reasons, identify the dismissal grounds, or say whether the dismissal was with prejudice.",
+    "plainEnglish": "This is the court system's formal result sheet: the defendant's dismissal motion was granted. To understand why the case was dismissed and whether Saraca could amend or refile, the reader must open the referenced July 16 order; this one-page judgment does not answer those questions.",
+    "legalReading": [
+      "Unlike a party filing, a clerk's judgment records an operative court disposition, here entry of judgment after the court granted the motion to dismiss.",
+      "The judgment expressly relies on the reasons in the July 16, 2020 order and does not incorporate those reasons into this one-page document.",
+      "The page does not state the rule invoked, the claims dismissed, prejudice, leave to amend, jurisdictional basis, costs, or appellate outcome."
+    ],
+    "caseConnections": [
+      "Doc 12 is the necessary companion source for the dismissal grounds, scope, and any leave-to-amend analysis.",
+      "Any appeal, amended pleading, or later preclusion argument must be verified from later docket entries rather than inferred from this judgment."
+    ],
+    "whyItMatters": [
+      "It is authoritative evidence that judgment was entered in favor of Liehong Zhuang after the dismissal motion was granted.",
+      "It prevents the application from inventing reasons or prejudice language absent from the judgment itself."
+    ],
+    "verificationTasks": [
+      "Collect and review the July 16, 2020 order referenced by the judgment.",
+      "Check the official docket for a notice of appeal, mandate, amended judgment, costs, or later proceedings."
+    ],
+    "riskFlags": [
+      "The judgment supplies the outcome but not the court's reasoning.",
+      "Do not label the dismissal as with prejudice, jurisdictional, or merits-based without the referenced order."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The clerk entered judgment reflecting that defendant Liehong Zhuang's motion to dismiss was granted.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The page does not state the grounds, scope, or prejudice effect of dismissal.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份 2020 年 7 月 16 日书记员判决执行法院同日命令，在 Saraca Media Group, Inc. 提起的诉讼中准许被告 Liehong Zhuang 的驳回动议。它证明文件表面所载的案件处分，但没有重述法院理由、说明驳回依据，也没有说明是否为不得再诉的驳回。",
+    "plainEnglish": "可以把它看成法院系统的“正式结果单”：被告的驳回动议获准。案件为什么被驳回、Saraca 能否修改起诉或重新起诉，需要查看它引用的 7 月 16 日命令；这一页判决没有回答。",
+    "legalReading": [
+      "与当事方文件不同，书记员判决记录具有操作效力的法院处分；本文件是在法院准许驳回动议后登记判决。",
+      "判决明确以 2020 年 7 月 16 日命令所述理由为依据，但没有把理由写入本单页文件。",
+      "本页没有说明适用规则、被驳回的具体请求、是否不得再诉、是否准许修改、管辖依据、费用或上诉结果。"
+    ],
+    "caseConnections": [
+      "Doc 12 是了解驳回理由、范围以及是否准许修改的必要配套来源。",
+      "任何上诉、修订起诉或后续既判力主张，都必须依据后续案卷核验，不能从本判决推断。"
+    ],
+    "whyItMatters": [
+      "它是法院在准许驳回动议后为 Liehong Zhuang 登记判决的权威结果记录。",
+      "它可以防止程序在判决未写明时自行添加驳回理由或不得再诉结论。"
+    ],
+    "verificationTasks": [
+      "收集并复核判决所引用的 2020 年 7 月 16 日命令。",
+      "检查正式案卷中的上诉通知、mandate、修订判决、费用或后续程序。"
+    ],
+    "riskFlags": [
+      "本判决说明结果，但不提供法院推理。",
+      "没有引用命令，不得把驳回标记为不得再诉、管辖性驳回或实体驳回。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "书记员登记判决，反映被告 Liehong Zhuang 的驳回动议获准。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本页没有说明驳回的依据、范围或是否不得再诉。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

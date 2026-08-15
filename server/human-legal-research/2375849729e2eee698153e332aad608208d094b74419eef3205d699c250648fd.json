@@ -1,0 +1,72 @@
+{
+  "sha256": "2375849729e2eee698153e332aad608208d094b74419eef3205d699c250648fd",
+  "caseId": "discovered-nysd-59921003",
+  "docNumber": "12",
+  "posture": "proof_of_service",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "This one-page affidavit states that a process server personally delivered the summons, complaint, and related court materials for GTV Media Group Inc. to Mack Robertson at a New York address on May 24, 2021. Robertson reportedly said he was authorized to accept service for the entity. This is sworn proof offered to establish service; it is not a ruling on liability or the merits.",
+    "plainEnglish": "This document is a delivery receipt under oath. It records who says the papers were handed over, when, where, and to whom. It does not decide whether the plaintiffs' claims are true, and a court could still be asked to decide whether the method of service was legally sufficient.",
+    "legalReading": [
+      "The affiant identifies himself as an adult nonparty and states that service occurred at 10:36 a.m. on May 24, 2021 at 162 East 64th Street, New York.",
+      "The listed papers include the summons, complaint, civil cover sheet, Judge Schofield's COVID-19 practices and civil rules, and electronic-filing instructions.",
+      "The affidavit identifies Mack Robertson as the recipient and reports that he was security and authorized to accept service on GTV Media Group Inc.'s behalf.",
+      "An affidavit of service is evidence of service. This filing does not itself adjudicate contested service, personal jurisdiction, liability, damages, or any allegation in the complaint."
+    ],
+    "caseConnections": [
+      "Read with the complaint and any later motion challenging service or jurisdiction to determine whether service became disputed.",
+      "Keep this entity-specific service record separate from service on other defendants and from any later clerk's default or default judgment."
+    ],
+    "whyItMatters": [
+      "Valid service ordinarily starts the served party's response period and is a prerequisite to many later default procedures.",
+      "The date, recipient, authority, and address are the key facts to compare with the docket and any service challenge."
+    ],
+    "verificationTasks": [
+      "Confirm Doc 12 and its filing date against PACER or the RECAP docket.",
+      "Review any later filing that accepts, waives, or contests service on GTV Media Group Inc."
+    ],
+    "riskFlags": [
+      "The page was recovered through OCR; portions of the header, signature, and license field are unclear.",
+      "The process server's sworn statement is not a judicial finding that service was legally sufficient.",
+      "Service does not establish liability or the truth of the complaint."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The affidavit reports personal delivery of specified case papers for GTV Media Group Inc. to Mack Robertson on May 24, 2021.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "Robertson is described as security who stated he was authorized to accept service for the entity.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The filing records a sworn service account but contains no judicial determination of service validity or case merits.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份一页送达宣誓书称，送达人于 2021 年 5 月 24 日在纽约一处地址，将传票、起诉状及相关法院材料亲自交给 Mack Robertson，以完成对 GTV Media Group Inc. 的送达。文件称 Robertson 表示自己获授权代表该实体接受送达。这是用于证明送达的宣誓证据，不是关于责任或案件实体问题的裁决。",
+    "plainEnglish": "可以把它理解成一张经过宣誓的“法律文件签收记录”：谁在什么时间、什么地点，把哪些文件交给了谁。它不说明原告的主张是真是假；如果有人提出异议，法院仍可能需要判断这种送达方式在法律上是否有效。",
+    "legalReading": [
+      "宣誓人说明自己是成年非当事人，并称 2021 年 5 月 24 日上午 10:36 在纽约东 64 街 162 号实施送达。",
+      "所列文件包括传票、起诉状、民事封面表、Schofield 法官的疫情期间规则和民事规则，以及电子提交说明。",
+      "文件把 Mack Robertson 列为收件人，并称其为保安且获授权代表 GTV Media Group Inc. 接受送达。",
+      "送达宣誓书属于送达证据；它本身不裁判送达争议、人身管辖权、责任、损害赔偿或起诉状中的任何指控。"
+    ],
+    "caseConnections": [
+      "应与起诉状及后续任何质疑送达或管辖权的动议一起阅读，确认送达后来是否成为争议。",
+      "这份针对特定实体的送达记录应与其他被告的送达、书记官缺席登记和缺席判决分别记录。"
+    ],
+    "whyItMatters": [
+      "有效送达通常会启动被送达方的回应期限，也是许多后续缺席程序的前提。",
+      "送达日期、收件人、授权依据和地址，是与案卷及任何送达异议核对的核心信息。"
+    ],
+    "verificationTasks": [
+      "通过 PACER 或 RECAP 案卷核对 Doc 12 及其提交日期。",
+      "检查后续文件中是否有接受、放弃或质疑对 GTV Media Group Inc. 送达的内容。"
+    ],
+    "riskFlags": [
+      "本页通过 OCR 恢复，页眉、签名和执照号码字段有部分字符不清。",
+      "送达人的宣誓陈述不等于法院已经认定送达在法律上有效。",
+      "完成送达不等于被告承担责任，也不证明起诉状内容属实。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "宣誓书称，2021 年 5 月 24 日已把列明的案件文件交给 Mack Robertson，以送达 GTV Media Group Inc.。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "文件把 Robertson 描述为保安，并记载其表示自己获授权代表该实体接受送达。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该文件记录送达人的宣誓陈述，但没有法院对送达有效性或案件实体问题的裁判。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

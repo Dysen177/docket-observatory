@@ -1,0 +1,28 @@
+{
+  "sha256": "8fddb498d1b4014143827d1d759ee3f0c94fa93db5f1f579a90f7546810ae8e6",
+  "caseId": "discovered-nysb-63174755",
+  "docNumber": "11",
+  "posture": "party_letter_remand_abstention",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "PAX's counsel informed the Southern District of New York bankruptcy court that PAX had moved to remand the action to New York Supreme Court or, alternatively, for permissive abstention under 28 U.S.C. § 1334(c)(1). PAX also stated that it consented to Kwok's motion to transfer the action to Judge Manning in the District of Connecticut, while reserving a request for a prompt hearing if Judge Jones did not transfer it.",
+    "plainEnglish": "PAX was telling the judge which courtroom it preferred. Its first choice was to return the dispute to New York state court; it was also willing to have the Connecticut bankruptcy judge handle the transfer dispute. If neither happened immediately, PAX wanted a hearing. This letter reports requests and consent positions; it does not show what the court ultimately ordered.",
+    "legalReading": ["The letter says a separate motion seeks remand or permissive abstention under § 1334(c)(1); the legal arguments and evidence must be taken from that motion, not this one-page notice.", "PAX consents to Kwok's ECF No. 4 transfer motion for reasons reflected in the proposed stipulation at ECF No. 7.", "PAX conditionally states that, if Judge Jones does not transfer the action, it will seek leave for the earliest possible hearing date. No hearing is set by this letter."],
+    "caseConnections": ["The filing identifies the action as PAX v. Kwok Ho Wan et al., 22-01073-dsj, and links the forum dispute to the Connecticut bankruptcy proceeding before Judge Manning.", "ECF Nos. 4 and 7, the remand/abstention motion, the April 15 conference record, and the later transfer or remand order are required to complete the procedural sequence."],
+    "whyItMatters": ["It captures PAX's contemporaneous forum position and distinguishes consent to transfer from agreement on the merits.", "It shows that remand, abstention, and inter-district transfer were alternative procedural routes, not interchangeable outcomes."],
+    "verificationTasks": ["Collect the actual remand/abstention motion, ECF Nos. 4 and 7, and the April 15 conference transcript or minute entry.", "Locate the signed order that decided transfer, remand, or abstention and then trace the receiving docket."],
+    "riskFlags": ["This is a party letter, not a court order and not proof that remand or abstention was granted.", "Consent to venue transfer does not concede liability, estate ownership, or the merits of PAX's underlying claims.", "The letter does not provide the full factual or jurisdictional record needed to decide § 1334(c)(1)."],
+    "findings": [{"section":"summary","text":"PAX reported that it had requested remand to New York state court or permissive abstention under § 1334(c)(1).","confidence":"high","pages":[1]},{"section":"legalReading","text":"PAX consented to Kwok's transfer motion but reserved a prompt-hearing request if Judge Jones did not transfer the action.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The letter records PAX's procedural position and does not state the court's eventual ruling.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "PAX 律师通知纽约南区联邦破产法院：PAX 已提出动议，请求把案件发回纽约州最高法院，或者由法院依据 28 U.S.C. § 1334(c)(1) 酌情放弃审理。PAX 同时表示同意 Kwok 把案件移交康涅狄格破产法院 Manning 法官的动议；如果 Jones 法官不移交，则保留尽快请求听证的立场。",
+    "plainEnglish": "PAX 是在告诉法官自己希望由哪个法院处理：首选回纽约州法院，也愿意让康涅狄格破产法官处理移交争议；如果都没有马上发生，就希望尽快听证。这封信记录请求和同意立场，不说明法院最后怎样裁定。",
+    "legalReading": ["来函称另一份动议请求发回或依据 § 1334(c)(1) 酌情放弃审理；完整法律论证和证据应从该动议读取，不能从本页补写。", "PAX 基于 ECF No. 7 拟议协议中的理由，同意 Kwok 在 ECF No. 4 提出的移交动议。", "PAX 有条件表示：如果 Jones 法官不移交，将请求许可取得尽早听证日期；本来函本身没有排定听证。"],
+    "caseConnections": ["文件把案件标为 PAX 诉 Kwok Ho Wan 等，22-01073-dsj，并把法院选择争议连接到 Manning 法官主持的康涅狄格破产程序。", "必须补齐 ECF Nos. 4、7、发回/放弃审理动议、4 月 15 日会议记录及后续移交或发回命令，才能完成程序链。"],
+    "whyItMatters": ["它记录了 PAX 当时关于审理法院的立场，并把同意移交与承认实体责任区分开。", "它显示发回、放弃审理和跨地区移交是不同的备选程序路线，不是同一个结果。"],
+    "verificationTasks": ["收集实际发回/放弃审理动议、ECF Nos. 4、7，以及 4 月 15 日会议记录或庭记。", "找到决定移交、发回或放弃审理的签署命令，并继续追踪接收法院案卷。"],
+    "riskFlags": ["这是当事方来函，不是法院命令，也不能证明发回或放弃审理已经获准。", "同意审判地移交，不等于承认责任、破产财产所有权或 PAX 基础请求的实体。", "本来函没有提供裁判 § 1334(c)(1) 所需的完整事实和管辖记录。"],
+    "findings": [{"section":"summary","text":"PAX 表示已请求发回纽约州法院，或者依据 § 1334(c)(1) 酌情放弃审理。","confidence":"high","pages":[1]},{"section":"legalReading","text":"PAX 同意 Kwok 的移交动议，但在 Jones 法官不移交时保留尽快听证请求。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"来函只记录 PAX 的程序立场，没有记载法院最终裁定。","confidence":"high","pages":[1]}]
+  }
+}

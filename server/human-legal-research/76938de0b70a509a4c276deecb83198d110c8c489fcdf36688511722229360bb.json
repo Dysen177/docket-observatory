@@ -1,0 +1,72 @@
+{
+  "sha256": "76938de0b70a509a4c276deecb83198d110c8c489fcdf36688511722229360bb",
+  "caseId": "discovered-azd-60331837",
+  "docNumber": "151-11",
+  "posture": "exhibit_clerks_entry_of_default",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "Exhibit K reproduces a June 2, 2022 clerk's entry of default against Voice of Guo Media Incorporated and Sara Wei in Case 2:21-cv-01079-SMB. The reproduction was filed as Exhibit K in a different Arizona case, Case 2:21-cv-01497-JAT, with an opposition to a motion to set aside judgment. The embedded default is procedural, not a default judgment, and its inclusion as an exhibit does not make it a finding in the receiving case.",
+    "plainEnglish": "This is a copy of a clerk's default from one lawsuit attached as evidence in another lawsuit. It shows that two defendants failed to respond in the first docket at that time. It is not the final default judgment, and attaching it elsewhere does not automatically prove the other case.",
+    "legalReading": [
+      "Page 1 is an Exhibit K divider in Case 2:21-cv-01497-JAT; page 2 embeds Doc 50 from Case 2:21-cv-01079-SMB.",
+      "The embedded clerk entry invokes Rule 55(a) and enters default against Voice of Guo Media Incorporated and Sara Wei on plaintiffs' application.",
+      "A Rule 55(a) entry establishes a procedural default on that docket as of the entry date, not damages, final judgment, issue preclusion, or the truth of every allegation.",
+      "The exhibit itself does not explain why it was relevant to the motion-to-set-aside dispute in the receiving case."
+    ],
+    "caseConnections": [
+      "Read the parent opposition at Doc 151 and the motion to set aside at Doc 143 in Case 2:21-cv-01497-JAT for the purpose of Exhibit K.",
+      "Review later entries in Case 2:21-cv-01079-SMB for any motion to vacate, default judgment, damages ruling, settlement, or dismissal."
+    ],
+    "whyItMatters": [
+      "It provides a direct documentary link between two Arizona dockets while preserving their separate procedural identities.",
+      "It prevents a clerk's default copied as an exhibit from being overstated as a final or cross-case merits ruling."
+    ],
+    "verificationTasks": [
+      "Authenticate original Doc 50 and trace its later procedural history.",
+      "Review Docs 143 and 151 to identify the proposition for which Exhibit K was offered."
+    ],
+    "riskFlags": [
+      "Clerk's entry of default is not default judgment.",
+      "An exhibit from another case is not automatically admissible, preclusive, or conclusive in the receiving case.",
+      "This two-page exhibit omits the parent brief's argument and later history of the embedded default."
+    ],
+    "findings": [
+      { "section": "summary", "text": "Exhibit K reproduces a Rule 55(a) default entered June 2, 2022 against Voice of Guo Media Incorporated and Sara Wei.", "confidence": "high", "pages": [1, 2] },
+      { "section": "caseConnections", "text": "The reproduced order is Doc 50 in Case 2:21-cv-01079-SMB but the exhibit was filed as Doc 151-11 in Case 2:21-cv-01497-JAT.", "confidence": "high", "pages": [2] },
+      { "section": "riskFlags", "text": "The reproduced clerk entry is not a default judgment or a merits determination in either case.", "confidence": "high", "pages": [2] }
+    ]
+  },
+  "zh": {
+    "summary": "附件 K 复制了 Case 2:21-cv-01079-SMB 中 2022 年 6 月 2 日针对 Voice of Guo Media Incorporated 和 Sara Wei 的书记官缺席登记。该副本作为另一亚利桑那案件 Case 2:21-cv-01497-JAT 中反对撤销判决动议的附件 K 提交。被复制的缺席属于程序登记，不是缺席判决；作为附件提交也不会使其自动成为接收案件的法院认定。",
+    "plainEnglish": "这是一宗案件里的书记官缺席记录，被复制后作为另一宗案件的证据附件。它说明在第一个案卷的那个时间点，两名被告没有回应；它不是最终缺席判决，也不会因为被附在另一个案子里就自动证明另案主张。",
+    "legalReading": [
+      "第 1 页是 Case 2:21-cv-01497-JAT 的附件 K 分隔页；第 2 页嵌入 Case 2:21-cv-01079-SMB 的 Doc 50。",
+      "被嵌入的书记官登记援引 Rule 55(a)，根据原告申请对 Voice of Guo Media Incorporated 和 Sara Wei 记入缺席。",
+      "Rule 55(a) 缺席登记只确定该案卷在登记日的程序缺席，不决定损害赔偿、终局判决、争点排除或所有指控真实性。",
+      "本附件本身没有解释它为何与接收案件中的撤销判决争议有关。"
+    ],
+    "caseConnections": [
+      "应阅读 Case 2:21-cv-01497-JAT 的 Doc 151 主反对文件和 Doc 143 撤销判决动议，确定附件 K 的用途。",
+      "应审阅 Case 2:21-cv-01079-SMB 后续案卷，查找撤销缺席、缺席判决、损害赔偿、和解或驳回。"
+    ],
+    "whyItMatters": [
+      "它在保留两案独立程序身份的同时，提供两个亚利桑那案卷之间的直接文件联系。",
+      "它可以防止把作为附件复制的书记官缺席夸大为终局或跨案件实体裁判。"
+    ],
+    "verificationTasks": [
+      "核验原 Doc 50 并追踪后续程序历史。",
+      "审阅 Docs 143 和 151，确定提交附件 K 要证明的具体命题。"
+    ],
+    "riskFlags": [
+      "书记官缺席登记不等于缺席判决。",
+      "来自另一案件的附件不会自动在接收案件中具有可采性、排除效力或决定性。",
+      "本两页附件没有包含主书状论证及被复制缺席的后续历史。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "附件 K 复制了 2022 年 6 月 2 日针对 Voice of Guo Media Incorporated 和 Sara Wei 的 Rule 55(a) 缺席登记。", "confidence": "high", "pages": [1, 2] },
+      { "section": "caseConnections", "text": "被复制文件是 Case 2:21-cv-01079-SMB 的 Doc 50，但本附件作为 Case 2:21-cv-01497-JAT 的 Doc 151-11 提交。", "confidence": "high", "pages": [2] },
+      { "section": "riskFlags", "text": "被复制的书记官登记不是任何一案中的缺席判决或实体裁判。", "confidence": "high", "pages": [2] }
+    ]
+  }
+}

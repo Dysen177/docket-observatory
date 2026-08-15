@@ -1,0 +1,66 @@
+{
+  "sha256": "34a5101b2db7d9021ad9386bc304af66ad490b3f4b411263d8d153a2f59973bd",
+  "caseId": "discovered-nysd-17452688",
+  "docNumber": "24",
+  "posture": "party_corporate_disclosure",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "GTV Media Group Inc. stated on October 5, 2020 that privately held Saraca Media Group Inc. owned over 84% of GTV common stock and that no publicly held corporation owned 10% or more of GTV stock. This is a significant dated party disclosure for the corporate relationship map, but it is not a court adjudication of beneficial ownership, control, or later ownership changes.",
+    "plainEnglish": "GTV's lawyer told the court that Saraca owned more than 84 out of every 100 shares of GTV common stock at that time. That is strong evidence of what the company formally reported, but it is still a disclosure form rather than a judge's ruling about who ultimately controlled GTV.",
+    "legalReading": [
+      "The filing expressly identifies Saraca Media Group Inc. as a privately held parent-level owner holding over 84% of GTV common stock.",
+      "It separately states that no publicly held corporation owned 10% or more of GTV stock.",
+      "The statement addresses common-stock ownership as reported on the filing date; it does not disclose every shareholder, voting agreement, beneficial owner, creditor interest, or informal controller."
+    ],
+    "caseConnections": [
+      "Read with Saraca's same-day Doc 25, which states that Saraca had no parent corporation and no public corporation owning 10% or more of its stock.",
+      "Any broader claim connecting Guo personally to GTV ownership or control requires separate evidence; being named as a co-defendant is not enough."
+    ],
+    "whyItMatters": [
+      "It is one of the clearest filing-side statements of the Saraca-to-GTV equity relationship at a defined date.",
+      "It allows the relationship graph to distinguish formal reported equity ownership from allegations of personal or functional control."
+    ],
+    "verificationTasks": [
+      "Check amended Rule 7.1 statements, cap tables, corporate records, and later rulings for changes or disputes concerning the 84% figure.",
+      "Do not extend the October 5, 2020 ownership statement to earlier or later periods without additional evidence."
+    ],
+    "riskFlags": [
+      "The ownership percentage is a party-filed representation, not an adjudicated finding.",
+      "Formal common-stock ownership does not by itself resolve beneficial ownership or actual control."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "GTV stated that privately held Saraca Media Group Inc. owned over 84% of GTV common stock.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The page contains no court finding that Wengui Guo owned or controlled GTV.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "GTV Media Group Inc. 于 2020 年 10 月 5 日声明，非上市公司 Saraca Media Group Inc. 持有 GTV 超过 84% 的普通股，且没有上市公司持有 GTV 10% 或以上股份。这是关系图中重要的特定日期当事方披露，但不是法院对受益所有权、控制权或后续所有权变化的裁判。",
+    "plainEnglish": "GTV 的律师告诉法院：在当时，GTV 每 100 股普通股中有超过 84 股由 Saraca 持有。这是公司正式申报内容的重要证据，但它仍是一张披露表，不是法官对谁最终控制 GTV 的判决。",
+    "legalReading": [
+      "文件明确把 Saraca Media Group Inc. 识别为非上市的母公司层级股东，并称其持有 GTV 超过 84% 的普通股。",
+      "文件另称没有上市公司持有 GTV 10% 或以上股份。",
+      "陈述涉及提交日所报告的普通股所有权，没有披露每一位股东、表决协议、受益所有人、债权权益或非正式控制人。"
+    ],
+    "caseConnections": [
+      "应与 Saraca 同日提交的 Doc 25 一起阅读；Doc 25 称 Saraca 没有母公司，也没有上市公司持有其 10% 或以上股份。",
+      "任何把郭本人进一步连接到 GTV 所有权或控制权的主张都需要独立证据；同案被列为被告并不足够。"
+    ],
+    "whyItMatters": [
+      "它是在明确日期说明 Saraca 与 GTV 股权关系的最清晰提交方文件之一。",
+      "它使关系图能够区分正式申报股权与个人或实际控制的指控。"
+    ],
+    "verificationTasks": [
+      "检查修订的规则第 7.1 条声明、股权表、公司记录和后续裁定，确认 84% 数字是否变化或存在争议。",
+      "没有其他证据，不得把 2020 年 10 月 5 日的所有权陈述扩展到更早或更晚时期。"
+    ],
+    "riskFlags": [
+      "该持股比例是当事方提交的陈述，不是经裁判的事实认定。",
+      "正式普通股所有权本身不能解决受益所有权或实际控制。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "GTV 声明非上市的 Saraca Media Group Inc. 持有 GTV 超过 84% 的普通股。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本页没有法院认定 Wengui Guo 拥有或控制 GTV。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

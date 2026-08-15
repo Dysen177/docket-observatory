@@ -1,0 +1,72 @@
+{
+  "sha256": "236ef613b56976963153ab71cf37734ae06409965cdc7051fa08327e905b08aa",
+  "caseId": "discovered-nysd-67013048",
+  "docNumber": "183",
+  "posture": "counsel_appearance_notice",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T21:30:00.000+08:00",
+  "en": {
+    "summary": "This one-page PDF is another byte-distinct copy of SDNY Document 183. It states that Jamie Scher entered an appearance for 3,345 Himalaya Exchange customers in criminal case 23 Cr. 118. It is not a merits ruling or judicial validation of the represented group.",
+    "plainEnglish": "This is another stored copy of the same lawyer sign-in page. It should improve source resilience, not multiply the number of appearances or prove the customers' claims.",
+    "legalReading": [
+      "The body is stamped Case 1:23-cr-00118-AT, Document 183, filed December 6, 2023; that body identification is more specific than the local discovery caseId.",
+      "Scher states that he is admitted in New York and SDNY and appears for 3,345 Himalaya Exchange customers.",
+      "The page is signed by Scher and contains no judicial signature, order, factual findings, or relief.",
+      "The notice does not establish intervention, standing, customer identity, ownership, loss, restitution, or forfeiture rights."
+    ],
+    "caseConnections": [
+      "Its extracted text is identical to the sdny-23-cr-118 Doc 183 copy and another discovery copy, despite different PDF SHA-256 values.",
+      "Doc 185 is a separate same-day notice concerning Bradford Geyer and pending pro hac vice admission."
+    ],
+    "whyItMatters": [
+      "It permits version-locked review of this binary while preserving logical deduplication.",
+      "It documents representation chronology without overstating substantive effect."
+    ],
+    "verificationTasks": [
+      "Group all three Doc 183 binaries under one logical filing after comparison with the official docket.",
+      "Check subsequent orders for any legally operative treatment of the represented customers."
+    ],
+    "riskFlags": [
+      "The local discovery label does not change the SDNY case identification printed in the PDF.",
+      "The 3,345 figure is counsel's statement and no list is attached.",
+      "A duplicate copy is not a second judicial event or independent proof."
+    ],
+    "findings": [
+      {"section": "summary", "text": "The page is SDNY Document 183 and states that Jamie Scher appeared for 3,345 Himalaya Exchange customers.", "confidence": "high", "pages": [1]},
+      {"section": "caseConnections", "text": "Its extracted text exactly matches two other Doc 183 corpus copies.", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "The notice has no adjudicative effect on standing, ownership, victim status, or recovery.", "confidence": "high", "pages": [1]}
+    ]
+  },
+  "zh": {
+    "summary": "这份 1 页 PDF 是 SDNY Document 183 的另一份二进制副本。文件称 Jamie Scher 在刑事案 23 Cr. 118 中代表 3,345 名 Himalaya Exchange 客户出庭。它不是实体裁判，也不是法院对该群体的司法认证。",
+    "plainEnglish": "这是同一张“律师签到页”的另一个保存副本。它能提高资料来源的稳健性，但不能增加出庭次数，也不能证明客户请求成立。",
+    "legalReading": [
+      "正文标注 Case 1:23-cr-00118-AT、Document 183，于 2023 年 12 月 6 日提交；该正文识别比本地 discovered caseId 更具体。",
+      "Scher 称自己已获准在纽约州和 SDNY 执业，并代表 3,345 名 Himalaya Exchange 客户出庭。",
+      "该页由 Scher 签署，没有法官签名、法院命令、事实认定或救济。",
+      "通知不证明介入、standing、客户身份、所有权、损失、赔偿或没收权利。"
+    ],
+    "caseConnections": [
+      "虽然 PDF SHA-256 不同，其提取正文与 sdny-23-cr-118 Doc 183 副本及另一发现副本完全相同。",
+      "Doc 185 是同日涉及 Bradford Geyer 及其待批准 pro hac vice 的另一份通知。"
+    ],
+    "whyItMatters": [
+      "它支持对本二进制文件进行版本锁定复核，同时保持逻辑去重。",
+      "它记录代理时间线，但不夸大实体法律效果。"
+    ],
+    "verificationTasks": [
+      "与正式案卷核对后，把三个 Doc 183 二进制副本归入一个逻辑文件。",
+      "检查后续命令是否对受代理客户作出任何具有法律效力的处理。"
+    ],
+    "riskFlags": [
+      "本地发现标签不会改变 PDF 正文印明的 SDNY 案件身份。",
+      "3,345 人是律师陈述，文件没有附名单。",
+      "重复副本不是第二次司法事件或独立证据。"
+    ],
+    "findings": [
+      {"section": "summary", "text": "该页为 SDNY Document 183，称 Jamie Scher 代表 3,345 名 Himalaya Exchange 客户出庭。", "confidence": "high", "pages": [1]},
+      {"section": "caseConnections", "text": "其提取正文与另外两份 Doc 183 资料库副本完全一致。", "confidence": "high", "pages": [1]},
+      {"section": "riskFlags", "text": "该通知对 standing、所有权、受害人身份或获偿没有裁判效力。", "confidence": "high", "pages": [1]}
+    ]
+  }
+}

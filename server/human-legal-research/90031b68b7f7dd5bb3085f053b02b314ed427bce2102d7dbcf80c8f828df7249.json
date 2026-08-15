@@ -1,0 +1,68 @@
+{
+  "sha256": "90031b68b7f7dd5bb3085f053b02b314ed427bce2102d7dbcf80c8f828df7249",
+  "caseId": "dconn-22-50073",
+  "docNumber": "51",
+  "posture": "certificate_of_service",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "Patrick M. Birney certifies that PAX's objection to the debtor's request for more time to file schedules and statements was filed through CM/ECF on February 28, 2022, causing electronic notice to registered recipients. The certificate proves the filer represented that notice was sent; it neither reproduces the objection nor decides the extension request.",
+    "plainEnglish": "This is an electronic mailing receipt, not the legal argument and not the judge's answer. It says the objection was filed and the court system notified registered users.",
+    "legalReading": [
+      "The certificate identifies the served filing as PAX's objection to extending the debtor's deadline for schedules of assets and liabilities and statements of financial affairs.",
+      "It states that CM/ECF sent notice to parties receiving electronic notification.",
+      "The filing contains no merits analysis and no order granting or denying the debtor's request."
+    ],
+    "caseConnections": [
+      "Read the referenced objection and the debtor's extension motion for the parties' competing positions.",
+      "Use the later court order, not this certificate, to determine the deadline actually imposed."
+    ],
+    "whyItMatters": [
+      "It documents notice and helps reconstruct the procedural sequence around early bankruptcy disclosures.",
+      "Schedules and statements are important disclosure documents, but this certificate says nothing about their accuracy or completeness."
+    ],
+    "verificationTasks": [
+      "Identify the docket number of the underlying extension motion and review Doc 50 and the later disposition.",
+      "Confirm whether any non-CM/ECF recipients required separate service."
+    ],
+    "riskFlags": [
+      "A certificate of service is the filer's representation, not a merits ruling.",
+      "The underlying objection's arguments are not contained in this one-page document.",
+      "Electronic notice to registered recipients does not by itself establish every form of service required for every person."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The filer certified CM/ECF filing and electronic notice of PAX's objection on February 28, 2022.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The certificate does not decide the extension request or describe the objection's substantive reasoning.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "Patrick M. Birney 证明，PAX 反对债务人延长提交资产负债表和财务状况陈述期限的文件，已于 2022 年 2 月 28 日通过 CM/ECF 提交，系统因此向登记接收通知的人发送电子通知。这份证明只能说明提交人宣称已发出通知；它既没有载明反对意见的完整内容，也没有裁决延期请求。",
+    "plainEnglish": "这相当于一张“电子寄送回执”，不是法律辩论本身，也不是法官的答案。它只说反对意见已经提交，法院系统通知了登记用户。",
+    "legalReading": [
+      "证明书把被送达文件描述为 PAX 对债务人延长提交资产负债表及财务状况陈述期限的反对意见。",
+      "文件称 CM/ECF 已向通过该系统接收电子通知的当事方发送通知。",
+      "文件没有实体法律分析，也没有批准或驳回债务人的延期请求。"
+    ],
+    "caseConnections": [
+      "应阅读所引用的反对意见和债务人的延期动议，了解双方立场。",
+      "实际期限应以法院后续命令为准，不能依据本送达证明判断。"
+    ],
+    "whyItMatters": [
+      "它记录了通知情况，有助于还原破产案早期财务披露争议的程序顺序。",
+      "资产负债表和财务陈述是重要披露文件，但本证明不评价其准确性或完整性。"
+    ],
+    "verificationTasks": [
+      "确定原延期动议的案卷编号，并阅读 Doc 50 和后续处理结果。",
+      "核对是否存在需要以其他方式单独送达的非 CM/ECF 收件人。"
+    ],
+    "riskFlags": [
+      "送达证明是提交人的陈述，不是实体裁判。",
+      "本一页文件不包含基础反对意见的法律论证。",
+      "向系统登记用户发出电子通知，不当然证明对每个人所需的全部送达方式都已完成。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "提交人证明，PAX 的反对意见于 2022 年 2 月 28 日通过 CM/ECF 提交并发出电子通知。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该证明不裁决延期请求，也不陈述反对意见的实体理由。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

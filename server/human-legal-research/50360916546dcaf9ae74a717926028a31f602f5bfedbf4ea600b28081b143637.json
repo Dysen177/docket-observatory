@@ -1,0 +1,324 @@
+{
+  "sha256": "50360916546dcaf9ae74a717926028a31f602f5bfedbf4ea600b28081b143637",
+  "caseId": "bkd-22-05032",
+  "docNumber": "213",
+  "posture": "district_court_bankruptcy_appeal_affirmance_of_preliminary_injunction",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:08:37+08:00",
+  "en": {
+    "summary": "On September 30, 2024, District Judge Kari A. Dooley affirmed the bankruptcy court's January 2023 preliminary injunction in adversary proceeding 22-5032. The district court held that the bankruptcy court had at least 'related to' jurisdiction, properly applied the bankruptcy-adjusted Section 105(a) preliminary-injunction factors, and reached a result that would also satisfy Rule 65. Treating the injunction as a content-based prior restraint, the court applied strict scrutiny and held that the injunction was narrowly tailored to protect residential privacy and the integrity of the bankruptcy process. It also rejected vagueness, overbreadth, and hearsay challenges. The judgment preserved an interlocutory injunction; it did not finally adjudicate all claims in the adversary proceeding, damages, asset ownership, or corporate control.",
+    "plainEnglish": "This opinion is an appellate quality check on an emergency rule, not the final trial of the whole dispute. The district judge reviewed why the bankruptcy judge restricted specified protest, doxing, and incitement activity, decided that the bankruptcy process and private homes needed protection, and left the preliminary injunction in force. Think of it as affirming the guardrails while the underlying case continues, not deciding every disputed fact or who ultimately owns particular assets.",
+    "legalReading": [
+      "Appellate posture and review: the district court had granted leave to appeal an interlocutory order under 28 U.S.C. § 158(a). It reviewed legal conclusions de novo and factual findings for clear error. Because the appellant did not challenge the underlying factual findings, the opinion largely accepted the bankruptcy court's findings rather than retrying the evidence.",
+      "Jurisdiction: the court held that the injunction dispute was at least 'related to' administration of the bankruptcy estate because the protest campaign affected settlement, creditor and informant participation, the trustee's work, and the prospect that the trustee might resign. The court noted support for the bankruptcy court's additional conclusion that the proceeding was statutorily core.",
+      "Section 105(a) and Rule 65 are distinct sources of authority. The bankruptcy court used the Section 105(a) framework, which asks about successful reorganization rather than success on an underlying merits claim. The district court held that Rule 65, incorporated by Bankruptcy Rule 7065, independently authorized relief and that the same injunction would survive the traditional Rule 65 test.",
+      "Under the Section 105(a) framework used here, the relevant factors were likelihood of successful reorganization, imminent irreparable harm to the estate, balance of harms, and public interest. The court found the trustee's investigation could fund a confirmable plan and that continued protests could impede investigation, asset recovery, creditor participation, and the trustee's continued service.",
+      "First Amendment: the court rejected the appellees' characterization of the order as merely viewpoint-neutral time, place, and manner regulation. Because the injunction specifically regulated 'harassing material,' the court treated it as a content-based prior restraint and applied strict scrutiny, the most demanding constitutional standard.",
+      "Compelling interests: the court identified two interests of the highest order in this record: protecting the well-being, tranquility, and privacy of homes, and protecting the integrity of the bankruptcy proceeding from intimidation and outside pressure.",
+      "Narrow tailoring: the court upheld the injunction's graduated rules, including restrictions before or about homes, 200-foot residential zones, 36-foot workplace-entrance zones, 100-foot workplace zones during specified ingress and egress periods, anti-doxing terms, and a prohibition on encouraging or funding prohibited conduct. The court reasoned that expression remained available outside the defined locations, times, and conduct.",
+      "Notice and scope: after considering the four-day evidentiary hearing and the bankruptcy court's 61-page memorandum, the district court held that the terms 'harassing material' and 'interfering' were sufficiently defined and that the broad list of protected persons and locations matched the demonstrated reach of the campaign.",
+      "Evidence: social-media statements offered to show that the statements were made or to show their effect on listeners were not hearsay when not offered for their truth. The court separately held that authenticated hearsay could be considered at the preliminary-injunction stage, where admissibility affects weight rather than automatic exclusion.",
+      "Limited effect: the opinion affirmed only the preliminary-injunction order and directed entry of judgment closing the district-court appeal. It did not enter a final merits judgment in adversary proceeding 22-5032 and did not adjudicate general affiliation, beneficial ownership, alter ego, asset title, damages, or criminal liability."
+    ],
+    "caseConnections": [
+      "Bankruptcy adversary Doc. 133 is the 61-page memorandum containing the detailed factual findings repeatedly incorporated or summarized by this appellate opinion; Doc. 134 is the operative preliminary-injunction order whose terms appear at pages 11-14.",
+      "Bankruptcy adversary Doc. 214 is the separate district-court judgment implementing this opinion. Read Docs. 213 and 214 together: Doc. 213 supplies the reasoning and Doc. 214 formally records affirmance and closure of the district-court appeal.",
+      "The opinion connects adversary proceeding 22-5032 to the main Chapter 11 case 22-50073 and to the jointly administered Genever Holdings, LLC and Genever Holdings Corporation Chapter 11 cases, but that procedural connection is not itself an ownership determination.",
+      "The reproduced injunction names specified individuals and NFSC, Himalaya, Rule of Law Foundation, GTV, G-News, and other G-Series entities as persons or entities found by the bankruptcy court to be officers, agents, servants, employees, attorneys, or in active concert for purposes of Rule 65(d)(2). That injunction-specific binding determination should not be converted into a universal corporate-ownership or beneficial-control finding.",
+      "Any later enforcement, contempt, modification, dissolution, appellate review, or effect of changed bankruptcy circumstances must be established from later docket entries; this September 2024 opinion cannot answer those later procedural questions."
+    ],
+    "whyItMatters": [
+      "It is the principal appellate explanation for why the January 2023 preliminary injunction remained enforceable after constitutional and jurisdictional review.",
+      "It distinguishes bankruptcy equitable authority under Section 105(a) from traditional Rule 65 doctrine while holding that both paths supported relief on this record.",
+      "It supplies a detailed strict-scrutiny analysis of restrictions aimed at residential targeting, doxing, intimidation, and pressure on bankruptcy participants.",
+      "It provides authoritative limits for the relationship graph: the opinion supports case-specific Rule 65 active-concert links, but not unqualified ownership or control labels.",
+      "It explains why social-media evidence can prove that statements and calls to action occurred without proving that the accusations contained in those statements were true."
+    ],
+    "verificationTasks": [
+      "Review adversary Docs. 133 and 134 against the appellate summaries, especially the complete factual record, the exact definition of 'harassing material,' and every operative injunction term.",
+      "Confirm through PACER or an official court source whether the district-court appeal, judgment, or preliminary injunction was later appealed to the Second Circuit, modified, stayed, dissolved, or enforced.",
+      "Review later entries in the main bankruptcy case and adversary proceeding for contempt or enforcement decisions; do not infer later violations or outcomes from this affirmance.",
+      "When mapping organizations or people, preserve the Rule 65(d)(2) and injunction-specific context and compare any later ownership, agency, alter-ego, or control findings.",
+      "Authenticate the RECAP copy against PACER before relying on exact pagination or wording in contested litigation."
+    ],
+    "riskFlags": [
+      "This is a public RECAP copy rather than a PACER-authenticated download, although the local PDF is complete, internally consistent, and locked to its SHA-256.",
+      "The opinion summarizes and accepts many bankruptcy-court findings because the appellant did not challenge those factual findings; it is not a new trial of every underlying event.",
+      "The injunction is preliminary. Affirmance does not establish final liability on every claim, damages, asset ownership, corporate control, or criminal wrongdoing.",
+      "Descriptions of party arguments are not holdings. In particular, accusations quoted from social media were considered as statements and operative conduct, not adjudicated as true.",
+      "The opinion's statement that the Rule 65 path reaches the same result is an alternative holding; the bankruptcy court itself applied the Section 105(a) framework.",
+      "Later docket activity may have changed the injunction's status after September 30, 2024."
+    ],
+    "findings": [
+      {
+        "section": "posture",
+        "text": "The district court affirmed the bankruptcy court's preliminary-injunction order and directed entry of judgment closing the district-court appeal.",
+        "confidence": "high",
+        "pages": [
+          1,
+          39
+        ]
+      },
+      {
+        "section": "standardOfReview",
+        "text": "The court reviewed legal conclusions de novo and factual findings for clear error after granting leave to appeal the interlocutory order.",
+        "confidence": "high",
+        "pages": [
+          15
+        ]
+      },
+      {
+        "section": "jurisdiction",
+        "text": "The court held that the bankruptcy court had at least 'related to' jurisdiction because the enjoined conduct could affect administration and reorganization of the estate.",
+        "confidence": "high",
+        "pages": [
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "section": "injunctionAuthority",
+        "text": "Section 105(a) and Rule 65 supplied separate injunction authority, and the court held that the result would be the same under either framework.",
+        "confidence": "high",
+        "pages": [
+          18,
+          19
+        ]
+      },
+      {
+        "section": "section105Factors",
+        "text": "The court upheld the bankruptcy court's findings on likely successful reorganization, harm to the reorganization process, balance of hardships, and public interest.",
+        "confidence": "high",
+        "pages": [
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "section": "firstAmendment",
+        "text": "Because the injunction regulated defined 'harassing material,' the court treated it as a content-based prior restraint and applied strict scrutiny.",
+        "confidence": "high",
+        "pages": [
+          22,
+          23,
+          24
+        ]
+      },
+      {
+        "section": "compellingInterests",
+        "text": "The court found compelling interests in residential privacy and in protecting the integrity of the bankruptcy process.",
+        "confidence": "high",
+        "pages": [
+          24,
+          25,
+          26,
+          27
+        ]
+      },
+      {
+        "section": "narrowTailoring",
+        "text": "The court upheld the injunction's locations, buffer zones, time limits, protected-person scope, anti-doxing rule, and restriction on defined harassing material as narrowly tailored on this record.",
+        "confidence": "high",
+        "pages": [
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ]
+      },
+      {
+        "section": "scopeAndNotice",
+        "text": "The injunction gave sufficiently specific notice and was not unconstitutionally vague, ambiguous, or overbroad.",
+        "confidence": "high",
+        "pages": [
+          34,
+          35,
+          36,
+          37
+        ]
+      },
+      {
+        "section": "hearsay",
+        "text": "The court held that operative social-media statements were not hearsay when offered to show they were made or their effect, and that authenticated hearsay could in any event be weighed at the preliminary-injunction stage.",
+        "confidence": "high",
+        "pages": [
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "section": "proceduralLimit",
+        "text": "The opinion preserves a preliminary injunction but does not decide final merits, damages, asset title, beneficial ownership, corporate control, or criminal liability.",
+        "confidence": "high",
+        "pages": [
+          1,
+          15,
+          39
+        ]
+      }
+    ]
+  },
+  "zh": {
+    "summary": "2024 年 9 月 30 日，联邦地区法官 Kari A. Dooley 维持了破产法院于 2023 年 1 月在附属诉讼 22-5032 中签发的初步禁令。地区法院认定，破产法院至少具有“与破产案有关”的管辖权，正确适用了经破产语境调整的 § 105(a) 初步禁令因素；即使改用 Rule 65，结果也相同。法院把该禁令视为基于内容的事先限制，适用严格审查，并认定禁令经过狭窄设计，旨在保护住宅隐私和破产程序完整性。法院还驳回了含糊、过度宽泛和传闻证据方面的挑战。本判决维持的是一项中间性的初步禁令，并未终局裁判附属诉讼的全部请求、损害赔偿、资产归属或公司控制关系。",
+    "plainEnglish": "这份判决是在检查一套“紧急护栏”是否合法，不是把整个案件重新开庭审完。地区法官审查了破产法官为什么限制特定抗议、公开私人信息和煽动行为，认为破产程序和私人住宅需要保护，因此让初步禁令继续有效。可以把它理解为“护栏经上诉检查后保留”，而不是法院已经决定所有争议事实、具体资产最终属于谁。",
+    "legalReading": [
+      "上诉性质与审查标准：地区法院依据 28 U.S.C. § 158(a) 准许对中间命令上诉。法律结论采用重新审查，事实认定采用明显错误标准。由于上诉人没有挑战基础事实认定，本判决主要接受破产法院的认定，并未重新审理全部证据。",
+      "管辖权：法院认定禁令争议至少“与”破产财产管理“有关”，因为抗议行动影响了和解、债权人和信息提供者参与、受托人工作以及受托人可能辞职的问题。法院同时指出，相关案例也支持破产法院关于本案属于法定核心程序的结论。",
+      "§ 105(a) 与 Rule 65 是相互独立的授权依据。破产法院采用 § 105(a) 框架，该框架关注成功重组的可能性，而不是某项基础实体请求的胜诉可能性。地区法院认定，经破产规则 Rule 7065 适用的 Rule 65 也独立授权救济，且该禁令同样能够通过传统 Rule 65 检验。",
+      "本案采用的 § 105(a) 因素包括成功重组的可能性、破产财产面临的迫在眉睫且无法弥补的损害、损害权衡和公共利益。法院认定，受托人调查可能为可获确认的计划追回足够资产，而持续抗议可能妨碍调查、资产追回、债权人参与及受托人继续任职。",
+      "第一修正案：法院没有接受被上诉人关于该命令仅属观点中立的时间、地点和方式限制的说法。由于禁令专门规制“骚扰性材料”，法院将其视为基于内容的事先限制，适用了宪法审查中最严格的严格审查标准。",
+      "重大利益：法院根据本案记录确认两项最高层级利益，即保护住宅福祉、安宁与隐私，以及保护破产程序免受恐吓和外部压力、维护程序完整性。",
+      "狭窄设计：法院维持了分层设置的限制，包括住宅之前或周围的限制、200 英尺住宅区、36 英尺工作场所入口区、特定进出时段的 100 英尺工作场所区、禁止公开私人信息的条款，以及禁止鼓励或资助受禁行为的条款。法院认为，在这些特定地点、时间和行为之外仍有表达渠道。",
+      "明确性与范围：结合四天证据听证和破产法院 61 页理由书，地区法院认定“骚扰性材料”和“干扰”等术语定义充分，受保护人员和地点的较广范围与案卷所显示行动范围相匹配。",
+      "证据：社交媒体陈述如果用于证明陈述确实发生或证明其对听众的影响，而不是证明陈述内容真实，就不属于传闻。法院还单独认定，在初步禁令阶段可以考虑经过真实性认证的传闻，此时可采性问题影响权重，而非当然排除。",
+      "效力边界：本判决只维持初步禁令，并命令录入判决、关闭地区法院上诉案。它没有对附属诉讼 22-5032 作出最终实体判决，也没有裁判一般性关联关系、受益所有权、人格混同、资产权属、损害赔偿或刑事责任。"
+    ],
+    "caseConnections": [
+      "破产附属诉讼 Doc. 133 是 61 页 PI 理由书，包含本上诉判决反复引用或概述的详细事实认定；Doc. 134 是具体初步禁令命令，其主要条款转载于本文件第 11-14 页。",
+      "破产附属诉讼 Doc. 214 是落实本判决的单独地区法院判决书。应当把 Docs. 213 和 214 合并阅读：Doc. 213 提供裁判理由，Doc. 214 正式记录维持结果并关闭地区法院上诉案。",
+      "本判决把附属诉讼 22-5032 与破产主案 22-50073，以及合并管理的 Genever Holdings, LLC 和 Genever Holdings Corporation 第 11 章案件联系起来；但这种程序关联本身不构成所有权认定。",
+      "本判决转载的禁令列明若干个人以及 NFSC、Himalaya、法治基金会、GTV、G-News 和其他 G 系列实体，说明破产法院为 Rule 65(d)(2) 的禁令约束目的，认定其属于高级人员、代理人、受雇人、雇员、律师或积极协同行动者。这一针对禁令约束范围的认定，不应转写为普遍适用的公司所有权或受益控制结论。",
+      "后续是否发生执行、藐视、修改、解除、进一步上诉，或者破产情势变化是否影响禁令，必须依据后续案卷确认；这份 2024 年 9 月判决不能回答后来的程序问题。"
+    ],
+    "whyItMatters": [
+      "这是解释 2023 年 1 月初步禁令为何在管辖权和宪法审查后继续有效的主要上诉裁判文件。",
+      "它区分了 § 105(a) 下破产衡平权与传统 Rule 65 法理，同时认定两条路径在本案记录上都支持救济。",
+      "它对住宅定点抗议、公开私人信息、恐吓和向破产参与者施压的限制提供了详尽严格审查分析。",
+      "它为关系图设定权威边界：本文件支持特定案件中 Rule 65 的积极协同行动关联，但不支持不加限定的所有权或控制标签。",
+      "它解释了社交媒体证据为什么能够证明有关陈述和行动号召确实发生，却不等于证明陈述中的指控为真。"
+    ],
+    "verificationTasks": [
+      "对照附属诉讼 Docs. 133 和 134 审查上诉判决的概述，重点核对完整事实记录、“骚扰性材料”的精确定义和每一项可执行禁令条款。",
+      "通过 PACER 或法院正式来源确认地区法院上诉、判决或初步禁令后来是否上诉至第二巡回、被中止、修改、解除或执行。",
+      "检查破产主案和附属诉讼后续案卷中的藐视或执行裁定；不得从本维持判决推断后续违规或结果。",
+      "绘制组织或人员关系时，必须保留 Rule 65(d)(2) 和特定禁令语境，并与后续所有权、代理、人格混同或控制认定进行比对。",
+      "如在争议诉讼中依赖精确页码或措辞，应使用 PACER 核验 RECAP 副本。"
+    ],
+    "riskFlags": [
+      "本地文件是公开 RECAP 副本，不是直接从 PACER 下载的认证副本；但 PDF 页面完整、内部一致，并已由 SHA-256 锁定。",
+      "由于上诉人没有挑战许多事实认定，本判决概述并接受了破产法院的相关认定；它不是对每项基础事件重新进行的审判。",
+      "该禁令属于初步禁令。维持禁令不等于确认全部请求的最终责任、损害赔偿、资产归属、公司控制或刑事违法。",
+      "当事方论点不是法院裁判结论。尤其是社交媒体中被引用的指控，只作为陈述及行为事实被考虑，并未被法院认定为真实。",
+      "本判决关于采用 Rule 65 也会得到相同结果的论述属于替代性裁判理由；破产法院实际采用的是 § 105(a) 框架。",
+      "2024 年 9 月 30 日之后的案卷活动可能已经改变禁令状态。"
+    ],
+    "findings": [
+      {
+        "section": "posture",
+        "text": "地区法院维持破产法院的初步禁令命令，并命令录入被上诉人胜诉判决、关闭地区法院上诉案。",
+        "confidence": "high",
+        "pages": [
+          1,
+          39
+        ]
+      },
+      {
+        "section": "standardOfReview",
+        "text": "地区法院准许对中间命令上诉后，对法律结论进行重新审查，对事实认定按明显错误标准审查。",
+        "confidence": "high",
+        "pages": [
+          15
+        ]
+      },
+      {
+        "section": "jurisdiction",
+        "text": "法院认定破产法院至少具有“与破产案有关”的管辖权，因为受禁行为可能影响破产财产的管理和重组。",
+        "confidence": "high",
+        "pages": [
+          16,
+          17,
+          18
+        ]
+      },
+      {
+        "section": "injunctionAuthority",
+        "text": "§ 105(a) 与 Rule 65 分别提供禁令授权，法院认定适用任一框架都会得到相同结果。",
+        "confidence": "high",
+        "pages": [
+          18,
+          19
+        ]
+      },
+      {
+        "section": "section105Factors",
+        "text": "法院维持了破产法院关于成功重组可能性、重组程序损害、困难权衡和公共利益的认定。",
+        "confidence": "high",
+        "pages": [
+          20,
+          21,
+          22
+        ]
+      },
+      {
+        "section": "firstAmendment",
+        "text": "由于禁令规制所定义的“骚扰性材料”，法院将其视为基于内容的事先限制并适用严格审查。",
+        "confidence": "high",
+        "pages": [
+          22,
+          23,
+          24
+        ]
+      },
+      {
+        "section": "compellingInterests",
+        "text": "法院确认保护住宅隐私和保护破产程序完整性构成重大政府利益。",
+        "confidence": "high",
+        "pages": [
+          24,
+          25,
+          26,
+          27
+        ]
+      },
+      {
+        "section": "narrowTailoring",
+        "text": "法院根据本案记录，维持了禁令的地点、缓冲区、时间、受保护人员范围、反公开私人信息条款和所定义骚扰性材料限制。",
+        "confidence": "high",
+        "pages": [
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ]
+      },
+      {
+        "section": "scopeAndNotice",
+        "text": "禁令提供了足够具体的通知，不存在违宪的含糊、歧义或过度宽泛问题。",
+        "confidence": "high",
+        "pages": [
+          34,
+          35,
+          36,
+          37
+        ]
+      },
+      {
+        "section": "hearsay",
+        "text": "法院认定，社交媒体陈述用于证明其被发表或证明其影响时不属于传闻；即使属于传闻，经过认证的材料也可在初步禁令阶段被赋予适当权重。",
+        "confidence": "high",
+        "pages": [
+          37,
+          38,
+          39
+        ]
+      },
+      {
+        "section": "proceduralLimit",
+        "text": "本判决维持初步禁令，但不裁判最终实体责任、损害赔偿、资产权属、受益所有权、公司控制或刑事责任。",
+        "confidence": "high",
+        "pages": [
+          1,
+          15,
+          39
+        ]
+      }
+    ]
+  }
+}

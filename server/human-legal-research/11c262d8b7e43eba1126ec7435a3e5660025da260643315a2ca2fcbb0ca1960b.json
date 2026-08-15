@@ -1,0 +1,70 @@
+{
+  "sha256": "11c262d8b7e43eba1126ec7435a3e5660025da260643315a2ca2fcbb0ca1960b",
+  "caseId": "discovered-nysd-59921003",
+  "docNumber": "38",
+  "posture": "clerks_entry_of_default",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:00:35+08:00",
+  "en": {
+    "summary": "The SDNY Clerk certifies that Lihong Wei Lafrenz and Voice of Guo Media, Inc. had not answered or otherwise moved after the docketed email service, and the Clerk notes their default. This is an entry of default, not a default judgment and not a merits determination of liability or damages.",
+    "plainEnglish": "This is the clerk marking that two defendants missed the procedural deadline to respond. It opens the door to a possible request for a default judgment, but it is not the judgment itself and does not automatically award money or prove the complaint.",
+    "legalReading": [
+      "The certificate identifies May 19, 2021 as commencement of the action and describes email service on July 15, 2021 under Doc 25, with proof filed as Doc 30.",
+      "The Clerk certifies that the docket showed no answer or other motion from Lihong Wei Lafrenz and Voice of Guo Media, Inc.",
+      "A clerk's entry under the default process is procedural. A later court order is generally required for default judgment and any adjudication of relief."
+    ],
+    "caseConnections": [
+      "Read with Docs 25 and 30 to evaluate the authorized service method and proof of service.",
+      "Locate any later motion to vacate default, default-judgment motion, appearance, settlement, dismissal, or merits judgment involving these defendants."
+    ],
+    "whyItMatters": [
+      "It records a concrete procedural consequence of failing to respond.",
+      "It prevents the common error of reporting a clerk's default as a court judgment or final victory."
+    ],
+    "verificationTasks": [
+      "Confirm the certificate and referenced docket entries through PACER or RECAP.",
+      "Determine whether the default remained in place or was later vacated, mooted, or converted into a default judgment."
+    ],
+    "riskFlags": [
+      "Entry of default is not default judgment.",
+      "The certificate does not determine liability, damages, or the truth of the pleaded allegations.",
+      "The document reports the docket status as of its issuance and may be superseded by later proceedings."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The Clerk noted default against Lihong Wei Lafrenz and Voice of Guo Media, Inc. after certifying that no answer or motion appeared on the docket.", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "The certificate references email service under Doc 25 and proof of service at Doc 30.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The filing is a clerk's procedural entry and not a default judgment or merits ruling.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "纽约南区法院书记官证明：案卷显示，在记载的电子邮件送达之后，Lihong Wei Lafrenz 和 Voice of Guo Media, Inc. 没有提交答辩或其他动议，因此书记官记入其缺席。这是缺席登记，不是缺席判决，也不是对责任或损害赔偿的实体裁判。",
+    "plainEnglish": "可以把它理解成书记官在案卷上标记“两名被告没有按期回应”。这可能让原告下一步申请缺席判决，但它本身不是判决，不会自动判钱，也没有证明起诉状内容成立。",
+    "legalReading": [
+      "证明书写明案件于 2021 年 5 月 19 日开始，并记载依据 Doc 25 于 7 月 15 日通过电子邮件送达，送达证明作为 Doc 30 提交。",
+      "书记官证明，案卷中没有 Lihong Wei Lafrenz 和 Voice of Guo Media, Inc. 的答辩或其他动议。",
+      "书记官的缺席登记属于程序步骤；缺席判决及具体救济通常仍需要后续法院裁定。"
+    ],
+    "caseConnections": [
+      "应与 Docs 25 和 30 一起阅读，核对法院授权的送达方式和送达证明。",
+      "应查找后续是否存在撤销缺席、申请缺席判决、出庭、和解、驳回或实体判决。"
+    ],
+    "whyItMatters": [
+      "它记录了未回应所产生的一项明确程序后果。",
+      "它可以防止把“书记官登记缺席”误报成“法院已经判决原告胜诉”。"
+    ],
+    "verificationTasks": [
+      "通过 PACER 或 RECAP 核对该证明书及其引用的案卷条目。",
+      "确认该缺席后来是否继续有效、被撤销、失去实际意义，或转化为缺席判决。"
+    ],
+    "riskFlags": [
+      "缺席登记不等于缺席判决。",
+      "该证明书不裁判责任、损害赔偿或起诉指控是否属实。",
+      "文件只反映签发时的案卷状态，可能被后续程序改变。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "书记官在确认案卷没有答辩或动议后，对 Lihong Wei Lafrenz 和 Voice of Guo Media, Inc. 记入缺席。", "confidence": "high", "pages": [1] },
+      { "section": "legalReading", "text": "证明书引用 Doc 25 所授权的电子邮件送达和 Doc 30 的送达证明。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "该文件只是书记官的程序登记，不是缺席判决或实体裁判。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

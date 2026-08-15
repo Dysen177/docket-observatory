@@ -278,6 +278,7 @@ export function buildRelationshipAudit({ manifest, completenessAudit, processing
     .sort(compareRelations)
 
   const counts = countRelations(dockets)
+  const pendingReviewDockets = dockets.filter((item) => item.relationship.status === 'pending_manual_review')
   return {
     schemaVersion,
     generatedAt: new Date().toISOString(),
@@ -289,13 +290,13 @@ export function buildRelationshipAudit({ manifest, completenessAudit, processing
       discoveredDockets: dockets.filter((item) => item.discoveryState === 'discovered').length,
       formalTrackedDockets: dockets.filter((item) => item.discoveryState === 'tracked').length,
       usableFiles: files.filter((file) => file.status !== 'error').length,
-      filesPendingReview: files.filter((file) => file.status !== 'error' && file.caseId?.startsWith('discovered-')).length,
+      filesPendingReview: pendingReviewDockets.reduce((total, item) => total + item.files.usable, 0),
       byStatus: counts.byStatus,
       byType: counts.byType,
     },
     relationTypes: Object.fromEntries(relationshipTypes.map((type) => [type, relationshipTypeDefinition(type)])),
     dockets,
-    pendingReview: dockets.filter((item) => item.relationship.status === 'pending_manual_review'),
+    pendingReview: pendingReviewDockets,
     excluded: dockets.filter((item) => item.relationship.status === 'excluded'),
   }
 }

@@ -1,0 +1,28 @@
+{
+  "sha256": "83884e7a53d381705d657bebd412faed5264f21262f19950abcf8940f9254ae0",
+  "caseId": "discovered-nysd-71961885",
+  "docNumber": "7",
+  "posture": "court_order_removal_record_completion",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "After the Dong v. GTV action was removed from New York state court, the district judge ordered the objector to file an updated removal notice with the missing state-court papers by December 5, 2025. The order also required plaintiff and defendant counsel to appear and objector's counsel to serve the order and retain proof.",
+    "plainEnglish": "The federal judge was completing the file before the case could move forward. The person who removed the case had not attached the state-court record, so the judge required those papers and required the lawyers to formally appear. This is docket housekeeping with mandatory deadlines, not a decision about GTV, the subpoena dispute, class certification, or liability.",
+    "legalReading": ["The order confirms removal occurred on November 25, 2025, but does not decide whether removal was legally proper.", "The objector had a December 5 deadline to supplement the removal notice with the underlying state-court documents.", "Appearance and service directives are operative procedural commands; retaining proof of service preserves evidence of compliance."],
+    "caseConnections": ["Dkt. No. 1 is the removal notice whose omitted state-court attachments prompted this order.", "Later filings should include the updated notice, counsel appearances, proof of service, and any remand or closure ruling; this order itself does not supply those outcomes."],
+    "whyItMatters": ["The missing state-court record is necessary to understand what was pending before removal.", "It establishes short procedural obligations without prejudging the merits."],
+    "verificationTasks": ["Locate the updated notice due December 5 and verify that it includes the complete state-court docket and pleadings.", "Check later orders for remand, jurisdiction, subpoena disposition, class issues, or closure."],
+    "riskFlags": ["Removal to federal court is not a ruling that federal jurisdiction ultimately exists.", "The caption identifies GTV as a defendant but makes no finding about ownership, control, wrongdoing, or Guo.", "The embedded text layer corrupts part of the signature/date graphics; the page image and electronic filing stamp confirm filing on December 4, 2025."],
+    "findings": [{"section":"summary","text":"The court required an updated removal notice with the omitted state-court papers by December 5, 2025.","confidence":"high","pages":[1]},{"section":"legalReading","text":"Counsel were ordered to appear, and objector's counsel was ordered to serve the order and retain proof.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The order does not decide jurisdiction or any substantive claim.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Dong 诉 GTV 案从纽约州法院移送后，联邦地区法官命令异议人最迟于 2025 年 12 月 5 日提交更新后的移送通知，补齐缺失的州法院文件。命令还要求原告、被告律师出庭，并要求异议人律师送达命令和保留证明。",
+    "plainEnglish": "联邦法官是在先把案卷补齐，再让案件继续走。移送案件的人没有附上州法院资料，因此法官要求补交，并要求各方律师正式报到。这是带有强制期限的程序管理，不是对 GTV、传票争议、集体诉讼认证或责任作出判断。",
+    "legalReading": ["命令确认案件于 2025 年 11 月 25 日发生移送，但没有裁判该移送在法律上是否成立。", "异议人必须在 12 月 5 日前把州法院基础文件随更新后的移送通知提交。", "出庭和送达要求属于具有操作效力的程序命令；保留送达证明是为了证明已经履行。"],
+    "caseConnections": ["Dkt. No. 1 是缺少州法院附件的移送通知，也是本命令产生的直接原因。", "后续应有更新通知、律师出庭、送达证明，以及可能的发回或结案命令；本命令没有提供这些后续结果。"],
+    "whyItMatters": ["只有补齐州法院记录，才能准确理解移送前正在处理的事项。", "它设定了明确程序义务，但不预判案件实体。"],
+    "verificationTasks": ["查找 12 月 5 日到期的更新通知，并确认其是否含完整州法院案卷和诉状。", "检查后续是否有发回、管辖权、传票、集体诉讼或结案裁定。"],
+    "riskFlags": ["案件移送至联邦法院，不等于法院已经认定联邦管辖权最终成立。", "案名页把 GTV 列为被告，但没有认定所有权、控制、违法行为或郭文贵的关系。", "PDF 嵌入文本层损坏了部分签名和日期图形；页面图像及电子提交标记确认提交日期为 2025 年 12 月 4 日。"],
+    "findings": [{"section":"summary","text":"法院要求异议人最迟于 2025 年 12 月 5 日补交包含州法院文件的更新移送通知。","confidence":"high","pages":[1]},{"section":"legalReading","text":"法院命令各方律师出庭，并命令异议人律师送达本命令及保留证明。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"本命令没有裁判管辖权或任何实体请求。","confidence":"high","pages":[1]}]
+  }
+}

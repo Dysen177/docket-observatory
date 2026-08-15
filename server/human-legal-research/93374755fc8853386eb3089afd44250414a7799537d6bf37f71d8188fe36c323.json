@@ -1,0 +1,28 @@
+{
+  "sha256": "93374755fc8853386eb3089afd44250414a7799537d6bf37f71d8188fe36c323",
+  "caseId": "bkd-24-05021-bannon",
+  "docNumber": "38",
+  "posture": "notice_of_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "Kristin B. Mayhew of Pullman & Comley, LLC entered an appearance as special litigation counsel for chapter 11 trustee Luc A. Despins in the trustee's adversary proceeding against Bannon Strategic Advisors, Inc.",
+    "plainEnglish": "This filing adds a lawyer to the trustee's legal team and tells the court where to send future papers. It does not prove the trustee's allegations, decide whether Bannon Strategic Advisors owes anything, or decide who owns or controls that company.",
+    "legalReading": ["Mayhew states she is admitted or otherwise authorized to practice and requests notice of all future pleadings and filings.", "The filing identifies her role as special litigation counsel for the trustee, not counsel for the debtor or defendant.", "No motion is granted and no claim, defense, liability, damages, ownership, or control issue is adjudicated."],
+    "caseConnections": ["The caption links adversary proceeding 24-05021 to the jointly administered Ho Wan Kwok, Genever Holdings LLC, and Genever Holdings Corporation chapter 11 cases.", "Docs 39 and 40 are separate later appearance notices for two additional Pullman & Comley attorneys; together they show counsel participation, not a merits event."],
+    "whyItMatters": ["It identifies trustee counsel and service information as of July 9, 2026.", "It helps distinguish attorney participation from substantive progress in the case."],
+    "verificationTasks": ["Review the complaint, answer, motions, settlement papers, and final disposition separately.", "Check later docket entries for withdrawal, substitution, or limits on special counsel's retention."],
+    "riskFlags": ["An appearance notice is not evidence supporting the complaint and is not a court ruling.", "The debtor-identification footnote does not establish any relationship between the debtors and Bannon Strategic Advisors beyond the existence of this captioned adversary proceeding."],
+    "findings": [{"section":"summary","text":"Kristin B. Mayhew appeared as special litigation counsel for trustee Luc A. Despins.","confidence":"high","pages":[1]},{"section":"caseConnections","text":"The notice is filed in adversary proceeding 24-05021 under the jointly administered chapter 11 cases.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The notice contains no merits, ownership, control, or liability ruling.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Pullman & Comley, LLC 的 Kristin B. Mayhew 在第 11 章受托人 Luc A. Despins 诉 Bannon Strategic Advisors, Inc. 的附属诉讼中，以受托人特别诉讼律师身份出庭。",
+    "plainEnglish": "这份文件只是给受托人律师团队增加一名律师，并告诉法院以后向哪里发送文件。它不能证明受托人的指控成立，不能裁判 Bannon Strategic Advisors 是否欠款，也不能裁判谁所有或控制该公司。",
+    "legalReading": ["Mayhew 声明其已获准或获授权在本院执业，并请求接收此后所有诉状和提交文件的通知。", "文件明确她是受托人的特别诉讼律师，不是债务人或被告的律师。", "文件没有批准任何动议，也没有裁判诉因、抗辩、责任、损害、所有权或控制。"],
+    "caseConnections": ["案名页把附属诉讼 24-05021 与 Ho Wan Kwok、Genever Holdings LLC 和 Genever Holdings Corporation 合并管理的第 11 章案件相连。", "Docs 39、40 是随后两名 Pullman & Comley 律师分别提交的出庭通知；三份文件共同显示律师参与，不构成实体进展。"],
+    "whyItMatters": ["它确定了截至 2026 年 7 月 9 日受托人律师及送达信息。", "它有助于把律师参与与案件实体进展区分开。"],
+    "verificationTasks": ["分别审阅起诉状、答辩、实体动议、和解文件和最终处分。", "检查后续案卷是否有退出、替换或特别律师聘任范围限制。"],
+    "riskFlags": ["出庭通知不是支持起诉状的证据，也不是法院裁定。", "债务人身份脚注不能证明债务人与 Bannon Strategic Advisors 存在何种关系，只能证明本附属诉讼采用这一案名。"],
+    "findings": [{"section":"summary","text":"Kristin B. Mayhew 作为受托人 Luc A. Despins 的特别诉讼律师出庭。","confidence":"high","pages":[1]},{"section":"caseConnections","text":"该通知提交于合并管理第 11 章案件下的附属诉讼 24-05021。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"通知没有包含实体、所有权、控制或责任裁定。","confidence":"high","pages":[1]}]
+  }
+}

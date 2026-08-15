@@ -1,0 +1,68 @@
+{
+  "sha256": "884573c5d9677a9fda7d648848114d32d27412ab6717e8924a32f27bcc3341d2",
+  "caseId": "az-voice-of-guo",
+  "docNumber": "26-1",
+  "posture": "service_evidence_exhibit",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:30:00+08:00",
+  "en": {
+    "summary": "Exhibit 1 is a two-page filing containing an exhibit cover and an OCR-recovered Discord screenshot. The screenshot shows a direct-message interface labeled Sara and a PDF attachment named for the summons, complaint, cover sheet, and orders. It is evidence submitted to support claimed electronic service, not a judicial finding that the account belonged to the defendant, the file was opened, or service was legally effective.",
+    "plainEnglish": "This is a screenshot offered as a digital delivery receipt. It shows that a file appeared in a chat labeled Sara, but a screenshot alone does not prove who controlled the account, whether the recipient read the file, or whether the court ultimately accepted the service.",
+    "legalReading": [
+      "Page 1 is only an exhibit divider; page 2 shows a Discord direct-message screen and the attachment name VOG._-_Summons_Complaint_Cover_Sheet_Orders.pdf.",
+      "The image does not display a substantive reply, read receipt, account-verification record, or independent authentication evidence in the extracted text.",
+      "The exhibit supports the process server's account in Doc 26 but must be read with the authorizing order and any later ruling on service."
+    ],
+    "caseConnections": [
+      "Read with Doc 26, the affidavit identifying the date, time, account, documents, and claimed authority for Discord service.",
+      "Read ECF No. 24 and later docket entries to determine the authorized method and whether service was challenged or accepted."
+    ],
+    "whyItMatters": [
+      "It preserves contemporaneous visual evidence of the claimed electronic transmission.",
+      "Its limits prevent a screenshot from being overstated as proof of identity, receipt, legal sufficiency, or liability."
+    ],
+    "verificationTasks": [
+      "Compare the screenshot with the original Discord export, metadata, and attachment hash if available.",
+      "Verify ECF No. 24 and any later service ruling through PACER or RECAP."
+    ],
+    "riskFlags": [
+      "The screenshot was recovered through OCR and some browser text is unclear.",
+      "The image alone does not authenticate control of the Sara account or prove that the attachment was opened.",
+      "Evidence offered for service is not itself a court determination that service was effective."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The exhibit shows a Discord screen labeled Sara with a PDF attachment named for summons, complaint, cover sheet, and orders.", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "No readable reply, read receipt, or account-authentication record appears in the extracted exhibit.", "confidence": "high", "pages": [2] }
+    ]
+  },
+  "zh": {
+    "summary": "附件 1 是一份两页文件，包括附件封面和经 OCR 恢复的 Discord 截图。截图显示一个标为 Sara 的私信界面，以及一份文件名指向传票、起诉状、封面表和法院命令的 PDF 附件。它是为支持电子送达主张而提交的证据，不是法院关于账号属于被告、文件已被打开或送达在法律上有效的认定。",
+    "plainEnglish": "可以把它看成原告提交的一张“数字寄送截图”。它显示某个标为 Sara 的聊天里出现了一份文件，但截图本身不能证明谁控制账号、对方是否阅读文件，也不能证明法院最终认可了送达。",
+    "legalReading": [
+      "第 1 页只是附件分隔页；第 2 页显示 Discord 私信界面和名为 VOG._-_Summons_Complaint_Cover_Sheet_Orders.pdf 的附件。",
+      "提取文本中没有实体回复、已读回执、账号验证记录或独立认证材料。",
+      "该附件用于支持 Doc 26 中送达人的陈述，但仍须与授权命令及任何后续送达裁定一起阅读。"
+    ],
+    "caseConnections": [
+      "应与 Doc 26 一起阅读；后者陈述送达日期、时间、账号、文件和使用 Discord 的授权依据。",
+      "应核对 ECF No. 24 和后续案卷，确认获准送达方式及送达是否被质疑或认可。"
+    ],
+    "whyItMatters": [
+      "它保存了据称电子发送文件时的同时期视觉证据。",
+      "明确其局限，可以避免把截图夸大为对身份、收件、法律有效性或责任的证明。"
+    ],
+    "verificationTasks": [
+      "如能取得原始 Discord 导出数据、元数据和附件哈希，应与截图比较。",
+      "通过 PACER 或 RECAP 核验 ECF No. 24 和任何后续送达裁定。"
+    ],
+    "riskFlags": [
+      "截图通过 OCR 恢复，部分浏览器文字不清。",
+      "该图不能单独认证 Sara 账号的控制人，也不能证明附件已被打开。",
+      "为送达而提交的证据不等于法院已经认定送达有效。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "附件显示标为 Sara 的 Discord 界面以及一份文件名指向传票、起诉状、封面表和命令的 PDF。", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "提取内容中没有可读的回复、已读回执或账号认证记录。", "confidence": "high", "pages": [2] }
+    ]
+  }
+}

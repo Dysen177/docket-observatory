@@ -1,0 +1,28 @@
+{
+  "sha256": "09114efe4e9ba5df24d8bd61b58dcb928fa70480432ec740eec541b2426f4648",
+  "caseId": "discovered-ctb-68256713",
+  "docNumber": "30",
+  "posture": "notice_of_appearance",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T17:02:25+08:00",
+  "en": {
+    "summary": "Attorney Kari A. Mitchell entered an appearance for Luc A. Despins, the chapter 11 trustee, in adversary proceeding 24-05272 against Hayman Hong Kong Opportunities Onshore Fund LP.",
+    "plainEnglish": "This form tells the court and the other side which lawyer should receive papers for the trustee. It is an administrative filing, not evidence that the trustee's claims are true and not a ruling against the fund.",
+    "legalReading": ["Mitchell states that she is admitted or otherwise authorized to practice and requests notice of all later pleadings and filings.", "The appearance is for the trustee in this adversary proceeding; the form does not describe the complaint or the relief sought.", "The filing creates no merits determination, default, admission, ownership finding, or adjudication of the fund's relationship to Guo."],
+    "caseConnections": ["The caption links adversary proceeding 24-05272 to the Ho Wan Kwok bankruptcy case, No. 22-50073.", "The claims and any response must be read from the complaint and later docket; this appearance form does not state them."],
+    "whyItMatters": ["It identifies trustee counsel and the service contact as of January 2, 2026.", "It helps reconstruct who was participating without overstating the procedural filing."],
+    "verificationTasks": ["Check the docket for the complaint, service, responsive pleading, substitution of counsel, and final disposition.", "Preserve a visual/OCR fallback because the PDF's embedded text layer omits almost the entire form body."],
+    "riskFlags": ["A notice of appearance is not a court order or merits ruling.", "The project extractor returned only the signature and docket footer; the complete visible form was recovered and visually checked from the actual PDF page."],
+    "findings": [{"section":"summary","text":"Kari A. Mitchell appeared as counsel for chapter 11 trustee Luc A. Despins.","confidence":"high","pages":[1]},{"section":"legalReading","text":"The form requests notice of future pleadings and filings in adversary proceeding 24-05272.","confidence":"high","pages":[1]},{"section":"riskFlags","text":"The filing contains no ruling on claims, defenses, ownership, control, or liability.","confidence":"high","pages":[1]}]
+  },
+  "zh": {
+    "summary": "Kari A. Mitchell 律师在第 11 章受托人 Luc A. Despins 诉 Hayman Hong Kong Opportunities Onshore Fund LP 的附属诉讼 24-05272 中，代表受托人提交出庭通知。",
+    "plainEnglish": "这张表只是告诉法院和对方：以后给受托人一方送文件时，应联系哪位律师。它不是证明受托人的主张为真，也不是法院对该基金作出不利裁定。",
+    "legalReading": ["Mitchell 声明其已获准或获授权在本院执业，并请求收到此后全部诉状和提交文件的通知。", "她是在本附属诉讼中代表受托人出庭；表格没有说明起诉请求或所求救济。", "该文件不产生实体认定、缺席、承认、所有权判断，也不裁判基金与郭文贵的关系。"],
+    "caseConnections": ["案名页把附属诉讼 24-05272 与 Ho Wan Kwok 破产主案 22-50073 相连。", "具体诉因和回应必须查看起诉状及后续案卷，本出庭表格没有记载。"],
+    "whyItMatters": ["它确定了截至 2026 年 1 月 2 日受托人一方的律师和送达联系人。", "它有助于重建参与人员，同时避免夸大程序文件。"],
+    "verificationTasks": ["查找起诉状、送达、答辩或其他回应、律师替换和最终处分。", "保留页面图像/OCR 回退，因为 PDF 嵌入文本层遗漏了几乎全部表格正文。"],
+    "riskFlags": ["出庭通知不是法院命令，也不是实体裁定。", "项目提取器只返回签名和案卷页脚；完整可见表格正文已从实际 PDF 页面恢复并进行图像核对。"],
+    "findings": [{"section":"summary","text":"Kari A. Mitchell 作为第 11 章受托人 Luc A. Despins 的律师出庭。","confidence":"high","pages":[1]},{"section":"legalReading","text":"表格请求接收附属诉讼 24-05272 此后的诉状和提交文件通知。","confidence":"high","pages":[1]},{"section":"riskFlags","text":"文件不裁判诉因、抗辩、所有权、控制或责任。","confidence":"high","pages":[1]}]
+  }
+}

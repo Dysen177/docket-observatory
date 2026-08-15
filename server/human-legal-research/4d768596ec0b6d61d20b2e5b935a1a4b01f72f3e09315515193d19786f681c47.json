@@ -1,0 +1,66 @@
+{
+  "sha256": "4d768596ec0b6d61d20b2e5b935a1a4b01f72f3e09315515193d19786f681c47",
+  "caseId": "discovered-nysd-13347834",
+  "docNumber": "3",
+  "posture": "party_corporate_disclosure",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-15T16:58:50+08:00",
+  "en": {
+    "summary": "Plaintiffs' counsel filed this Rule 7.1 disclosure on August 5, 2016. Counsel certified that Genever Holdings, LLC had one parent, privately held Genever Holding Corporation, and that no publicly held corporation owned 10% or more of the parent's stock. This is a party disclosure for judicial-conflict screening, not a court finding about ultimate ownership or control.",
+    "plainEnglish": "This form tells the judge which company sits directly above Genever Holdings so the judge can check for conflicts. It is like a conflict-of-interest label, not a ruling on who controls assets or who wins the lawsuit.",
+    "legalReading": [
+      "Rule 7.1 disclosures help judges evaluate disqualification or recusal; they ordinarily do not adjudicate liability, beneficial ownership, alter ego, agency, or asset ownership.",
+      "The filing-side certification identifies Genever Holding Corporation as Genever Holdings, LLC's one parent and describes that parent as privately held.",
+      "The 10% statement concerns ownership of the parent by publicly held corporations; it does not provide a complete natural-person or beneficial-owner chart."
+    ],
+    "caseConnections": [
+      "Use this filing as dated, party-supplied evidence for the Genever entity map, then compare later amended disclosures, sworn evidence, and judicial findings before asserting continuing ownership or control.",
+      "The caption links Genever Holdings, LLC and Miles Kwok as co-plaintiffs in this action, but co-plaintiff status does not itself establish ownership between them."
+    ],
+    "whyItMatters": [
+      "It supplies a precise corporate-parent representation as of August 5, 2016.",
+      "It prevents the relationship graph from treating a Rule 7.1 declaration as a broader ownership judgment."
+    ],
+    "verificationTasks": [
+      "Check the official docket for later amended Rule 7.1 statements or orders addressing the Genever entities.",
+      "Authenticate the RECAP copy against PACER if the relationship is used for a contested ownership conclusion."
+    ],
+    "riskFlags": [
+      "The filing is counsel's certification, not an adjudicated finding.",
+      "Local extraction required OCR; the page is complete, but a few layout artifacts were normalized in translation."
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "Counsel identified Genever Holding Corporation as the one parent of Genever Holdings, LLC and described the parent as privately held.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The document was filed to support recusal screening and contains no merits adjudication.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "原告律师于 2016 年 8 月 5 日提交这份规则第 7.1 条披露。律师证明 Genever Holdings, LLC 有一家母公司，即非上市的 Genever Holding Corporation，并称没有上市公司持有该母公司 10% 或以上股份。这是供法官筛查利益冲突的当事方披露，不是法院对最终所有权或控制关系的认定。",
+    "plainEnglish": "这张表是告诉法官 Genever Holdings 上面直接是哪家公司，方便法官检查自己是否存在利益冲突。可以把它理解成一张“利益冲突标签”，而不是谁控制资产或谁会胜诉的判决。",
+    "legalReading": [
+      "规则第 7.1 条披露用于帮助法官判断是否需要回避，通常不裁判责任、受益所有权、人格混同、代理关系或具体资产归属。",
+      "提交方律师证明 Genever Holding Corporation 是 Genever Holdings, LLC 的唯一母公司，并称该母公司为非上市公司。",
+      "10% 表述只涉及上市公司是否持有该母公司的股份，不是完整的自然人或受益所有人结构图。"
+    ],
+    "caseConnections": [
+      "可把本文件作为截至 2016 年 8 月 5 日的当事方实体关系陈述，但在主张持续所有权或控制前，应对照后续修订披露、宣誓证据和法院认定。",
+      "案名页显示 Genever Holdings, LLC 与 Miles Kwok 是本案共同原告，但共同原告身份本身不证明二者之间存在所有权关系。"
+    ],
+    "whyItMatters": [
+      "它提供了特定日期的直接公司母子关系陈述。",
+      "它可以防止关系图把规则第 7.1 条申报误写成范围更广的所有权判决。"
+    ],
+    "verificationTasks": [
+      "检查正式案卷中是否有后续修订的规则第 7.1 条声明，或涉及 Genever 实体关系的裁定。",
+      "如要把该关系用于有争议的所有权结论，应使用 PACER 核验 RECAP 副本。"
+    ],
+    "riskFlags": [
+      "这是律师代表当事方作出的证明，不是经裁判的事实认定。",
+      "本地提取使用了 OCR；页面覆盖完整，但译文对少量版面识别噪声作了规范化。"
+    ],
+    "findings": [
+      { "section": "legalReading", "text": "律师确认 Genever Holding Corporation 是 Genever Holdings, LLC 的唯一母公司，并称该母公司为非上市公司。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "本文件用于法官回避审查，不包含案件实体裁判。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}
