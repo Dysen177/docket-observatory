@@ -25,6 +25,7 @@
   <a href="#核心能力">核心能力</a> ·
   <a href="#证据来源与边界">证据边界</a> ·
   <a href="#本地优先与安全">安全</a> ·
+  <a href="#问题反馈与联系">反馈与联系</a> ·
   <a href="#从源码运行">从源码运行</a>
 </p>
 
@@ -157,6 +158,20 @@
 - 公开源码、依赖锁文件、网络白名单、资料清单、发布审查证据和完整构建流程均可在仓库中查看。
 
 当前审计没有发现已知后门或隐藏信息收集路径，但这不是对未来依赖、操作系统、构建环境或第三方重新打包的绝对保证。请参阅 [开源审计说明](OPEN_SOURCE_AUDIT.md)、[安全政策](SECURITY.zh-CN.md)、[隐私说明](PRIVACY.zh-CN.md)、[网络白名单](NETWORK.md) 和 [下载安装说明](DOWNLOADS.md)。
+
+## 问题反馈与联系
+
+为了让问题可追踪、可复现并能看到修复进度，请按问题类型选择渠道：
+
+| 问题类型 | 推荐渠道 |
+| --- | --- |
+| 程序错误、崩溃、安装或界面问题 | [提交 Bug Report](https://github.com/Dysen177/docket-observatory/issues/new?template=bug-report.yml)，请注明版本、系统、复现步骤和已经隐去敏感信息的日志。 |
+| 缺失案件、案卷或法院文件 | [提交 Source Gap](https://github.com/Dysen177/docket-observatory/issues/new?template=source-gap.yml)，请尽量附上法院、案号、Doc 文件号和公开来源链接。 |
+| 可被利用的安全漏洞 | 不要公开提交 Issue。请使用 [GitHub 私密漏洞报告](https://github.com/Dysen177/docket-observatory/security/advisories/new)；无法使用时发送邮件。 |
+| 不适合公开讨论的其他事项 | 邮件：[poison127@protonmail.com](mailto:poison127@protonmail.com)，建议主题写明 `[Docket Observatory] Bug / Security / Source`。 |
+| 项目动态与公开联系 | X：[@Dysen1777](https://x.com/Dysen1777)；[项目发布帖](https://x.com/Dysen1777/status/2088677729109717489?s=20)。 |
+
+请勿通过 GitHub Issue、邮件或 X 发送 API Key、PACER 密码、私有本机路径、密封或受限材料，以及包含凭据的未清理日志。普通 Bug 优先使用 GitHub Issue，便于其他用户检索同类问题并跟踪处理状态。
 
 ## 从源码运行
 

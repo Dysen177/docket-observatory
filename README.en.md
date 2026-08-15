@@ -25,6 +25,7 @@
   <a href="#core-capabilities">Capabilities</a> &middot;
   <a href="#evidence-sources-and-boundaries">Evidence boundaries</a> &middot;
   <a href="#local-first-and-security">Security</a> &middot;
+  <a href="#feedback-and-contact">Feedback and contact</a> &middot;
   <a href="#run-from-source">Run from source</a>
 </p>
 
@@ -157,6 +158,20 @@ This is not a general-purpose docket browser. It is a focused legal-research wor
 - Source code, lockfile, network allowlist, corpus manifests, publication-review evidence, and the complete build workflow are available in the repository.
 
 The current audit found no known backdoor or hidden collection path. That is not an absolute guarantee against future dependencies, a compromised operating system, a compromised build environment, or malicious third-party repackaging. See [open-source audit notes](OPEN_SOURCE_AUDIT.md), [security policy](SECURITY.md), [privacy notice](PRIVACY.md), [network manifest](NETWORK.md), and [installation instructions](DOWNLOADS.md).
+
+## Feedback And Contact
+
+Use the channel that matches the issue so reports remain reproducible, trackable, and visible through resolution:
+
+| Issue type | Preferred channel |
+| --- | --- |
+| Application bugs, crashes, installation, or interface problems | [Submit a Bug Report](https://github.com/Dysen177/docket-observatory/issues/new?template=bug-report.yml) with the version, operating system, reproduction steps, and sanitized logs. |
+| Missing cases, dockets, or court filings | [Submit a Source Gap](https://github.com/Dysen177/docket-observatory/issues/new?template=source-gap.yml) with the court, docket number, document number, and a public source link when available. |
+| Exploitable security vulnerabilities | Do not open a public Issue. Use [GitHub private vulnerability reporting](https://github.com/Dysen177/docket-observatory/security/advisories/new); use email only if that channel is unavailable. |
+| Other matters that should not be discussed publicly | Email [poison127@protonmail.com](mailto:poison127@protonmail.com). Suggested subject: `[Docket Observatory] Bug / Security / Source`. |
+| Project updates and public contact | X: [@Dysen1777](https://x.com/Dysen1777); [project announcement post](https://x.com/Dysen1777/status/2088677729109717489?s=20). |
+
+Never send API keys, PACER passwords, private local paths, sealed or restricted material, or unsanitized logs containing credentials through GitHub Issues, email, or X. Use GitHub Issues for ordinary bugs so other users can find related reports and follow their status.
 
 ## Run From Source
 

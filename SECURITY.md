@@ -102,4 +102,8 @@ No review can guarantee permanent or absolute security. Remaining risks include 
 
 ## Reporting Issues
 
-For a private local build, record suspected security issues in `OPEN_SOURCE_AUDIT.md` or your issue tracker before publishing or packaging.
+Do not disclose exploitable security details in a public Issue or on X. Use [GitHub private vulnerability reporting](https://github.com/Dysen177/docket-observatory/security/advisories/new). If that channel is unavailable, email [poison127@protonmail.com](mailto:poison127@protonmail.com) with a subject beginning `[Docket Observatory] Security`.
+
+Include the application version, operating system and architecture, affected component, reproduction steps, expected impact, and sanitized logs when available. Never send API keys, PACER credentials, private local paths, sealed or restricted material, or logs containing credentials.
+
+Ordinary non-security defects belong in the public [Bug Report template](https://github.com/Dysen177/docket-observatory/issues/new?template=bug-report.yml). Missing cases or filings belong in the [Source Gap template](https://github.com/Dysen177/docket-observatory/issues/new?template=source-gap.yml).

@@ -58,4 +58,10 @@ npm run release:prepare-data
 npm run release:verify-data
 ```
 
-发现安全问题时，不要公开粘贴 API Key、PACER 凭证、私有路径或受密封/限制材料。应先通过维护者指定的私密渠道报告；在尚未建立私密渠道前，不要把可利用细节发布到公共 Issue。
+## 报告问题
+
+不要在公开 Issue 或 X 上披露可被利用的安全细节。请优先使用 [GitHub 私密漏洞报告](https://github.com/Dysen177/docket-observatory/security/advisories/new)；如果该渠道无法使用，请发送邮件到 [poison127@protonmail.com](mailto:poison127@protonmail.com)，邮件主题以 `[Docket Observatory] Security` 开头。
+
+报告时请尽量包括程序版本、操作系统与架构、受影响组件、复现步骤、预期影响和已经隐去敏感信息的日志。请勿发送 API Key、PACER 凭证、私有本机路径、密封或受限材料，以及包含凭据的日志。
+
+普通非安全 Bug 请使用公开的 [Bug Report 模板](https://github.com/Dysen177/docket-observatory/issues/new?template=bug-report.yml)；缺失案件或文件请使用 [Source Gap 模板](https://github.com/Dysen177/docket-observatory/issues/new?template=source-gap.yml)。
