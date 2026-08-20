@@ -145,6 +145,18 @@ const externalOnlyHosts = [
     host: 'odysee.com',
     purpose: 'User-opened historical livestream reposts on Odysee.',
   },
+  {
+    host: 'abcnews.com',
+    purpose: 'User-opened ABC News reporting used as a clearly labeled secondary source for the March 15, 2023 fire chronology.',
+  },
+  {
+    host: 'www.hk01.com',
+    purpose: 'User-opened reporting used to verify and credit the Kin Ming Je identification image.',
+  },
+  {
+    host: 'china.caixin.com',
+    purpose: 'User-opened reporting used to verify and credit the Yanping Wang identification image.',
+  },
 ]
 
 const allowedExternalHosts = [

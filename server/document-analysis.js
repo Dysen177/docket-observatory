@@ -19,6 +19,10 @@ import { humanDocumentTranslation } from './human-translations.js'
 import { himalayaRestorationSearchAliases } from './himalaya-restoration.js'
 import { getDocumentSearchProcessingSnapshot, searchDocumentCatalog } from './document-search.js'
 import { allCaseRecords, localizeDiscoveredCase } from './discovered-case-records.js'
+import { normalizeLegalMetadataText } from './legal-metadata.js'
+
+const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
+const withdrawalPortfolioCaseId = 'dconn-26-withdrawal-reference'
 
 const documentAnalysisSchema = {
   type: 'object',
@@ -62,6 +66,24 @@ const documentAnalysisSchema = {
       },
     },
   },
+}
+
+function portfolioCaseId(caseId) {
+  return standaloneWithdrawalCasePattern.test(String(caseId ?? '')) ? withdrawalPortfolioCaseId : caseId
+}
+
+function userFacingCaseRecords(state, manifest) {
+  void manifest
+  return (state?.cases ?? []).filter((caseRecord) => !standaloneWithdrawalCasePattern.test(String(caseRecord.id ?? '')))
+}
+
+function recordBelongsToCase(record, caseRecord) {
+  if (portfolioCaseId(record.caseId) === caseRecord.id) return true
+  return record.relatedTopicIds?.some((topicId) => caseRecord.watchQuestions?.join(' ').toLowerCase().includes(topicId))
+}
+
+function eventBelongsToCase(event, caseId) {
+  return portfolioCaseId(event.caseId) === caseId || event.relatedCaseIds?.some((relatedCaseId) => portfolioCaseId(relatedCaseId) === caseId)
 }
 
 function collectiveClaimExactNote(summary, summaryZh, priority = 'high') {
@@ -319,9 +341,9 @@ const priorityWeight = {
   low: 1,
 }
 
-const analysisCacheVersion = 'document-analysis-v35'
+const analysisCacheVersion = 'document-analysis-v36'
 const translationCacheVersion = 'translation-v7'
-const documentCatalogCacheVersion = 'document-catalog-v14'
+const documentCatalogCacheVersion = 'document-catalog-v15'
 const analysisBuilds = new Map()
 const analysisMemoryCache = new Map()
 const documentCatalogBuilds = new Map()
@@ -491,7 +513,7 @@ export async function buildDocumentCatalog(manifest, state, lang = 'zh', options
   }
 
   const result = await searchDocumentCatalog(manifest, index.records, { ...options, language: lang })
-  return { ...result, catalog: result.catalog.map(withoutCatalogSearchText) }
+  return { ...result, catalog: result.catalog.map(catalogResponseRecord) }
 }
 
 function catalogSearchAliases(record) {
@@ -810,8 +832,7 @@ function sourceRecordAnalysis(record, lang) {
 }
 
 function cleanDisplayTitle(value) {
-  return String(value ?? '')
-    .replace(/[\s\u00a0]*[\uFF08(]+\s*$/u, '')
+  return normalizeLegalMetadataText(value)
     .trim()
 }
 
@@ -1083,9 +1104,25 @@ function catalogIndexText(record) {
   ].filter(Boolean).join(' ')
 }
 
-function withoutCatalogSearchText(record) {
-  const { searchText: _searchText, ...publicRecord } = record
-  return publicRecord
+function catalogResponseRecord(record) {
+  return {
+    id: record.id,
+    resourceKind: record.resourceKind,
+    docNumber: record.docNumber,
+    title: record.title,
+    variantLabel: record.variantLabel,
+    sourceLabel: record.sourceLabel,
+    sourceUrl: record.sourceUrl,
+    status: record.status,
+    category: record.category,
+    priority: record.priority,
+    summary: record.summary,
+    plainEnglish: record.plainEnglish,
+    researchQuality: record.researchQuality,
+    sourceVerification: record.sourceVerification,
+    sourceAlternatives: record.sourceAlternatives ?? [],
+    searchMatches: record.searchMatches ?? [],
+  }
 }
 
 function boundedNumber(value, fallback, max) {
@@ -2440,7 +2477,7 @@ function sourceStrategy(lang) {
 }
 
 function documentPortfolioRead(records, state, lang, manifest) {
-  const caseRecords = allCaseRecords(state, manifest)
+  const caseRecords = userFacingCaseRecords(state, manifest)
   const countsByCategory = records.reduce((acc, record) => {
     acc[record.categoryKey] = (acc[record.categoryKey] ?? 0) + 1
     return acc
@@ -2530,11 +2567,11 @@ function documentAnalytics(records, errorRecords, state, lang, manifest) {
   }))
 
   const sourceStatusById = new Map(state.sourceStatuses.map((status) => [status.sourceId, status]))
-  const caseRecords = allCaseRecords(state, manifest)
+  const caseRecords = userFacingCaseRecords(state, manifest)
   const caseMatrix = caseRecords.map((caseRecord) => {
     const localizedCase = localizedCaseRecord(caseRecord, lang)
-    const caseRecords = records.filter((record) => record.caseId === caseRecord.id || record.relatedTopicIds?.some((topicId) => caseRecord.watchQuestions?.join(' ').toLowerCase().includes(topicId)))
-    const caseEvents = state.events.filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds?.includes(caseRecord.id))
+    const caseRecords = records.filter((record) => recordBelongsToCase(record, caseRecord))
+    const caseEvents = state.events.filter((event) => eventBelongsToCase(event, caseRecord.id))
     const sourceGapIds = caseRecord.sourceIds.filter((sourceId) => sourceStatusById.get(sourceId)?.status !== 'ok')
     return {
       caseId: caseRecord.id,
@@ -2655,7 +2692,7 @@ function automationPlan(records, errorRecords, extractionByUrl, state, lang, cac
           ? 'Bundled case dossiers remain available offline. New evidence can be organized locally, while Ollama or a configured cloud model can generate a deeper case-level update.'
           : '内置案件整体解读可离线直接使用；新增证据可先在本地归档，Ollama 或已配置的云端模型可生成更深入的案件级更新。',
       done: cacheInventory.caseAi,
-      total: allCaseRecords(state, manifest).length,
+      total: userFacingCaseRecords(state, manifest).length,
     },
   ]
 
@@ -2691,14 +2728,14 @@ function automationPlan(records, errorRecords, extractionByUrl, state, lang, cac
 }
 
 async function buildCaseDossiers(records, state, lang, manifest) {
-  return Promise.all(allCaseRecords(state, manifest).map(async (caseRecord) => {
+  return Promise.all(userFacingCaseRecords(state, manifest).map(async (caseRecord) => {
     const localizedCase = localizedCaseRecord(caseRecord, lang)
-    const caseRecords = records.filter((record) => record.caseId === caseRecord.id)
+    const caseRecords = records.filter((record) => portfolioCaseId(record.caseId) === caseRecord.id)
     const directEvents = state.events
-      .filter((event) => event.caseId === caseRecord.id)
+      .filter((event) => portfolioCaseId(event.caseId) === caseRecord.id)
       .sort((a, b) => b.date.localeCompare(a.date))
     const relatedEvents = state.events
-      .filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds?.includes(caseRecord.id))
+      .filter((event) => eventBelongsToCase(event, caseRecord.id))
       .sort((a, b) => b.date.localeCompare(a.date))
     const latestDirectEvent = directEvents[0] ?? null
     const latestRelatedEvent = latestDirectEvent ? null : relatedEvents[0] ?? null
@@ -3033,11 +3070,12 @@ function caseTrackKind(caseRecord) {
 }
 
 export function relationshipGraphForRecords(records, state, lang, caseRecords = state.cases) {
-  const caseNodes = caseRecords.map((caseRecord) => ({
+  const visibleCaseRecords = caseRecords.filter((caseRecord) => !standaloneWithdrawalCasePattern.test(String(caseRecord.id ?? '')))
+  const caseNodes = visibleCaseRecords.map((caseRecord) => ({
     id: caseRecord.id,
     label: localizedCaseRecord(caseRecord, lang).shortTitle,
     type: 'case',
-    weight: records.filter((record) => record.caseId === caseRecord.id).length,
+    weight: records.filter((record) => portfolioCaseId(record.caseId) === caseRecord.id).length,
   }))
   const entityNodes = state.entities.map((entity) => ({
     id: entity.id,
@@ -3048,13 +3086,13 @@ export function relationshipGraphForRecords(records, state, lang, caseRecords = 
   const candidateLinks = state.entities.flatMap((entity) =>
     entity.caseIds.map((caseId) => ({
       source: entity.id,
-      target: caseId,
+      target: portfolioCaseId(caseId),
       label: legalRelationshipLabel(entity, caseId, lang),
     })),
   )
   const caseIds = new Set(caseNodes.map((node) => node.id))
   const entityIds = new Set(entityNodes.map((node) => node.id))
-  const links = candidateLinks.filter((link) => caseIds.has(link.target) && entityIds.has(link.source))
+  const links = uniqueRelationshipLinks(candidateLinks.filter((link) => caseIds.has(link.target) && entityIds.has(link.source)))
   const linkedCaseIds = new Set(links.map((link) => link.target))
   const linkedEntityIds = new Set(links.map((link) => link.source))
   return {
@@ -3064,6 +3102,16 @@ export function relationshipGraphForRecords(records, state, lang, caseRecords = 
     ],
     links,
   }
+}
+
+function uniqueRelationshipLinks(links) {
+  const seen = new Set()
+  return links.filter((link) => {
+    const key = `${link.source}\u0000${link.target}\u0000${link.label}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 }
 
 function localizedCaseRecord(caseRecord, lang) {

@@ -90,34 +90,89 @@ export function localAiModeName(lang = 'zh') {
   return lang === 'en' ? `Local Ollama (${model})` : `本机 Ollama（${model}）`
 }
 
-export async function ollamaGenerateJson({ system, user, schemaName = 'legal_analysis', timeoutMs = runtimeSetting('localAiTimeoutMs') }) {
+export async function ollamaGenerateJson({
+  system,
+  user,
+  schemaName = 'legal_analysis',
+  timeoutMs = runtimeSetting('localAiTimeoutMs'),
+  model: modelOverride = null,
+  format = 'json',
+  options = {},
+  onProgress = null,
+  signal = null,
+}) {
   const base = String(runtimeSetting('localAiBaseUrl') ?? '').replace(/\/+$/u, '')
   if (!isAllowedLocalAiUrl(base)) {
     const error = new Error('Local AI base URL must be localhost or 127.0.0.1 on an allowed port.')
     error.statusCode = 400
     throw error
   }
-  const controller = AbortSignal.timeout(Math.max(10000, Math.min(600000, Number(timeoutMs) || 180000)))
+  const timeoutSignal = AbortSignal.timeout(Math.max(10000, Math.min(1200000, Number(timeoutMs) || 180000)))
+  const requestSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal
   const response = await fetch(`${base}/api/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: runtimeSetting('localAiModel'),
-      stream: false,
-      format: 'json',
+      model: String(modelOverride || runtimeSetting('localAiModel')).trim(),
+      stream: true,
+      think: false,
+      format,
       prompt: `${system}\n\nReturn strict JSON for ${schemaName}. Do not include markdown fences.\n\n${user}`,
       options: {
         temperature: 0.1,
+        ...options,
       },
     }),
-    signal: controller,
+    signal: requestSignal,
   })
-  const body = await readTextWithLimit(response, 5 * 1024 * 1024)
-  if (!response.ok) throw new Error(`Local Ollama HTTP ${response.status}: ${body.slice(0, 240)}`)
-  const payload = JSON.parse(body)
-  const raw = String(payload.response ?? '').trim()
+  if (!response.ok) {
+    const body = await readTextWithLimit(response, 5 * 1024 * 1024)
+    throw new Error(`Local Ollama HTTP ${response.status}: ${body.slice(0, 240)}`)
+  }
+  const raw = (await readOllamaStreamWithLimit(response, 5 * 1024 * 1024, onProgress)).trim()
   if (!raw) throw new Error('Local Ollama returned an empty response.')
   return JSON.parse(extractJsonObject(raw))
+}
+
+async function readOllamaStreamWithLimit(response, maximumBytes, onProgress) {
+  if (!response.body) return ''
+  const decoder = new TextDecoder()
+  let buffered = ''
+  let generated = ''
+  let total = 0
+  let lastProgressAt = 0
+
+  for await (const chunk of response.body) {
+    const bytes = Buffer.from(chunk)
+    total += bytes.length
+    if (total > maximumBytes) {
+      await response.body.cancel().catch(() => undefined)
+      throw new Error(`Local Ollama response exceeded the allowed ${maximumBytes}-byte limit.`)
+    }
+    buffered += decoder.decode(bytes, { stream: true })
+    const lines = buffered.split('\n')
+    buffered = lines.pop() ?? ''
+    for (const line of lines) generated += ollamaResponseFragment(line)
+    const now = Date.now()
+    if (typeof onProgress === 'function' && now - lastProgressAt >= 1000) {
+      lastProgressAt = now
+      await Promise.resolve(onProgress({ generatedCharacters: generated.length, responseBytes: total })).catch(() => undefined)
+    }
+  }
+
+  buffered += decoder.decode()
+  if (buffered.trim()) generated += ollamaResponseFragment(buffered)
+  if (typeof onProgress === 'function') {
+    await Promise.resolve(onProgress({ generatedCharacters: generated.length, responseBytes: total, done: true })).catch(() => undefined)
+  }
+  return generated
+}
+
+function ollamaResponseFragment(line) {
+  if (!line.trim()) return ''
+  const payload = JSON.parse(line)
+  if (payload.error) throw new Error(`Local Ollama error: ${payload.error}`)
+  return String(payload.response ?? '')
 }
 
 export async function ollamaTranslateText(text, targetLanguage, segmentLabel = 'Document segment') {

@@ -54,6 +54,8 @@ function sourceStatus(source, startTime, status, message, extras = {}) {
     itemCount: extras.itemCount ?? 0,
     message,
     retryable: extras.retryable === true,
+    retryAt: typeof extras.retryAt === 'string' ? extras.retryAt : null,
+    retryAfterMs: Number.isFinite(Number(extras.retryAfterMs)) ? Math.max(0, Number(extras.retryAfterMs)) : null,
     facts: extras.facts ?? [],
   }
 }
@@ -508,11 +510,17 @@ export async function courtlistenerRecap(source) {
     const docketEntries = archive.targets.reduce((total, target) => total + target.docketEntries, 0)
     const structuredEntries = searchArchive.targets.reduce((total, target) => total + target.docketEntries, 0)
     const reachableTargets = archive.targets.length - failedTargetIds.size
+    const retry = courtListenerRetryMetadata([
+      ...archive.targets.map((target) => target.error),
+      ...searchArchive.targets.map((target) => target.error),
+      ...relatedArchive.failures,
+    ])
     return {
       events: mergeCourtListenerEvents(archive.events, searchArchive.events, relatedArchive.events),
       status: sourceStatus(source, start, docketEntries || structuredEntries || relatedArchive.events.length ? 'limited' : 'error', `CourtListener public RECAP sources scanned ${reachableTargets}/${archive.targets.length} tracked docket(s) plus ${relatedArchive.acceptedDocketCount} accepted related docket(s), returned ${docketEntries} recent feed entries, ${structuredEntries} structured tracked entries, ${relatedArchive.events.length} related-search entries, and exposed ${searchArchive.documents.length + relatedArchive.documents.length} public PDF(s). A token is optional and adds full docket-entry pagination.`, {
         itemCount: Math.max(docketEntries, structuredEntries, relatedArchive.events.length),
-        retryable: failedTargetIds.size > 0,
+        retryable: failedTargetIds.size > 0 || relatedArchive.failures.length > 0,
+        ...retry,
         facts: archive.targets.map((target) => ({
           label: target.label,
           value: target.error ? 'feed error' : `${target.docketEntries} recent entries`,
@@ -630,7 +638,11 @@ export async function runSourceAdapters(sources) {
       } catch (error) {
         return {
           events: [],
-          status: sourceStatus(source, Date.now(), 'error', error instanceof Error ? error.message : String(error), { retryable: true }),
+          status: sourceStatus(source, Date.now(), 'error', error instanceof Error ? error.message : String(error), {
+            retryable: true,
+            retryAt: error?.retryAt,
+            retryAfterMs: error?.retryAfterMs,
+          }),
         }
       }
     }),
@@ -639,5 +651,19 @@ export async function runSourceAdapters(sources) {
   return {
     events: results.flatMap((result) => result.events),
     statuses: results.map((result) => result.status),
+  }
+}
+
+function courtListenerRetryMetadata(values) {
+  const retryTimes = values
+    .filter(Boolean)
+    .map((value) => String(value).match(/paused until\s+([^\s]+)\s+after HTTP 429/i)?.[1])
+    .map((value) => Date.parse(value ?? ''))
+    .filter((value) => Number.isFinite(value) && value > Date.now())
+  if (!retryTimes.length) return {}
+  const retryAtMs = Math.max(...retryTimes)
+  return {
+    retryAt: new Date(retryAtMs).toISOString(),
+    retryAfterMs: retryAtMs - Date.now(),
   }
 }

@@ -2,6 +2,21 @@
 
 All routine outbound access should be visible here and enforced in `server/network-policy.cjs`.
 
+## AI Chat retrieval boundary
+
+AI Chat does not perform unrestricted search-engine queries and does not place arbitrary live webpages directly into a model prompt. It answers from the local evidence library. Network refresh is a separate ingestion step governed by the allowlist below, source-type labels, URL validation, response-size limits, and local integrity metadata.
+
+Evidence priority is:
+
+1. PACER and official court records, when legitimately available through the user's own access.
+2. CourtListener/RECAP records and court-hosted documents.
+3. DOJ, SEC, Federal Register, trustee, and claims-administrator records.
+4. Party or project publications, labeled as party/project material rather than adjudicated fact.
+5. News reporting, when present, as secondary context only.
+6. Social posts and historical broadcast transcripts as public statements only, never as proof of a judicial finding.
+
+Conflicting sources remain separate. A lower-tier source cannot silently override an official record. Text fetched from any source is treated as untrusted evidence data: instructions embedded in a filing, webpage, transcript, or retrieved document are never executed by AI Chat.
+
 | Host | Purpose | Data |
 | --- | --- | --- |
 | `nfsc.press` | Public mirror for docket-linked PDFs. | Public mirror metadata and PDFs. |
@@ -36,6 +51,9 @@ The historical public-record workspace can open the following hosts in the opera
 | `x.com`, `www.x.com` | User-selected public statements on X. | None; browser open only. |
 | `rumble.com`, `www.rumble.com` | User-selected historical Rumble reposts. | None; browser open only. |
 | `odysee.com` | User-selected historical Odysee reposts. | None; browser open only. |
+| `abcnews.com` | User-selected ABC News reporting used as a labeled secondary source for the March 15, 2023 fire chronology. | None; browser open only. |
+| `www.hk01.com` | User-selected reporting used to verify and credit the Kin Ming Je identification image. | None; browser open only. |
+| `china.caixin.com` | User-selected reporting used to verify and credit the Yanping Wang identification image. | None; browser open only. |
 
 The bundled index stores text metadata and external HTTPS links only. It does not contain third-party video, audio, thumbnails, profile images, cookies, session data, or platform credentials. A repost link records an accessible copy and is not labeled as an original official publication unless separately established.
 

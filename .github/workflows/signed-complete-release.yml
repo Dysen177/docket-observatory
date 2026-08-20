@@ -175,7 +175,7 @@ jobs:
           name: release-evidence
           path: release-metadata
 
-      - name: Generate streaming checksums, SBOM, and provenance record
+      - name: Generate internal SBOM and provenance record
         env:
           GITHUB_REF: refs/tags/${{ inputs.release_tag }}
         run: npm run release:finalize
@@ -190,6 +190,5 @@ jobs:
           path: |
             release/*.dmg
             release/*.exe
-            release/SHA256SUMS.txt
-            release/SBOM.cdx.json
-            release/BUILD-PROVENANCE.json
+            output/release-evidence/SBOM.cdx.json
+            output/release-evidence/BUILD-PROVENANCE.json

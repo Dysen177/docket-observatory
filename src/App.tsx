@@ -15,7 +15,6 @@ import {
   BookOpenCheck,
   BriefcaseBusiness,
   Building2,
-  CalendarClock,
   ChartNetwork,
   Check,
   CheckCircle2,
@@ -31,17 +30,15 @@ import {
   Eye,
   EyeOff,
   GitBranch,
-  History,
   KeyRound,
   Landmark,
   Languages,
-  Link2,
   Loader2,
   LockKeyhole,
+  MessageSquareText,
   Minus,
   Network,
   Plus,
-  PlayCircle,
   Radio,
   RefreshCw,
   RotateCcw,
@@ -63,6 +60,8 @@ import {
   X,
 } from 'lucide-react'
 import brandLogo from './assets/brand-logo.png'
+import TranscriptResearchPanel from './TranscriptResearchPanel'
+import ResearchChatWorkspace from './ResearchChatWorkspace'
 import './App.css'
 import './redesign.css'
 
@@ -85,13 +84,18 @@ type Language = 'zh' | 'en'
 type Theme = 'dark' | 'light'
 type Severity = 'critical' | 'high' | 'medium' | 'low'
 type DocumentSearchScope = 'all' | 'original' | 'translation' | 'analysis' | 'web'
-type WorkspaceView = '#timeline' | '#documents' | '#cases' | '#positions' | '#entities' | '#public-records' | '#policy' | '#calendar'
+type WorkspaceView = '#timeline' | '#documents' | '#cases' | '#positions' | '#entities' | '#public-records' | '#ai-chat' | '#policy'
 type DocumentWorkspaceTab = 'files' | 'review' | 'audit' | 'analytics' | 'automation'
 
-const workspaceViews = new Set<WorkspaceView>(['#timeline', '#documents', '#cases', '#positions', '#entities', '#public-records', '#policy', '#calendar'])
+const workspaceViews = new Set<WorkspaceView>(['#timeline', '#documents', '#cases', '#positions', '#entities', '#public-records', '#ai-chat', '#policy'])
+const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
 
 function normalizeWorkspaceView(hash: string): WorkspaceView {
   return workspaceViews.has(hash as WorkspaceView) ? hash as WorkspaceView : '#timeline'
+}
+
+function isStandaloneWithdrawalCaseId(caseId: string | null | undefined) {
+  return standaloneWithdrawalCasePattern.test(String(caseId ?? ''))
 }
 
 type SourceStatus = {
@@ -121,50 +125,6 @@ type SourceRecord = {
   url: string
   coverage: string
   limitations: string
-}
-
-type PublicRecordSource = {
-  platform: 'youtube' | 'gettr' | 'rumble' | 'odysee' | 'x'
-  url: string
-  uploader: string
-  sourceTitle: string
-  durationSec: number | null
-  checkedAt: string | null
-  role: string
-}
-
-type PublicRecordItem = {
-  id: string
-  date: string
-  title: string
-  originalTitle: string
-  summary: string
-  speaker: string
-  recordType: string
-  verificationStatus: string
-  completeness: string
-  primarySource: PublicRecordSource
-  alternatives: PublicRecordSource[]
-  tags: string[]
-}
-
-type PublicRecordLibrary = {
-  summary: {
-    coverageStart: string
-    coverageEnd: string
-    casePhaseStart: string
-    totalRecords: number
-    unresolvedSourceLeads: number
-    platformCounts: Record<string, number>
-    yearCounts: Array<{ year: string; count: number }>
-    generatedAt: string | null
-  }
-  filters: { q: string; year: string; platform: string; sort: 'newest' | 'oldest' }
-  total: number
-  offset: number
-  limit: number
-  hasMore: boolean
-  records: PublicRecordItem[]
 }
 
 type EventRecord = {
@@ -215,6 +175,12 @@ type EntityRecord = {
   id: string
   name: string
   type: string
+  imagePath?: string
+  imageKind?: string
+  imageSourceUrl?: string
+  imageCredit?: string
+  imageLicense?: string
+  imageVerifiedAt?: string
   role: string
   caseIds: string[]
   riskAreas: string[]
@@ -342,6 +308,7 @@ type LitigationPositionsLibrary = {
 type DocumentFile = {
   title: string
   docNumber: string | null
+  filedAt: string | null
   caseId: string
   sourceId: string
   sourceLabel?: string
@@ -1011,6 +978,7 @@ type AppSettingsRecord = {
   localAiModel: string
   localAiTimeoutMs: number
   localAiContextChars: number
+  researchChatContextChars: number
   translationProvider: 'openai' | 'anthropic' | 'gemini' | 'openai_compatible' | 'ollama' | 'local' | string
   autoRefresh: boolean
   refreshIntervalMinutes: number
@@ -1056,28 +1024,6 @@ type SettingsPayload = {
     itemCount: number
     message: string
   }>
-}
-
-type ProceduralCalendarItem = {
-  id: string
-  caseId: string
-  caseTitle: string
-  docket: string
-  title: string
-  date: string
-  deadlineType: string
-  status: 'known' | 'inferred' | 'needs_verification' | string
-  statusLabel: string
-  basisDoc: string
-  sourceUrl: string
-  sourceTier: string
-  note: string
-}
-
-type ProceduralCalendar = {
-  generatedAt: string
-  disclaimer: string
-  items: ProceduralCalendarItem[]
 }
 
 type AiTestResult = {
@@ -1152,13 +1098,13 @@ const ui = {
     navPositions: '诉讼方动态',
     navEntities: '实体关系',
     navPublicRecords: '公开言论',
+    navAiChat: 'AI Chat',
     navPolicy: '政策雷达',
-    navCalendar: '程序日历',
     navDocuments: '证据文件库',
     navSettings: '设置',
     settingsTitle: '本地设置',
     settingsEyebrow: '配置与安全',
-    settingsCopy: '管理来源接入、AI、翻译、自动处理和本地隐私。密钥只保存在本机安全存储，不会显示在页面或写入普通配置文件。',
+    settingsCopy: '管理来源、AI、自动处理与隐私；密钥仅存本机安全存储。',
     backHome: '返回主页',
     saveSettings: '保存设置',
     saved: '已保存',
@@ -1192,7 +1138,7 @@ const ui = {
     enterCredentialReplacement: '输入新值以替换',
     discardCredentialChanges: '放弃凭据更改',
     deleteAllLocalCredentials: '删除全部本地凭据',
-    credentialControlDetail: '凭据由用户控制。保存后才会添加、替换或删除本机加密库中的值；环境变量必须由用户在启动环境中修改。',
+    credentialControlDetail: '保存后才会添加、替换或删除本机凭据；环境变量仍由启动环境管理。',
     environmentManagedExternally: '由启动环境管理，可输入本地值覆盖',
     showCredential: '显示',
     hideCredential: '隐藏',
@@ -1203,19 +1149,21 @@ const ui = {
     testAi: '测试 AI',
     aiTitle: 'AI 与翻译',
     aiProvider: 'AI 提供商',
-    localRules: '本地规则（无需外联）',
+    localRules: '本地规则（离线）',
     localOllama: '本机 Ollama（可选，无云端）',
     localAiBaseUrl: '本机 AI 地址',
     localAiModel: '本机模型名称',
     localAiTimeout: '本机 AI 超时（毫秒）',
     localAiContext: '本机 AI 最大上下文字符',
-    localAiDetail: 'Ollama 只允许连接 localhost / 127.0.0.1 的本机服务；未安装或未启动时自动回退到本地确定性规则。',
+    researchChatContext: 'AI Chat 对话上下文字符预算',
+    researchChatContextDetail: '完整聊天记录始终保存在本机；每次生成只在此字符预算内选取最近对话。模型自身的上下文上限仍是硬限制，证据材料和回答也会占用模型窗口。',
+    localAiDetail: 'Ollama 仅连接本机 loopback；不可用时回退到本地规则。',
     openai: 'OpenAI（可选）',
     anthropic: 'Anthropic Claude（可选）',
     gemini: 'Google Gemini（可选）',
     openaiCompatible: 'OpenAI 兼容接口 / 中转站',
-    noCloudTranslation: '本地辅助译文（默认）',
-    localTranslationDetail: '完整版直接提供发布基线中已有的译文与阅读辅助。新增文件在无生成式服务时只形成明确标注的初步阅读辅助，不会覆盖或降级内置基线；Ollama、官方云端模型或兼容接口可生成更完整的正文翻译。',
+    noCloudTranslation: '本地辅助译文',
+    localTranslationDetail: '完整版保留内置译文。无生成式服务时，新文件仅生成标注为初步的阅读辅助，不会覆盖发布基线。',
     aiModel: '法律分析模型 ID',
     translationModel: '正文翻译模型 ID',
     compatibleAiBaseUrl: '兼容接口 Base URL',
@@ -1227,12 +1175,12 @@ const ui = {
     reasoningHigh: '高（推荐）',
     reasoningXHigh: '超高（更深入）',
     reasoningMax: '最大（最慢）',
-    reasoningDetail: '推理强度仅对支持该参数的模型生效；强度越高通常耗时更长、用量更高。其他提供商会忽略该选项，纯翻译和连接测试不使用深度推理。',
-    modelQualityDetail: '程序支持的是协议与自定义模型 ID，不代表所有模型质量相同。译文忠实度、法律推理、长文档覆盖、引用稳定性和速度，取决于模型能力、上下文长度、推理强度、服务商兼容实现及账户额度。小模型或不完整中转可能遗漏内容、误译术语或生成不稳定引用；任何 AI 输出都不是正式法律意见。',
+    reasoningDetail: '仅支持该参数的模型会采用推理强度；强度越高通常越慢、用量越大。',
+    modelQualityDetail: '支持自定义模型 ID 不代表质量相同。翻译、法律推理和引用可靠性取决于模型、上下文及服务商实现；AI 输出仅供研究。',
     translationProvider: '翻译方式',
     aiPrivacy: '允许向云端 AI 发送提取正文',
-    aiPrivacyDetail: '仅控制所有云端 AI 提供商和中转接口。关闭后，云端解读只使用元数据且云端正文翻译停用；本机 Ollama 仍可在 loopback 内读取本地提取正文。始终不上传 PDF 文件或本地路径。',
-    aiDataBoundary: 'OpenAI 官方请求使用 store:false；Anthropic、Gemini 和中转站的保留政策由对应服务商决定；Ollama 只允许本机 loopback 连接。密钥不返回前端，AI 输出是研究辅助，不是正式法律意见。',
+    aiPrivacyDetail: '关闭后，云端只分析元数据并停用正文翻译。PDF 文件和本地路径始终不会上传。',
+    aiDataBoundary: 'OpenAI 请求使用 store:false；其他服务的保留政策由服务商决定。密钥不返回界面。',
     aiRedaction: '发送前自动脱敏敏感信息',
     aiRedactionDetail: '默认遮盖邮箱、美国社保号、常见电话号码和账户/路由号形式；本地原文不改写。自动规则不能保证识别所有个人信息，发送前仍需核对。',
     automationTitle: '自动抓取与处理',
@@ -1242,14 +1190,14 @@ const ui = {
     autoProcess: '刷新后自动下载、翻译和分析公开文件',
     automaticScope: '自动处理范围',
     automaticLimit: '日常每轮新增下载/处理上限',
-    automaticScopePriority: '优先文件（推荐）',
+    automaticScopePriority: '优先文件',
     automaticScopeAll: '全部公开文件',
     automaticScopePriorityDetail: '联网刷新后只处理高价值材料，适合日常监控并控制 API 用量。',
     automaticScopeAllDetail: '联网刷新后处理全部可下载文件，可能耗时较长并产生更多翻译与 AI 请求。',
     includeTranslation: '自动翻译文件正文',
     includeAi: '自动生成文件级和案件级解读',
     automationLanguage: '后台输出语言',
-    automationBoth: '中英双语（推荐）',
+    automationBoth: '中英双语',
     automationChinese: '仅中文',
     automationEnglish: '仅英文',
     processingTitle: '处理性能与边界',
@@ -1265,7 +1213,7 @@ const ui = {
     downloadMaxSize: '单个下载最大体积（MB）',
     pdfMaxSize: '单个 PDF 解析上限（MB）',
     integrityMode: '文件完整性核验',
-    integrityChanged: '变更时完整哈希（推荐）',
+    integrityChanged: '变更文件哈希',
     integrityFull: '每次刷新完整哈希（较慢）',
     integrityRemote: '重新下载并比对远端（最严格）',
     pacerTitle: 'PACER 费用闸门',
@@ -1276,7 +1224,7 @@ const ui = {
     dataDirectory: '应用管理的文件目录（只读）',
     cacheDirectory: '应用管理的缓存目录（只读）',
     diagnosticTitle: '能力状态',
-    diagnosticCopy: '普通设置保存在本机并在保存后生效；“已配置”只代表凭据存在。目录由应用管理，当前版本不支持在此迁移资料库。请使用每个来源的连接测试确认权限和接口可用性。',
+    diagnosticCopy: '设置保存后生效；“已配置”仅代表凭据存在，请用连接测试确认可用性。资料库目录由应用管理。',
     sourcePacer: 'PACER 正式案卷',
     sourceRecap: 'CourtListener / RECAP',
     sourceAi: '云端 AI 协议',
@@ -1293,8 +1241,8 @@ const ui = {
     capabilityError: '测试失败',
     capabilityNoKey: '无需 API Key',
     capabilityPacerDetail: 'PACER 是正式案卷来源，但当前版本只有加密凭证和费用闸门，尚无登录或下载适配器。',
-    capabilityRecapDetail: '无需 Token 可读取 26 宗固定案卷的公开 Feed、结构化搜索结果和当前公开 RECAP PDF，并自动下载；Token 可增强完整案卷条目分页。PACER 仍是正式案卷。',
-    capabilityAiDetail: '无 Key 时直接使用完整版内置的现行法律解读和案件总览；新增文件可先做本地结构化初读，且不会覆盖内置基线。可选择 Ollama、OpenAI、Anthropic、Gemini，或填写任意 OpenAI 兼容服务的模型 ID 和 Base URL。',
+    capabilityRecapDetail: '无 Token 可读取 26 宗固定案卷的公开 Feed、搜索结果和当前公开 PDF；Token 增加完整分页。PACER 仍是正式案卷。',
+    capabilityAiDetail: '无 Key 使用内置解读；新增文件可本地初读。Ollama 或任意兼容服务可增强翻译和解读。',
     capabilityPublicDetail: '公开机构网页和政策 API 直接抓取，不需要用户凭证。',
     capabilityEpiqDetail: '公开页面可访问；完整 docket JSON 适配器尚未接入。',
     capabilityLocalDetail: 'pdf-parse 提取文本层；扫描版 PDF 使用本地 Tesseract.js OCR 回退。PDF 和扫描页不会因此上传。',
@@ -1317,11 +1265,11 @@ const ui = {
     autoRefreshState: '自动刷新',
     noKeyMatrixTitle: '零密钥能力矩阵',
     noKeyCore: '核心本地模式',
-    noKeyCoreDetail: '完整版直接提供当前全部资料、现有正文/译文、文件解读、案件整体解读和搜索数据。联网后只处理增量文件；本地初步输出与发布基线分层保存，不会覆盖或降低内置内容。',
+    noKeyCoreDetail: '完整版已含资料、正文/译文、文件与案件解读及搜索数据。联网只处理增量，本地初读不覆盖发布基线。',
     noKeyGenerative: '本机生成式增强',
-    noKeyGenerativeDetail: '选择并启动 Ollama 后，无需付费 API Key 即可进行正文翻译、文件级和案件级生成式解读。程序不会静默下载多 GB 模型。',
+    noKeyGenerativeDetail: 'Ollama 可在本机生成翻译及文件/案件解读；程序不会自动下载模型。',
     cloudEnhancement: '云端增强',
-    cloudEnhancementDetail: '可选配置官方 AI 或 OpenAI 兼容中转服务；正文发送默认关闭，启用后仍不发送 PDF 文件或本地路径。最终质量取决于所选模型和服务商实现。',
+    cloudEnhancementDetail: '云端与兼容接口可选；正文传输默认关闭，绝不上传 PDF 或本地路径。质量取决于模型。',
     officialCompleteness: '正式案卷完整性',
     officialCompletenessDetail: 'PACER 是正式案卷，但当前适配器尚未实现；RECAP/官方来源可免费补充，NFSC 仅作备用。',
     activeNow: '当前可用',
@@ -1329,7 +1277,7 @@ const ui = {
     adapterPending: '适配器待实现',
     enabled: '已开启',
     disabled: '已关闭',
-    settingsSecurityNote: '无遥测、无远程数据库、无自动更新服务。配置文件只存普通参数；macOS 使用禁止认证界面的钥匙串密钥加密，Windows 使用 DPAPI。',
+    settingsSecurityNote: '无遥测、远程数据库或自动更新；密钥由 macOS 钥匙串或 Windows DPAPI 保护。',
     sourcesStatus: '来源状态',
     sourceOverview: '来源总览',
     sourceOkShort: '正常',
@@ -1356,13 +1304,13 @@ const ui = {
     positionsWorkspaceTitle: '诉讼方动态与动议追踪',
     positionsWorkspaceCopy: '按案件、提交方和程序状态核对检方、辩方、法院及其他诉讼参与人的动议、回应和裁定，并保留原始文件依据。',
     entitiesWorkspaceTitle: '关联人物、机构与资产网络',
-    entitiesWorkspaceCopy: '查看跨案件的人物、公司、基金与资产关系；关系只表示资料中的关联，不自动推定责任。',
+    entitiesWorkspaceCopy: '人物、公司、基金与资产的跨案关联；关联不等于责任认定。',
     publicRecordsWorkspaceTitle: '历史直播与公开言论',
     publicRecordsWorkspaceCopy: '独立索引 2017 年 1 月 26 日至 2023 年 3 月 14 日的历史直播和公开视频；转载副本与法院认定严格分开。',
+    aiChatWorkspaceTitle: 'AI 全库研究对话',
+    aiChatWorkspaceCopy: '跨法院案卷、直播文字、案件时间线、人物公司、实体关系和政策资料进行检索与模型对话；必须先配置云端 API 或 Ollama，不会在无模型时伪造 AI 答案。',
     policyWorkspaceTitle: '美国政策与制度环境',
     policyWorkspaceCopy: '独立跟踪与案件相关的法律政策、执法制度和公开机构来源，避免把政策背景混同为个案事实。',
-    calendarWorkspaceTitle: '案卷日期与期限核验',
-    calendarWorkspaceCopy: '按时间整理已经发生的文件提交、命令和听证日期；只有明确标为法院期限的项目才可视为截止日，待核验与研究推算不能作为诉讼期限。',
     notRefreshed: '尚未执行在线刷新',
     latest: '最新',
     sources: '来源',
@@ -1402,14 +1350,12 @@ const ui = {
     events: '事件',
     entityMap: '关联人、公司与资产线',
     entityEyebrow: '实体图谱',
+    entityIdentificationImage: '资料识别图',
+    entityRegistryMark: '实体档案',
+    entityImageSource: '图片来源',
+    entityImageBoundary: '仅用于身份识别，不属于案卷证据',
     policyTitle: '美国政策与制度背景',
     policyEyebrow: '政策监控',
-    calendarTitle: '案卷日期索引与正式期限核验',
-    calendarEyebrow: '日期证据索引',
-    calendarKnown: '已确认文件日期',
-    calendarNeedsVerification: '待官方核验',
-    calendarInferred: '研究推算，非正式期限',
-    calendarBasis: '依据',
     sourceAudit: '来源审计',
     sourceAuditEyebrow: '来源审计',
     officialSourcePriority: '官方来源优先',
@@ -1591,7 +1537,7 @@ const ui = {
     chartSourceInsight: '左侧看来源分布，右侧看证据层级；PACER/RECAP 优先，NFSC 仅作备份镜像。',
     chartPriorityInsight: '关键和高优先文件先进入下载、翻译和法律解读队列，低优先主要用于背景归档。',
     chartAutomationInsight: '展示从发现新文件到案件总览重建的本机处理链路，以及仍需凭证或 API 的环节。',
-    chartRelationshipInsight: '左侧选择案件或实体，中间只显示当前节点的直接连接，右侧列出关系性质；点击相邻节点可继续追踪。',
+    chartRelationshipInsight: '当前图仅展示已记录的直接关联；弱关联和待核验线索不作为责任结论。',
     chartEvents: '案件事件',
     chartDocuments: '文件数量',
     sourceListLabel: '来源列表',
@@ -1619,8 +1565,6 @@ const ui = {
     metricVerifyDetail: '镜像文件需由 PACER/RECAP 复核',
     metricAiBacklog: '待专业复核',
     metricAiBacklogDetail: '按唯一 PDF 内容统计；本地规则初读不等于逐份专业复核',
-    metricDeadline: '期限待核验',
-    metricDeadlineDetail: '不得作为最终截止日依赖',
     metricOpenIssues: '开放法律问题',
     metricOpenIssuesDetail: '跨案件仍待文件回答',
     metricBlocked: '受限信息源',
@@ -1647,9 +1591,6 @@ const ui = {
     policyArea: '政策领域',
     allPolicyAreas: '全部政策领域',
     monitorTermsLabel: '监控词',
-    calendarFilterAll: '全部',
-    calendarCaseFilter: '案件筛选',
-    noCalendarItems: '没有符合筛选条件的日期。',
     positionsEyebrow: '诉讼动作索引',
     positionsTitle: '动议、回应与法院裁定',
     positionsTotal: '已索引动作',
@@ -1742,14 +1683,14 @@ const ui = {
     navCases: 'Case portfolio',
     navPositions: 'Party activity',
     navEntities: 'Entity map',
-    navPublicRecords: 'Public record',
+    navPublicRecords: 'Historical statements',
+    navAiChat: 'AI Chat',
     navPolicy: 'Policy radar',
-    navCalendar: 'Calendar',
     navDocuments: 'Evidence library',
     navSettings: 'Settings',
     settingsTitle: 'Local settings',
     settingsEyebrow: 'Configuration and security',
-    settingsCopy: 'Manage source access, AI, translation, automation, and local privacy. Secrets stay in encrypted local storage and are never returned to the UI in full.',
+    settingsCopy: 'Manage sources, AI, automation, and privacy; secrets remain in encrypted local storage.',
     backHome: 'Back to home',
     saveSettings: 'Save settings',
     saved: 'Saved',
@@ -1783,7 +1724,7 @@ const ui = {
     enterCredentialReplacement: 'Enter a new value to replace it',
     discardCredentialChanges: 'Discard credential changes',
     deleteAllLocalCredentials: 'Delete all local credentials',
-    credentialControlDetail: 'Credentials are user-controlled. Saving commits additions, replacements, or deletions in encrypted local storage. Environment variables must be changed in the launch environment.',
+    credentialControlDetail: 'Saving applies local credential additions, replacements, or deletions; environment variables remain managed by the launch environment.',
     environmentManagedExternally: 'Managed by the launch environment; enter a local value to override it',
     showCredential: 'Show',
     hideCredential: 'Hide',
@@ -1794,19 +1735,21 @@ const ui = {
     testAi: 'Test AI',
     aiTitle: 'AI and translation',
     aiProvider: 'AI provider',
-    localRules: 'Local rules (no outbound AI)',
+    localRules: 'Local rules (offline)',
     localOllama: 'Local Ollama (optional, no cloud)',
     localAiBaseUrl: 'Local AI URL',
     localAiModel: 'Local model name',
     localAiTimeout: 'Local AI timeout (ms)',
     localAiContext: 'Local AI context characters',
-    localAiDetail: 'Ollama is allowed only on localhost / 127.0.0.1. If it is not installed or running, the app falls back to deterministic local rules.',
+    researchChatContext: 'AI Chat conversation context budget',
+    researchChatContextDetail: 'Complete chat history remains on this computer. Each generation sends only the most recent conversation within this character budget. The model context limit remains a hard ceiling, and retrieved evidence plus the answer share that window.',
+    localAiDetail: 'Ollama is restricted to local loopback; the app falls back to local rules when unavailable.',
     openai: 'OpenAI (optional)',
     anthropic: 'Anthropic Claude (optional)',
     gemini: 'Google Gemini (optional)',
     openaiCompatible: 'OpenAI-compatible gateway',
-    noCloudTranslation: 'Local assistive translation (default)',
-    localTranslationDetail: 'The complete edition starts with the translations and reading aids bundled in the release baseline. New files receive clearly labeled preliminary reading assistance when no generative provider is active; it never overwrites or downgrades the bundled baseline. Ollama, official cloud models, or compatible gateways can generate fuller body translations.',
+    noCloudTranslation: 'Local translation',
+    localTranslationDetail: 'The complete edition preserves bundled translations. Without a generative provider, new files receive labeled preliminary reading aids that never overwrite the release baseline.',
     aiModel: 'Legal-analysis model ID',
     translationModel: 'Body-translation model ID',
     compatibleAiBaseUrl: 'Compatible API base URL',
@@ -1818,12 +1761,12 @@ const ui = {
     reasoningHigh: 'High (recommended)',
     reasoningXHigh: 'Extra high (deeper)',
     reasoningMax: 'Maximum (slowest)',
-    reasoningDetail: 'Reasoning effort applies only to models that support this parameter. Higher effort generally takes longer and uses more API resources. Other providers ignore this option; translation and connection tests do not use deep reasoning.',
-    modelQualityDetail: 'The app supports protocols and user-supplied model IDs; it does not imply equal capability across models. Translation fidelity, legal reasoning, long-document coverage, citation stability, speed, and cost depend on model capability, context length, reasoning mode, provider compatibility, and account limits. Smaller models or incomplete gateways may omit text, mistranslate legal terms, or produce unstable citations. AI output is research assistance, not formal legal advice.',
+    reasoningDetail: 'Only models that support this parameter use reasoning effort; higher settings are usually slower and consume more resources.',
+    modelQualityDetail: 'Custom model support does not imply equal quality. Translation, legal reasoning, and citation reliability depend on the model, context, and provider implementation; AI output is for research.',
     translationProvider: 'Translation provider',
     aiPrivacy: 'Allow extracted body text to cloud AI',
-    aiPrivacyDetail: 'This controls every cloud AI provider and compatible gateway. When off, cloud reads are metadata-only and cloud body translation is disabled; loopback Ollama may still read locally extracted text. PDF files and local paths are never uploaded.',
-    aiDataBoundary: 'Official OpenAI requests use store:false. Anthropic, Gemini, and gateway retention follow the selected provider policy. Ollama is restricted to loopback, and secrets are never returned to the renderer. AI output is research assistance, not formal legal advice.',
+    aiPrivacyDetail: 'When off, cloud analysis is metadata-only and cloud body translation is disabled. PDF files and local paths are never uploaded.',
+    aiDataBoundary: 'OpenAI requests use store:false; other retention policies are set by the provider. Secrets are never returned to the interface.',
     aiRedaction: 'Redact sensitive data before sending',
     aiRedactionDetail: 'Masks emails, U.S. Social Security numbers, common phone formats, and account/routing identifiers by default. Local source text is unchanged. Automated detection cannot identify every personal detail, so review remains necessary.',
     automationTitle: 'Automatic refresh and processing',
@@ -1833,14 +1776,14 @@ const ui = {
     autoProcess: 'Download, translate, and analyze public files after refresh',
     automaticScope: 'Automatic processing scope',
     automaticLimit: 'New downloads/files per routine run',
-    automaticScopePriority: 'Priority files (recommended)',
+    automaticScopePriority: 'Priority files',
     automaticScopeAll: 'All public files',
     automaticScopePriorityDetail: 'Process high-value materials after refresh for routine monitoring and controlled API use.',
     automaticScopeAllDetail: 'Process every downloadable file after refresh; this can take much longer and use more translation and AI requests.',
     includeTranslation: 'Translate document text automatically',
     includeAi: 'Generate document and case-level reads automatically',
     automationLanguage: 'Background output language',
-    automationBoth: 'Chinese and English (recommended)',
+    automationBoth: 'Chinese and English',
     automationChinese: 'Chinese only',
     automationEnglish: 'English only',
     processingTitle: 'Processing performance and limits',
@@ -1856,7 +1799,7 @@ const ui = {
     downloadMaxSize: 'Maximum download size per file (MB)',
     pdfMaxSize: 'Maximum PDF parsing size (MB)',
     integrityMode: 'File integrity verification',
-    integrityChanged: 'Full hash when changed (recommended)',
+    integrityChanged: 'Changed files',
     integrityFull: 'Full hash on every refresh (slower)',
     integrityRemote: 'Re-download and compare remote copies (strictest)',
     pacerTitle: 'PACER fee guard',
@@ -1867,7 +1810,7 @@ const ui = {
     dataDirectory: 'App-managed document directory (read-only)',
     cacheDirectory: 'App-managed cache directory (read-only)',
     diagnosticTitle: 'Capability status',
-    diagnosticCopy: 'Ordinary settings are stored locally and take effect after saving; configured only means a credential exists. Directories are app-managed, and this version does not migrate the library from this screen. Use each source test to confirm permission and endpoint availability.',
+    diagnosticCopy: 'Settings take effect after saving. Configured only means a credential exists; use connection tests to confirm access. Library directories are app-managed.',
     sourcePacer: 'PACER docket of record',
     sourceRecap: 'CourtListener / RECAP',
     sourceAi: 'Cloud AI protocols',
@@ -1884,8 +1827,8 @@ const ui = {
     capabilityError: 'Test failed',
     capabilityNoKey: 'No API key required',
     capabilityPacerDetail: 'PACER is the docket of record, but this build has only encrypted credentials and fee guards; login and download adapters are not implemented.',
-    capabilityRecapDetail: 'Without a token, the app reads public feeds and structured search for 26 fixed dockets, discovers the currently exposed RECAP PDFs, and downloads them. A token adds full docket-entry pagination; PACER remains the docket of record.',
-    capabilityAiDetail: 'Without a key, the complete edition uses its bundled current legal reads and case dossiers. New files may receive a preliminary local structured read without overwriting the bundled baseline. Select Ollama, OpenAI, Anthropic, Gemini, or supply any OpenAI-compatible service model ID and base URL.',
+    capabilityRecapDetail: 'Without a token, the app reads public feeds, search results, and exposed PDFs for 26 fixed dockets. A token adds full pagination; PACER remains the docket of record.',
+    capabilityAiDetail: 'Without a key, the app uses bundled reads and can give new files a local first read. Ollama or any compatible service can enhance translation and analysis.',
     capabilityPublicDetail: 'Public agency pages and the policy API are fetched without user credentials.',
     capabilityEpiqDetail: 'The public shell is reachable; full docket JSON extraction is not implemented.',
     capabilityLocalDetail: 'pdf-parse reads text layers; bundled local Tesseract.js handles scanned PDFs. Neither PDFs nor scanned pages are uploaded.',
@@ -1908,11 +1851,11 @@ const ui = {
     autoRefreshState: 'Automatic refresh',
     noKeyMatrixTitle: 'No-key capability matrix',
     noKeyCore: 'Core local mode',
-    noKeyCoreDetail: 'The complete edition immediately provides the current files, text and translation data, document reads, case dossiers, and search data. Online runs process only incremental files; preliminary local output is stored separately and never overwrites or downgrades the bundled baseline.',
+    noKeyCoreDetail: 'The complete edition includes files, text, translations, document and case reads, and search data. Online runs process increments; local first reads never overwrite the release baseline.',
     noKeyGenerative: 'Local generative enhancement',
-    noKeyGenerativeDetail: 'Select and start Ollama for body translation and generative document/case reads without a paid API key. The app never silently downloads a multi-GB model.',
+    noKeyGenerativeDetail: 'Ollama can generate local translation and document/case reads. The app never downloads a model automatically.',
     cloudEnhancement: 'Cloud enhancement',
-    cloudEnhancementDetail: 'Official AI providers and OpenAI-compatible gateways are optional. Body transmission is off by default, and PDF files or local paths are never sent. Final quality depends on the selected model and provider implementation.',
+    cloudEnhancementDetail: 'Cloud and compatible providers are optional. Body transmission is off by default; PDFs and local paths are never sent. Quality depends on the model.',
     officialCompleteness: 'Official docket completeness',
     officialCompletenessDetail: 'PACER is the docket of record, but its adapter is not implemented. RECAP and official sources provide free coverage; NFSC is backup only.',
     activeNow: 'Available now',
@@ -1920,7 +1863,7 @@ const ui = {
     adapterPending: 'Adapter pending',
     enabled: 'Enabled',
     disabled: 'Disabled',
-    settingsSecurityNote: 'No telemetry, remote database, or auto-update service. Plain settings stay local; macOS uses a no-authentication-UI Keychain key and Windows uses DPAPI.',
+    settingsSecurityNote: 'No telemetry, remote database, or auto-update service; secrets use macOS Keychain or Windows DPAPI.',
     sourcesStatus: 'Source status',
     sourceOverview: 'Source overview',
     sourceOkShort: 'OK',
@@ -1947,13 +1890,13 @@ const ui = {
     positionsWorkspaceTitle: 'Litigation positions and motion tracking',
     positionsWorkspaceCopy: 'Review motions, responses, and rulings by matter, filer, and procedural status across prosecution, defense, courts, and other participants, with links to the underlying record.',
     entitiesWorkspaceTitle: 'People, organizations, and asset network',
-    entitiesWorkspaceCopy: 'Review cross-case links among people, companies, funds, and assets. A displayed link records an association in the materials and does not itself establish liability.',
+    entitiesWorkspaceCopy: 'Cross-case links among people, companies, funds, and assets; association is not liability.',
     publicRecordsWorkspaceTitle: 'Historical livestreams and public statements',
     publicRecordsWorkspaceCopy: 'A separate index of historical livestreams and public videos from January 26, 2017 through March 14, 2023; repost copies remain distinct from judicial findings.',
+    aiChatWorkspaceTitle: 'Whole-library AI research chat',
+    aiChatWorkspaceCopy: 'Retrieve across court records, transcript text, case timelines, people and companies, entity relationships, and policy material before asking the configured model to answer; no model means no AI answer.',
     policyWorkspaceTitle: 'U.S. policy and institutional context',
     policyWorkspaceCopy: 'Track relevant legal policy, enforcement institutions, and public-agency sources separately from adjudicated facts in individual proceedings.',
-    calendarWorkspaceTitle: 'Docket dates and deadline verification',
-    calendarWorkspaceCopy: 'Index past filing, order, and hearing dates separately from operative deadlines. Only an item explicitly identified as a court deadline should be treated as a cutoff.',
     notRefreshed: 'No online refresh yet',
     latest: 'Latest',
     sources: 'Sources',
@@ -1993,14 +1936,12 @@ const ui = {
     events: 'Events',
     entityMap: 'People, companies, and asset lines',
     entityEyebrow: 'Entity map',
+    entityIdentificationImage: 'Identification image',
+    entityRegistryMark: 'Entity record',
+    entityImageSource: 'Image source',
+    entityImageBoundary: 'For identification only; not docket evidence',
     policyTitle: 'U.S. policy and legal context',
     policyEyebrow: 'Policy watch',
-    calendarTitle: 'Docket date index and formal deadline verification',
-    calendarEyebrow: 'Date evidence index',
-    calendarKnown: 'Confirmed filing dates',
-    calendarNeedsVerification: 'Official verification needed',
-    calendarInferred: 'Research estimate, not a deadline',
-    calendarBasis: 'Basis',
     sourceAudit: 'Source audit',
     sourceAuditEyebrow: 'Source audit',
     officialSourcePriority: 'Official source priority',
@@ -2182,7 +2123,7 @@ const ui = {
     chartSourceInsight: 'Left shows source volume and right shows evidence tier; PACER/RECAP first, NFSC as backup mirror only.',
     chartPriorityInsight: 'Critical and high-priority files enter download, translation, and AI legal-read queues first; low priority is background archive.',
     chartAutomationInsight: 'Shows the local chain from new-file discovery to rebuilt case reads, including credential/API blockers.',
-    chartRelationshipInsight: 'Choose a case or entity on the left, inspect its direct links in the center, and read the relationship basis on the right. Select a neighbor to continue tracing.',
+    chartRelationshipInsight: 'The graph shows recorded direct links only; weak or unverified leads are not liability findings.',
     chartEvents: 'Case events',
     chartDocuments: 'Documents',
     sourceListLabel: 'Source list',
@@ -2204,18 +2145,16 @@ const ui = {
     themeLabel: 'Appearance',
     lightTheme: 'Light',
     darkTheme: 'Dark',
-    metricRecent: 'Changes in 7 days',
-    metricRecentDetail: 'Relative to the latest library date',
-    metricVerify: 'Needs official check',
-    metricVerifyDetail: 'Mirror files awaiting PACER/RECAP confirmation',
-    metricAiBacklog: 'Professional reviews pending',
+    metricRecent: '7-day changes',
+    metricRecentDetail: 'Latest library window',
+    metricVerify: 'Official check',
+    metricVerifyDetail: 'Mirror files pending PACER/RECAP',
+    metricAiBacklog: 'Review backlog',
     metricAiBacklogDetail: 'Counted by unique PDF content; a local-rule first read is not an individual professional review',
-    metricDeadline: 'Deadlines to verify',
-    metricDeadlineDetail: 'Do not rely on these as final deadlines',
-    metricOpenIssues: 'Open legal questions',
-    metricOpenIssuesDetail: 'Cross-case questions awaiting records',
-    metricBlocked: 'Limited sources',
-    metricBlockedDetail: 'Credential, rate-limit, or adapter gaps',
+    metricOpenIssues: 'Open questions',
+    metricOpenIssuesDetail: 'Awaiting records',
+    metricBlocked: 'Source limits',
+    metricBlockedDetail: 'Credentials, limits, or adapters',
     documentTabFiles: 'Files',
     documentTabReview: 'Review queue',
     documentTabAudit: 'Coverage audit',
@@ -2238,9 +2177,6 @@ const ui = {
     policyArea: 'Policy area',
     allPolicyAreas: 'All policy areas',
     monitorTermsLabel: 'Monitor terms',
-    calendarFilterAll: 'All',
-    calendarCaseFilter: 'Case filter',
-    noCalendarItems: 'No dates match the current filters.',
     positionsEyebrow: 'Litigation action index',
     positionsTitle: 'Motions, responses, and court rulings',
     positionsTotal: 'Indexed actions',
@@ -2370,8 +2306,8 @@ function formatDateParts(dateValue: string, language: Language) {
   }
 }
 
-function formatNumber(value: number, language: Language) {
-  return value.toLocaleString(localeFor(language))
+function formatNumber(value: number | null | undefined, language: Language) {
+  return Number.isFinite(value) ? Number(value).toLocaleString(localeFor(language)) : '-'
 }
 
 function formatOptionalNumber(value: number | null | undefined, language: Language) {
@@ -2548,7 +2484,6 @@ function App() {
   const [relationshipAuditLoading, setRelationshipAuditLoading] = useState(false)
   const [relationshipAuditError, setRelationshipAuditError] = useState('')
   const [monitoringProfile, setMonitoringProfile] = useState<MonitoringProfile | null>(null)
-  const [proceduralCalendar, setProceduralCalendar] = useState<ProceduralCalendar | null>(null)
   const [litigationPositions, setLitigationPositions] = useState<LitigationPositionsLibrary | null>(null)
   const [litigationPositionsLoading, setLitigationPositionsLoading] = useState(false)
   const [litigationPositionsError, setLitigationPositionsError] = useState('')
@@ -2634,12 +2569,18 @@ function App() {
       void loadLitigationPositions(language)
       return
     }
-
-    if (workspaceView === '#calendar') void loadProceduralCalendar(language)
   }, [activeHash, documentWorkspaceTab, language, workspaceView])
 
   useEffect(() => {
-    const updateActiveHash = () => setActiveHash(window.location.hash || '#timeline')
+    const updateActiveHash = () => {
+      const nextHash = window.location.hash || '#timeline'
+      if (!nextHash.startsWith('#settings') && !workspaceViews.has(nextHash as WorkspaceView)) {
+        window.history.replaceState(null, '', `${window.location.pathname}#timeline`)
+        setActiveHash('#timeline')
+        return
+      }
+      setActiveHash(nextHash)
+    }
     updateActiveHash()
     window.addEventListener('hashchange', updateActiveHash)
     return () => window.removeEventListener('hashchange', updateActiveHash)
@@ -2669,7 +2610,6 @@ function App() {
       loadDocuments(language).then(() => loadDocumentAnalysis(language)),
       loadCompletenessAudit(language),
       loadRelationshipAudit(language),
-      loadProceduralCalendar(language),
       loadLitigationPositions(language),
     ])
   }, [automationRun?.status, language])
@@ -2988,16 +2928,6 @@ function App() {
     }
   }
 
-  async function loadProceduralCalendar(nextLanguage = language) {
-    try {
-      const response = await apiFetch(`/api/calendar?lang=${nextLanguage}`)
-      if (!response.ok) return
-      setProceduralCalendar((await response.json()) as ProceduralCalendar)
-    } catch {
-      setProceduralCalendar(null)
-    }
-  }
-
   async function loadLitigationPositions(nextLanguage = language) {
     setLitigationPositionsLoading(true)
     setLitigationPositionsError('')
@@ -3181,7 +3111,7 @@ function App() {
     }
   }
 
-  if (loading) {
+  if (loading && !dashboard) {
     return (
       <main className="boot-screen">
         <Loader2 className="spin" size={28} />
@@ -3202,6 +3132,7 @@ function App() {
   const activeCase = selectedEvent ? dashboard.cases.find((caseRecord) => caseRecord.id === selectedEvent.caseId) : null
   const activeSource = selectedEvent ? sourceById(dashboard.sources, selectedEvent.sourceId) : null
   const sourceStatuses = new Map(dashboard.sourceStatuses.map((status) => [status.sourceId, status]))
+  const displayCases = dashboard.cases.filter((caseRecord) => !isStandaloneWithdrawalCaseId(caseRecord.id))
   const sortedRailSources = [...dashboard.sources].sort((a, b) => sourcePriority(a) - sourcePriority(b))
   const attentionRailSources = sortedRailSources.filter((source) => statusTone(sourceStatuses.get(source.id)?.status ?? 'not_run') !== 'ok')
   const okSourceCount = dashboard.sourceStatuses.filter((status) => status.status === 'ok').length
@@ -3227,9 +3158,8 @@ function App() {
         : 'Every unique PDF content has a version-locked professional review'
       : language === 'zh'
         ? `${formatNumber(professionalReviewCount, language)} / ${formatNumber(uniquePdfContentCount, language)} 份唯一 PDF 已专业复核；其余仍可使用本地规则初读`
-        : `${formatNumber(professionalReviewCount, language)} / ${formatNumber(uniquePdfContentCount, language)} unique PDFs are professionally reviewed; local-rule first reads remain available for the rest`
+        : `${formatNumber(professionalReviewCount, language)} / ${formatNumber(uniquePdfContentCount, language)} professionally reviewed; local first reads cover the rest`
     : text.metricAiBacklogDetail
-  const deadlineVerificationCount = proceduralCalendar?.items.filter((item) => item.status === 'needs_verification').length ?? 0
   const openIssueCount = dashboard.portfolioAnalysis.openLoops.length
   const workspaceMeta: Record<WorkspaceView, { title: string; copy: string }> = {
     '#timeline': { title: text.timelineWorkspaceTitle, copy: text.timelineWorkspaceCopy },
@@ -3238,19 +3168,19 @@ function App() {
     '#positions': { title: text.positionsWorkspaceTitle, copy: text.positionsWorkspaceCopy },
     '#entities': { title: text.entitiesWorkspaceTitle, copy: text.entitiesWorkspaceCopy },
     '#public-records': { title: text.publicRecordsWorkspaceTitle, copy: text.publicRecordsWorkspaceCopy },
+    '#ai-chat': { title: text.aiChatWorkspaceTitle, copy: text.aiChatWorkspaceCopy },
     '#policy': { title: text.policyWorkspaceTitle, copy: text.policyWorkspaceCopy },
-    '#calendar': { title: text.calendarWorkspaceTitle, copy: text.calendarWorkspaceCopy },
   }
   const activeWorkspace = workspaceMeta[workspaceView]
   const navItems = [
     { href: '#timeline', label: text.navLatest, icon: <FileText size={17} />, metric: formatNumber(dashboard.metrics.totalEvents, language) },
     { href: '#documents', label: text.navDocuments, icon: <FolderOpen size={17} />, metric: formatOptionalNumber(localDocumentCount, language) },
-    { href: '#cases', label: text.navCases, icon: <BriefcaseBusiness size={17} />, metric: formatNumber(dashboard.metrics.monitoredCases, language) },
-    { href: '#positions', label: text.navPositions, icon: <UserRoundCheck size={17} />, metric: formatNumber(litigationPositions?.counts.total ?? 0, language) },
+    { href: '#cases', label: text.navCases, icon: <BriefcaseBusiness size={17} />, metric: formatNumber(displayCases.length, language) },
+    { href: '#positions', label: text.navPositions, icon: <UserRoundCheck size={17} />, metric: formatOptionalNumber(litigationPositions?.counts.total, language) },
     { href: '#entities', label: text.navEntities, icon: <GitBranch size={17} />, metric: formatNumber(dashboard.metrics.monitoredEntities, language) },
-    { href: '#public-records', label: text.navPublicRecords, icon: <Radio size={17} />, metric: '2017–23' },
+    { href: '#public-records', label: text.navPublicRecords, icon: <Radio size={17} />, metric: '2017-2023' },
     { href: '#policy', label: text.navPolicy, icon: <Landmark size={17} />, metric: formatNumber(dashboard.policyWatch.length, language) },
-    { href: '#calendar', label: text.navCalendar, icon: <CalendarClock size={17} />, metric: formatNumber(proceduralCalendar?.items.length ?? 0, language) },
+    { href: '#ai-chat', label: text.navAiChat, icon: <BrainCircuit size={17} />, metric: '' },
   ]
 
   if (activeHash.startsWith('#settings')) {
@@ -3311,7 +3241,7 @@ function App() {
           {navItems.map((item) => (
             <a
               href={item.href}
-              className={`rail-link ${workspaceView === item.href ? 'active' : ''}`}
+              className={`rail-link ${item.href === '#ai-chat' ? 'global-tool' : ''} ${workspaceView === item.href ? 'active' : ''}`}
               aria-current={workspaceView === item.href ? 'page' : undefined}
               onClick={() => {
                 if (item.href === '#documents') setDocumentWorkspaceTab('files')
@@ -3320,7 +3250,7 @@ function App() {
             >
               {item.icon}
               <span>{item.label}</span>
-              <strong>{item.metric}</strong>
+              {item.metric && <strong>{item.metric}</strong>}
             </a>
           ))}
           </nav>
@@ -3382,8 +3312,9 @@ function App() {
 
         <div className="rail-footer">
           <p>{text.sourcePrimaryHint}</p>
-          <a href="#settings" className="rail-settings-link">
-            <span><Settings2 size={17} />{text.navSettings}</span>
+          <a href="#settings" className="rail-link rail-settings-link">
+            <Settings2 size={17} />
+            <span>{text.navSettings}</span>
             <SlidersHorizontal size={14} />
           </a>
         </div>
@@ -3394,7 +3325,7 @@ function App() {
           <div>
             <p className="header-kicker">
               <span className="live-dot" />
-              {text.headerKicker} · {dashboard.lastRefresh ? new Date(dashboard.lastRefresh.completedAt).toLocaleString(localeFor(language)) : text.notRefreshed}
+              {text.headerKicker}
             </p>
             <h2>{activeWorkspace.title}</h2>
             <p className="topbar-copy">{activeWorkspace.copy}</p>
@@ -3408,7 +3339,7 @@ function App() {
           </div>
           <div className="topbar-actions">
             <ThemeToggle theme={theme} text={text} onChange={setTheme} />
-            <div className="language-switch" aria-label="Language">
+            <div className="language-switch" aria-label={language === 'zh' ? '语言' : 'Language'}>
               <Languages size={15} />
               <button type="button" className={language === 'zh' ? 'active' : ''} onClick={() => setLanguage('zh')}>
                 {language === 'zh' ? '中文' : 'ZH'}
@@ -3417,19 +3348,15 @@ function App() {
                 EN
               </button>
             </div>
-            <div className="header-stat">
-              <span>{text.latest}</span>
-              <strong>{dashboard.events[0]?.filingNumber ? `${language === 'zh' ? '文件' : 'Doc'} ${dashboard.events[0].filingNumber}` : text.notRefreshed}</strong>
-            </div>
-            <div className="header-stat">
-              <span>{text.sources}</span>
-              <strong>{dashboard.sourceStatuses.length}</strong>
-            </div>
-            <span className="ai-mode">
-              <Bot size={16} />
-              {dashboard.aiMode}
-            </span>
-            <button className="icon-button primary" type="button" onClick={refreshSources} disabled={refreshing} title={text.refresh}>
+            <button
+              className="icon-button primary"
+              type="button"
+              onClick={refreshSources}
+              disabled={refreshing}
+              title={refreshing ? (language === 'zh' ? '正在刷新来源' : 'Refreshing sources') : text.refresh}
+              aria-label={refreshing ? (language === 'zh' ? '正在刷新来源' : 'Refreshing sources') : text.refresh}
+              aria-busy={refreshing}
+            >
               {refreshing ? <Loader2 className="spin" size={18} /> : <RefreshCw size={18} />}
               <span>{text.refresh}</span>
             </button>
@@ -3448,7 +3375,6 @@ function App() {
             <Metric tone="teal" icon={<Activity size={19} />} label={text.metricRecent} value={recentEventCount} detail={text.metricRecentDetail} language={language} />
             <Metric tone="red" icon={<ShieldAlert size={19} />} label={text.metricVerify} value={backupMirrorFileCount} detail={text.metricVerifyDetail} language={language} />
             <Metric tone="blue" icon={<Bot size={19} />} label={text.metricAiBacklog} value={aiBacklogCount} detail={aiBacklogDetail} language={language} />
-            <Metric tone="green" icon={<CalendarClock size={19} />} label={text.metricDeadline} value={deadlineVerificationCount} detail={text.metricDeadlineDetail} language={language} />
             <Metric tone="gold" icon={<BookOpenCheck size={19} />} label={text.metricOpenIssues} value={openIssueCount} detail={text.metricOpenIssuesDetail} language={language} />
             <Metric tone="amber" icon={<AlertTriangle size={19} />} label={text.metricBlocked} value={actionSourceCount} detail={text.metricBlockedDetail} language={language} />
           </section>
@@ -3535,6 +3461,10 @@ function App() {
           <PublicRecordsView language={language} />
         )}
 
+        {workspaceView === '#ai-chat' && (
+          <ResearchChatWorkspace language={language} />
+        )}
+
         {workspaceView === '#documents' && ['files', 'review'].includes(documentWorkspaceTab) && (documentAnalysis || documentAnalysisLoading || documentAnalysisError) && (
           <section className="automation-grid">
             {documentAnalysis && documentAnalysisError && (
@@ -3597,7 +3527,7 @@ function App() {
                 value={caseFilter}
                 options={[
                   { value: 'all', label: text.allCases },
-                  ...dashboard.cases.map((caseRecord) => ({ value: caseRecord.id, label: caseRecord.shortTitle })),
+                  ...displayCases.map((caseRecord) => ({ value: caseRecord.id, label: caseRecord.shortTitle })),
                 ]}
                 onChange={setCaseFilter}
                 icon={<SlidersHorizontal size={16} />}
@@ -3703,7 +3633,7 @@ function App() {
             </div>
           </div>
           <div className="case-grid">
-            {dashboard.cases.map((caseRecord) => (
+            {displayCases.map((caseRecord) => (
               <article className="case-card" key={caseRecord.id}>
                 <div className="case-card-top">
                   <span>{caseRecord.kind}</span>
@@ -3737,8 +3667,6 @@ function App() {
           </div>
         </section>}
 
-        {workspaceView === '#calendar' && proceduralCalendar && <ProceduralCalendarView calendar={proceduralCalendar} language={language} text={text} />}
-
         {workspaceView === '#entities' && (
           <>
             {documentAnalysis && (
@@ -3759,23 +3687,42 @@ function App() {
               </div>
             </div>
             <div className="entity-list">
-              {dashboard.entities.map((entity) => (
-                <article className="entity-row" key={entity.id}>
-                  <div className="entity-icon">
-                    {entity.type.includes('Person') ? <UsersRound size={18} /> : entity.type.includes('Company') ? <Building2 size={18} /> : <CircleDollarSign size={18} />}
-                  </div>
-                  <div>
-                    <h4>{entity.name}</h4>
-                    <p>{entity.role}</p>
-                    <div className="event-tags">
-                      {entity.riskAreas.slice(0, 4).map((risk) => (
-                        <span key={risk}>{risk}</span>
-                      ))}
+              {dashboard.entities.map((entity) => {
+                const canDisplayEntityImage = Boolean(entity.imagePath) && /Person|Company|Entity|人物|公司|实体/.test(entity.type)
+                return (
+                  <article className="entity-row" key={entity.id}>
+                    <div className={`entity-visual ${canDisplayEntityImage ? 'has-image' : 'is-registry'}`}>
+                      {canDisplayEntityImage ? (
+                        <img src={entity.imagePath} alt={`${entity.name} · ${text.entityIdentificationImage}`} loading="lazy" decoding="async" />
+                      ) : (
+                        <span aria-hidden="true">
+                          {entity.type.includes('Person') ? <UsersRound size={20} /> : entity.type.includes('Company') ? <Building2 size={20} /> : <CircleDollarSign size={20} />}
+                          <b>{entityMonogram(entity.name)}</b>
+                        </span>
+                      )}
+                      <small>{canDisplayEntityImage ? text.entityIdentificationImage : text.entityRegistryMark}</small>
                     </div>
-                    <ExternalLinks sourceIds={sourcesForEntity(entity, dashboard.cases)} sources={dashboard.sources} label={text.linkSources} compact />
-                  </div>
-                </article>
-              ))}
+                    <div className="entity-copy">
+                      <h4>{entity.name}</h4>
+                      <p>{entity.role}</p>
+                      <div className="event-tags">
+                        {entity.riskAreas.slice(0, 4).map((risk) => (
+                          <span key={risk}>{risk}</span>
+                        ))}
+                      </div>
+                      {canDisplayEntityImage && entity.imageSourceUrl && (
+                        <div className="entity-media-meta">
+                          <a href={safeExternalHref(entity.imageSourceUrl)} target="_blank" rel="noreferrer" title={entity.imageCredit}>
+                            {text.entityImageSource}<ArrowUpRight size={11} />
+                          </a>
+                          <span>{text.entityImageBoundary}</span>
+                        </div>
+                      )}
+                      <ExternalLinks sourceIds={sourcesForEntity(entity, dashboard.cases)} sources={dashboard.sources} label={text.linkSources} compact />
+                    </div>
+                  </article>
+                )
+              })}
             </div>
               </div>
             </section>
@@ -3809,6 +3756,11 @@ function App() {
       </main>
     </div>
   )
+}
+
+function entityMonogram(name: string) {
+  const words = name.match(/[A-Za-z0-9]+/g) ?? []
+  return words.slice(0, 3).map((word) => word[0]).join('').toUpperCase() || 'ID'
 }
 
 function ThemeToggle({ theme, text, onChange }: { theme: Theme; text: (typeof ui)[Language]; onChange: (theme: Theme) => void }) {
@@ -3993,10 +3945,11 @@ function LitigationPositionsWorkspace({
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
   const [selectedActionId, setSelectedActionId] = useState(library.actions[0]?.id ?? '')
+  const [visibleActionLimit, setVisibleActionLimit] = useState(80)
 
   const availableActions = useMemo(() => [...new Set(library.actions.map((action) => action.actionKey))], [library.actions])
   const availableStatuses = useMemo(() => [...new Set(library.actions.map((action) => action.statusKey))], [library.actions])
-  const visibleActions = useMemo(() => {
+  const filteredActions = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
     return library.actions
       .filter((action) => {
@@ -4013,7 +3966,12 @@ function LitigationPositionsWorkspace({
       })
   }, [actionFilter, caseFilter, library.actions, query, roleFilter, sortOrder, statusFilter])
 
-  const selectedAction = visibleActions.find((action) => action.id === selectedActionId) ?? visibleActions[0] ?? null
+  useEffect(() => {
+    setVisibleActionLimit(80)
+  }, [actionFilter, caseFilter, query, roleFilter, sortOrder, statusFilter])
+
+  const visibleActions = filteredActions.slice(0, visibleActionLimit)
+  const selectedAction = filteredActions.find((action) => action.id === selectedActionId) ?? filteredActions[0] ?? null
   const roleSummary: LitigationRoleKey[] = ['government', 'defense', 'court', 'third_party', 'regulator', 'trustee']
 
   return (
@@ -4064,7 +4022,7 @@ function LitigationPositionsWorkspace({
         <div className="positions-list-panel">
           <div className="pane-heading">
             <div><p className="eyebrow">{text.positionsEyebrow}</p><h3>{text.positionsTitle}</h3></div>
-            <span>{text.positionsShowing} {formatNumber(visibleActions.length, language)}</span>
+            <span>{text.positionsShowing} {formatNumber(visibleActions.length, language)} / {formatNumber(filteredActions.length, language)}</span>
           </div>
           <div className="positions-list">
             {visibleActions.map((action) => (
@@ -4077,10 +4035,10 @@ function LitigationPositionsWorkspace({
                 <time dateTime={action.date}>{formatDate(action.date, language)}</time>
                 <div>
                   <div className="position-row-meta">
-                    <span className="position-role-chip">{action.roleLabel}</span>
-                    <span>{action.actionLabel}</span>
-                    <span>{action.statusLabel}</span>
-                    {action.courtDispositionLabel && <span className="position-court-result">{action.courtDispositionLabel}</span>}
+                    <span className={`position-role-chip role-${action.roleKey}`}>{action.roleLabel}</span>
+                    <span className={`position-action-chip action-${action.actionKey}`}>{action.actionLabel}</span>
+                    <span className={`position-status-chip status-${action.statusKey}`}>{action.statusLabel}</span>
+                    {action.courtDispositionLabel && <span className={`position-court-result disposition-${action.courtDispositionKey ?? 'ordered'}`}>{action.courtDispositionLabel}</span>}
                   </div>
                   <strong>{action.title}</strong>
                   <p>{action.caseTitle} · {language === 'zh' ? '文件' : 'Doc'} {action.filingNumber}</p>
@@ -4088,7 +4046,12 @@ function LitigationPositionsWorkspace({
                 {action.requiresVerification ? <ShieldAlert size={15} /> : <ShieldCheck size={15} />}
               </button>
             ))}
-            {!visibleActions.length && <p className="positions-empty">{text.noPositionActions}</p>}
+            {!filteredActions.length && <p className="positions-empty">{text.noPositionActions}</p>}
+            {visibleActions.length < filteredActions.length && (
+              <button className="catalog-load-button positions-load-button" type="button" onClick={() => setVisibleActionLimit((current) => current + 80)}>
+                {text.loadMore} · {formatNumber(visibleActions.length, language)} / {formatNumber(filteredActions.length, language)}
+              </button>
+            )}
           </div>
         </div>
 
@@ -4098,19 +4061,19 @@ function LitigationPositionsWorkspace({
               <div className="position-detail-head">
                 <div className="position-row-meta">
                   <span className={`position-role-chip role-${selectedAction.roleKey}`}>{selectedAction.roleLabel}</span>
-                  <span>{selectedAction.actionLabel}</span>
-                  <span>{formatDate(selectedAction.date, language)}</span>
+                  <span className={`position-action-chip action-${selectedAction.actionKey}`}>{selectedAction.actionLabel}</span>
+                  <span className="position-date-chip">{formatDate(selectedAction.date, language)}</span>
                 </div>
                 <h3>{selectedAction.title}</h3>
                 <p>{selectedAction.court} · {selectedAction.docketNumber} · {language === 'zh' ? '文件' : 'Doc'} {selectedAction.filingNumber}</p>
               </div>
               <div className="position-detail-body">
                 <dl className="position-facts">
-                  <div><dt>{text.recordedAction}</dt><dd>{selectedAction.actionLabel}</dd></div>
-                  <div><dt>{text.proceduralStatusLabel}</dt><dd>{selectedAction.statusLabel}</dd></div>
-                  {selectedAction.courtDispositionLabel && <div><dt>{language === 'zh' ? '法院处理结果' : 'Court disposition'}</dt><dd>{selectedAction.courtDispositionLabel}</dd></div>}
-                  <div><dt>{text.identificationBasis}</dt><dd>{selectedAction.roleBasisLabel}</dd></div>
-                  <div><dt>{text.sourceAuthorityLabel}</dt><dd>{selectedAction.primarySource ? text.primaryRecord : text.verificationRequired}</dd></div>
+                  <div><dt>{text.recordedAction}</dt><dd><span className={`position-fact-chip position-action-chip action-${selectedAction.actionKey}`}>{selectedAction.actionLabel}</span></dd></div>
+                  <div><dt>{text.proceduralStatusLabel}</dt><dd><span className={`position-fact-chip position-status-chip status-${selectedAction.statusKey}`}>{selectedAction.statusLabel}</span></dd></div>
+                  {selectedAction.courtDispositionLabel && <div><dt>{language === 'zh' ? '法院处理结果' : 'Court disposition'}</dt><dd><span className={`position-fact-chip position-court-result disposition-${selectedAction.courtDispositionKey ?? 'ordered'}`}>{selectedAction.courtDispositionLabel}</span></dd></div>}
+                  <div><dt>{text.identificationBasis}</dt><dd><span className={`position-fact-chip position-basis-chip basis-${selectedAction.roleBasis}`}>{selectedAction.roleBasisLabel}</span></dd></div>
+                  <div><dt>{text.sourceAuthorityLabel}</dt><dd><span className={`position-fact-chip position-source-authority-chip ${selectedAction.primarySource ? 'source-primary' : 'source-verify'}`}>{selectedAction.primarySource ? text.primaryRecord : text.verificationRequired}</span></dd></div>
                 </dl>
                 <section>
                   <h4>{text.fileSummary}</h4>
@@ -4227,351 +4190,11 @@ function ExternalLinks({ sourceIds, sources, label, compact = false }: { sourceI
 }
 
 function PublicRecordsView({ language }: { language: Language }) {
-  const copy = language === 'zh' ? {
-    chronology: '时间边界',
-    archiveNote: '本板块为封存历史索引，不再等待未来直播更新；2023 年 3 月 15 日后的新增信息进入司法案卷监测。',
-    firstRecord: '历史直播起点',
-    finalRecord: '最后直播日',
-    casePhase: '被捕与案件阶段开始',
-    casePhaseDetail: '2023 年 3 月 15 日起，司法进展转入案卷时间线。',
-    officialCaseSource: '查看 DOJ 案件来源',
-    indexed: '可访问记录',
-    period: '历史期间',
-    unresolved: '未找到可用副本',
-    platforms: '可用外部平台',
-    yearDistribution: '年度记录分布',
-    search: '搜索日期、标题、转载账号或关键词',
-    allYears: '全部年份',
-    newest: '新到旧',
-    oldest: '旧到新',
-    allPlatforms: '全部',
-    results: '条记录',
-    loading: '正在读取历史索引',
-    retry: '重试',
-    empty: '当前筛选没有可显示记录。',
-    loadMore: '加载更多',
-    sourceCopy: '来源副本',
-    repost: '历史转载',
-    platformPost: '历史平台帖子',
-    sourceUploader: '发布 / 转载账号',
-    sourceTitle: '平台标题',
-    originalTitle: '原始标题',
-    duration: '时长',
-    completeness: '完整性',
-    verification: '核验状态',
-    verifiedLink: '链接和平台元数据已核验',
-    longForm: '长视频 / 可能为完整版',
-    excerpt: '节选或短片段',
-    claimedFull: '发布者标注为完整版',
-    unknown: '待通过备用副本核对',
-    openSource: '打开转载副本',
-    alternatives: '备用副本',
-    evidenceBoundary: '证据边界',
-    evidenceBoundaryCopy: '这些内容记录公开言论和历史背景，不等于法院认定其中陈述属实。案件事实仍以法院文件和正式案卷为准。',
-  } : {
-    chronology: 'Chronology boundary',
-    archiveNote: 'This is a closed historical index, not a feed awaiting future livestreams. New developments after March 15, 2023 belong in docket monitoring.',
-    firstRecord: 'Historical livestream period begins',
-    finalRecord: 'Final livestream date',
-    casePhase: 'Arrest and case phase begins',
-    casePhaseDetail: 'From March 15, 2023, judicial developments continue in the docket timeline.',
-    officialCaseSource: 'Open DOJ case source',
-    indexed: 'Accessible records',
-    period: 'Historical period',
-    unresolved: 'No accessible copy',
-    platforms: 'Available external platforms',
-    yearDistribution: 'Records by year',
-    search: 'Search date, title, uploader, or keyword',
-    allYears: 'All years',
-    newest: 'Newest first',
-    oldest: 'Oldest first',
-    allPlatforms: 'All',
-    results: 'records',
-    loading: 'Loading the historical index',
-    retry: 'Retry',
-    empty: 'No records match the current filters.',
-    loadMore: 'Load more',
-    sourceCopy: 'Source copy',
-    repost: 'Historical repost',
-    platformPost: 'Historical platform post',
-    sourceUploader: 'Publisher / repost account',
-    sourceTitle: 'Platform title',
-    originalTitle: 'Original title',
-    duration: 'Duration',
-    completeness: 'Completeness',
-    verification: 'Verification status',
-    verifiedLink: 'Link and platform metadata checked',
-    longForm: 'Long-form / potentially complete',
-    excerpt: 'Excerpt or short segment',
-    claimedFull: 'Labeled complete by the publisher',
-    unknown: 'Needs comparison with an alternate copy',
-    openSource: 'Open repost copy',
-    alternatives: 'Alternate copies',
-    evidenceBoundary: 'Evidence boundary',
-    evidenceBoundaryCopy: 'These records document public statements and historical context. They do not establish that assertions made in a video are true. Case facts remain controlled by court records and the formal docket.',
-  }
-  const platformLabels: Record<string, string> = {
-    all: copy.allPlatforms,
-    youtube: 'YouTube',
-    gettr: 'GETTR',
-    rumble: 'Rumble',
-    odysee: 'Odysee',
-    x: 'X',
-  }
-  const [library, setLibrary] = useState<PublicRecordLibrary | null>(null)
-  const [query, setQuery] = useState('')
-  const [year, setYear] = useState('all')
-  const [platform, setPlatform] = useState('all')
-  const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
-  const [selectedId, setSelectedId] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState('')
-  const [retryNonce, setRetryNonce] = useState(0)
-
-  useEffect(() => {
-    const controller = new AbortController()
-    const handle = window.setTimeout(async () => {
-      setLoading(true)
-      setError('')
-      try {
-        const params = new URLSearchParams({ lang: language, q: query, year, platform, sort, limit: '60', offset: '0' })
-        const response = await apiFetch(`/api/public-records?${params}`, { signal: controller.signal })
-        if (!response.ok) throw new Error(`API ${response.status}`)
-        const payload = await response.json() as PublicRecordLibrary
-        setLibrary(payload)
-        setSelectedId((current) => payload.records.some((record) => record.id === current) ? current : payload.records[0]?.id ?? '')
-      } catch (fetchError) {
-        if (controller.signal.aborted) return
-        setError(fetchError instanceof Error ? fetchError.message : String(fetchError))
-      } finally {
-        if (!controller.signal.aborted) setLoading(false)
-      }
-    }, query ? 280 : 0)
-    return () => {
-      window.clearTimeout(handle)
-      controller.abort()
-    }
-  }, [language, platform, query, retryNonce, sort, year])
-
-  const selected = library?.records.find((record) => record.id === selectedId) ?? library?.records[0] ?? null
-  const maxYearCount = Math.max(1, ...(library?.summary.yearCounts ?? []).map((item) => item.count))
-  const yearOptions = [
-    { value: 'all', label: copy.allYears },
-    ...(library?.summary.yearCounts ?? []).map((item) => ({ value: item.year, label: `${item.year} (${formatNumber(item.count, language)})` })),
-  ]
-
-  async function loadMoreRecords() {
-    if (!library?.hasMore || loadingMore) return
-    setLoadingMore(true)
-    setError('')
-    try {
-      const params = new URLSearchParams({
-        lang: language,
-        q: query,
-        year,
-        platform,
-        sort,
-        limit: String(library.limit),
-        offset: String(library.records.length),
-      })
-      const response = await apiFetch(`/api/public-records?${params}`)
-      if (!response.ok) throw new Error(`API ${response.status}`)
-      const payload = await response.json() as PublicRecordLibrary
-      setLibrary((current) => current ? {
-        ...payload,
-        offset: 0,
-        records: [...current.records, ...payload.records.filter((record) => !current.records.some((existing) => existing.id === record.id))],
-      } : payload)
-    } catch (fetchError) {
-      setError(fetchError instanceof Error ? fetchError.message : String(fetchError))
-    } finally {
-      setLoadingMore(false)
-    }
-  }
-
-  const completenessLabel = (value: string) => ({
-    long_form: copy.longForm,
-    excerpt: copy.excerpt,
-    publisher_claims_full: copy.claimedFull,
-    unknown: copy.unknown,
-  })[value] ?? copy.unknown
-
   return (
-    <section className="public-record-workspace">
-      <div className="public-record-boundary">
-        <div className="public-record-boundary-heading">
-          <History size={18} />
-          <div>
-            <span>{copy.chronology}</span>
-            <small>{copy.archiveNote}</small>
-          </div>
-        </div>
-        <div className="public-record-boundary-track">
-          <div>
-            <span>2017.01.26</span>
-            <strong>{copy.firstRecord}</strong>
-          </div>
-          <div>
-            <span>2023.03.14</span>
-            <strong>{copy.finalRecord}</strong>
-          </div>
-          <div className="case-phase-marker">
-            <span>2023.03.15</span>
-            <strong>{copy.casePhase}</strong>
-            <small>{copy.casePhaseDetail}</small>
-            <a href={safeExternalHref('https://www.justice.gov/usao-sdny/pr/ho-wan-kwok-also-known-miles-guo-and-william-je-charged-orchestrating-over-1-billion')} target="_blank" rel="noreferrer">
-              {copy.officialCaseSource}<ArrowUpRight size={12} />
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div className="public-record-summary" aria-label={copy.indexed}>
-        <div><Radio size={17} /><span>{copy.indexed}</span><strong>{formatOptionalNumber(library?.summary.totalRecords ?? null, language)}</strong></div>
-        <div><History size={17} /><span>{copy.period}</span><strong>2017–2023</strong></div>
-        <div><Link2 size={17} /><span>{copy.unresolved}</span><strong>{formatOptionalNumber(library?.summary.unresolvedSourceLeads ?? null, language)}</strong></div>
-        <div><PlayCircle size={17} /><span>{copy.platforms}</span><strong>{Object.values(library?.summary.platformCounts ?? {}).filter((count) => count > 0).length || '—'}</strong></div>
-      </div>
-
-      <div className="public-record-year-chart" aria-label={copy.yearDistribution}>
-        <div className="public-record-year-chart-label"><Activity size={16} /><span>{copy.yearDistribution}</span></div>
-        <div className="public-record-year-bars">
-          {(library?.summary.yearCounts ?? []).map((item) => (
-            <button
-              type="button"
-              className={year === item.year ? 'active' : ''}
-              onClick={() => setYear((current) => current === item.year ? 'all' : item.year)}
-              aria-pressed={year === item.year}
-              title={`${item.year}: ${formatNumber(item.count, language)}`}
-              key={item.year}
-            >
-              <span><i style={{ height: `${Math.max(8, Math.round(item.count / maxYearCount * 100))}%` }} /></span>
-              <strong>{item.year}</strong>
-              <small>{formatNumber(item.count, language)}</small>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="public-record-toolbar">
-        <label className="search-box public-record-search">
-          <Search size={17} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} />
-        </label>
-        <CustomSelect
-          className="public-record-select"
-          value={year}
-          options={yearOptions}
-          onChange={setYear}
-          icon={<CalendarClock size={16} />}
-          ariaLabel={copy.allYears}
-        />
-        <CustomSelect
-          className="public-record-select"
-          value={sort}
-          options={[{ value: 'newest', label: copy.newest }, { value: 'oldest', label: copy.oldest }]}
-          onChange={(value) => setSort(value === 'oldest' ? 'oldest' : 'newest')}
-          icon={<ArrowDownUp size={16} />}
-          ariaLabel={copy.newest}
-        />
-      </div>
-
-      <div className="public-record-platforms" role="group" aria-label={copy.platforms}>
-        {['all', 'youtube', 'gettr', 'rumble', 'odysee', 'x'].filter((item) => item === 'all' || (library?.summary.platformCounts[item] ?? 0) > 0).map((item) => (
-          <button type="button" className={platform === item ? 'active' : ''} onClick={() => setPlatform(item)} key={item}>
-            {platformLabels[item]}
-            {item !== 'all' && library?.summary.platformCounts[item] ? <span>{formatNumber(library.summary.platformCounts[item], language)}</span> : null}
-          </button>
-        ))}
-      </div>
-
-      {error && <div className="catalog-error"><AlertTriangle size={16} /><span>{error}</span><button type="button" onClick={() => setRetryNonce((current) => current + 1)}>{copy.retry}</button></div>}
-
-      <div className="public-record-grid">
-        <div className="public-record-list-pane">
-          <div className="public-record-list-heading">
-            <span>{formatOptionalNumber(library?.total ?? null, language)} {copy.results}</span>
-            {loading && <Loader2 className="spin" size={16} />}
-          </div>
-          {loading && !library ? (
-            <div className="public-record-loading"><Loader2 className="spin" size={20} /><span>{copy.loading}</span></div>
-          ) : library?.records.length ? (
-            <div className="public-record-list">
-              {library.records.map((record) => (
-                <button type="button" className={record.id === selected?.id ? 'active' : ''} onClick={() => setSelectedId(record.id)} key={record.id}>
-                  <time>{formatDate(record.date, language)}</time>
-                  <strong>{record.title}</strong>
-                  {record.originalTitle && record.originalTitle !== record.title && <small>{record.originalTitle}</small>}
-                  <span><b>{platformLabels[record.primarySource.platform]}</b>{record.primarySource.uploader || copy.repost}</span>
-                </button>
-              ))}
-              {library.hasMore && (
-                <button className="public-record-load-more" type="button" onClick={loadMoreRecords} disabled={loadingMore}>
-                  {loadingMore ? <Loader2 className="spin" size={16} /> : <Plus size={16} />}{copy.loadMore}
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="public-record-empty">{copy.empty}</div>
-          )}
-        </div>
-
-        <article className="public-record-detail">
-          {selected ? (
-            <>
-              <div className="public-record-detail-head">
-                <div>
-                  <span>{formatDate(selected.date, language)} · {platformLabels[selected.primarySource.platform]}</span>
-                  <h3>{selected.title}</h3>
-                  {selected.originalTitle && selected.originalTitle !== selected.title && <p><b>{copy.originalTitle}</b>{selected.originalTitle}</p>}
-                </div>
-                <a className="public-record-open" href={safeExternalHref(selected.primarySource.url)} target="_blank" rel="noreferrer">
-                  <PlayCircle size={16} />{copy.openSource}<ArrowUpRight size={13} />
-                </a>
-              </div>
-              <p className="public-record-summary-copy">{selected.summary}</p>
-
-              <dl className="public-record-facts">
-                <div><dt>{copy.sourceCopy}</dt><dd>{selected.primarySource.role === 'historical_platform_post' ? copy.platformPost : copy.repost}</dd></div>
-                <div><dt>{copy.sourceUploader}</dt><dd>{selected.primarySource.uploader || '—'}</dd></div>
-                <div><dt>{copy.duration}</dt><dd>{formatPublicRecordDuration(selected.primarySource.durationSec, language)}</dd></div>
-                <div><dt>{copy.completeness}</dt><dd>{completenessLabel(selected.completeness)}</dd></div>
-                <div><dt>{copy.verification}</dt><dd>{copy.verifiedLink}</dd></div>
-                <div><dt>{copy.sourceTitle}</dt><dd>{selected.primarySource.sourceTitle || selected.originalTitle || '—'}</dd></div>
-              </dl>
-
-              {selected.alternatives.length > 0 && (
-                <div className="public-record-alternatives">
-                  <h4>{copy.alternatives}</h4>
-                  {selected.alternatives.map((source) => (
-                    <a href={safeExternalHref(source.url)} target="_blank" rel="noreferrer" key={source.url}>
-                      <span><b>{platformLabels[source.platform]}</b>{source.uploader || copy.repost}</span>
-                      <ArrowUpRight size={13} />
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              <div className="public-record-evidence-boundary">
-                <ShieldAlert size={17} />
-                <div><strong>{copy.evidenceBoundary}</strong><p>{copy.evidenceBoundaryCopy}</p></div>
-              </div>
-            </>
-          ) : <div className="public-record-empty">{copy.empty}</div>}
-        </article>
-      </div>
+    <section className="public-record-workspace public-record-unified">
+      <TranscriptResearchPanel language={language} />
     </section>
   )
-}
-
-function formatPublicRecordDuration(seconds: number | null, language: Language) {
-  if (!seconds || seconds <= 0) return language === 'zh' ? '未记录' : 'Not recorded'
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const remainingSeconds = Math.floor(seconds % 60)
-  if (language === 'zh') return hours ? `${hours} 小时 ${minutes} 分` : `${minutes} 分 ${remainingSeconds} 秒`
-  return hours ? `${hours}h ${minutes}m` : `${minutes}m ${remainingSeconds}s`
 }
 
 function PolicyWorkspace({ policies, sources, text }: { policies: PolicyWatch[]; sources: SourceRecord[]; text: (typeof ui)[Language] }) {
@@ -4609,85 +4232,6 @@ function PolicyWorkspace({ policies, sources, text }: { policies: PolicyWatch[];
           ))}
         </div>
       </div>
-    </section>
-  )
-}
-
-function ProceduralCalendarView({ calendar, language, text }: { calendar: ProceduralCalendar; language: Language; text: (typeof ui)[Language] }) {
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [caseFilter, setCaseFilter] = useState('all')
-  const [visibleLimit, setVisibleLimit] = useState(24)
-  const known = calendar.items.filter((item) => item.status === 'known').length
-  const inferred = calendar.items.filter((item) => item.status === 'inferred').length
-  const verify = calendar.items.length - known - inferred
-  const cases = [...new Map(calendar.items.map((item) => [item.caseId, item.caseTitle])).entries()]
-  const filteredItems = calendar.items.filter((item) => (statusFilter === 'all' || item.status === statusFilter) && (caseFilter === 'all' || item.caseId === caseFilter))
-  const visibleItems = filteredItems.slice(0, visibleLimit)
-  const updateStatusFilter = (value: string) => {
-    setStatusFilter(value)
-    setVisibleLimit(24)
-  }
-  const updateCaseFilter = (value: string) => {
-    setCaseFilter(value)
-    setVisibleLimit(24)
-  }
-  return (
-    <section className="calendar-panel" id="calendar">
-      <div className="section-heading calendar-heading">
-        <div>
-          <p className="eyebrow">{text.calendarEyebrow}</p>
-          <h3>{text.calendarTitle}</h3>
-        </div>
-        <div className="calendar-totals">
-          <span><strong>{formatNumber(known, language)}</strong>{text.calendarKnown}</span>
-          <span><strong>{formatNumber(verify, language)}</strong>{text.calendarNeedsVerification}</span>
-          <span><strong>{formatNumber(inferred, language)}</strong>{text.calendarInferred}</span>
-        </div>
-      </div>
-      <div className="calendar-filters">
-        <div className="filter-tabs" role="group" aria-label={text.calendarTitle}>
-          {[
-            ['all', text.calendarFilterAll],
-            ['known', text.calendarKnown],
-            ['needs_verification', text.calendarNeedsVerification],
-            ['inferred', text.calendarInferred],
-          ].map(([value, label]) => <button type="button" className={statusFilter === value ? 'active' : ''} onClick={() => updateStatusFilter(value)} key={value}>{label}</button>)}
-        </div>
-        <CustomSelect
-          className="select-box"
-          value={caseFilter}
-          options={[{ value: 'all', label: text.calendarCaseFilter }, ...cases.map(([value, label]) => ({ value, label }))]}
-          onChange={updateCaseFilter}
-          icon={<BriefcaseBusiness size={15} />}
-          ariaLabel={text.calendarCaseFilter}
-        />
-      </div>
-      <div className="calendar-disclaimer"><ShieldAlert size={15} /><span>{calendar.disclaimer}</span></div>
-      <div className="calendar-list">
-        {visibleItems.map((item) => (
-          <article className="calendar-row" key={item.id}>
-            <time dateTime={item.date}><strong>{formatDate(item.date, language)}</strong><span>{item.deadlineType}</span></time>
-            <div>
-              <div className="calendar-row-title">
-                <span className={`calendar-status status-${item.status}`}>{item.statusLabel}</span>
-                <strong>{item.title}</strong>
-              </div>
-              <p>{item.caseTitle} · {item.docket}</p>
-              <small>{item.note}</small>
-            </div>
-            <a href={safeExternalHref(item.sourceUrl)} target="_blank" rel="noreferrer" title={item.sourceTier}>
-              <span>{text.calendarBasis}: {item.basisDoc}</span>
-              <ArrowUpRight size={13} />
-            </a>
-          </article>
-        ))}
-        {!filteredItems.length && <p className="calendar-empty">{text.noCalendarItems}</p>}
-      </div>
-      {visibleItems.length < filteredItems.length && (
-        <button className="catalog-load-button calendar-load-button" type="button" onClick={() => setVisibleLimit((current) => current + 24)}>
-          {text.loadMore} · {formatNumber(visibleItems.length, language)} / {formatNumber(filteredItems.length, language)}
-        </button>
-      )}
     </section>
   )
 }
@@ -4788,12 +4332,14 @@ function IntelligenceBoard({
     label: graphNodeLabels.get(node.id) ?? node.label,
   }))
   const graphLinks = library.analytics.relationshipGraph.links
+  const displayCaseMatrix = library.analytics.caseMatrix.filter((row) => !isStandaloneWithdrawalCaseId(row.caseId))
+  const displayCaseDossiers = library.caseDossiers.filter((dossier) => !isStandaloneWithdrawalCaseId(dossier.caseId))
   const heading = view === 'documents' ? text.intelligenceBoard : view === 'cases' ? text.caseMatrix : text.relationshipMap
   const eyebrow = view === 'documents' ? text.intelligenceBoardEyebrow : view === 'cases' ? text.casePortfolioEyebrow : text.entityEyebrow
   const badge = view === 'documents'
     ? (dashboard.generatedAt ? new Date(dashboard.generatedAt).toLocaleString(localeFor(language)) : dashboard.aiMode)
     : view === 'cases'
-      ? formatNumber(library.caseDossiers.length, language)
+      ? formatNumber(displayCaseDossiers.length, language)
       : `${formatNumber(graphLinks.length, language)} ${language === 'zh' ? '条关系' : 'links'}`
   return (
     <section className={`intel-board intel-board-${view}`}>
@@ -4902,16 +4448,16 @@ function IntelligenceBoard({
           </div>
           <span className="panel-badge">
             <Landmark size={14} />
-            {formatNumber(library.analytics.caseMatrix.length, language)}
+            {formatNumber(displayCaseMatrix.length, language)}
           </span>
         </div>
         <div className="case-matrix-grid">
-          {library.analytics.caseMatrix.slice(0, visibleCaseRows).map((row) => (
+          {displayCaseMatrix.slice(0, visibleCaseRows).map((row) => (
             <article className="case-matrix-row" key={row.caseId}>
               <div>
                 <strong>{row.shortTitle}</strong>
                 <span>{row.docket}</span>
-                <p><b>{text.caseStage}</b>{row.stage}</p>
+                <p><b>{text.caseStage}:</b> {row.stage}</p>
                 {library.caseDossiers.find((dossier) => dossier.caseId === row.caseId)?.controllingDocs[0] && (() => {
                   const document = library.caseDossiers.find((dossier) => dossier.caseId === row.caseId)?.controllingDocs[0]
                   return document ? <a className="matrix-controlling-doc" href={safeExternalHref(document.sourceUrl)} target="_blank" rel="noreferrer"><span>{text.latestControllingDoc}</span>{document.docNumber ? `${language === 'zh' ? '文件' : 'Doc'} ${document.docNumber}` : document.title}<ArrowUpRight size={12} /></a> : null
@@ -4929,7 +4475,7 @@ function IntelligenceBoard({
                 return (
                   <div className="case-matrix-next">
                     <span><strong>{text.unresolvedIssues}</strong>{formatNumber(dossier?.unresolvedIssues.length ?? caseRecord?.watchQuestions.length ?? 0, language)}</span>
-                    <p><b>{text.nextQuestion}</b>{dossier?.unresolvedIssues[0] ?? caseRecord?.watchQuestions[0] ?? caseRecord?.focus}</p>
+                    <p><b>{text.nextQuestion}:</b> {dossier?.unresolvedIssues[0] ?? caseRecord?.watchQuestions[0] ?? caseRecord?.focus}</p>
                     {dossier?.aiDossier?.generatedAt && (
                       <small>
                         {caseDossierProviderLabel(dossier.aiDossier, language)} · {text.aiDossierUpdated}: {new Date(dossier.aiDossier.generatedAt).toLocaleString(localeFor(language))}
@@ -4941,9 +4487,9 @@ function IntelligenceBoard({
             </article>
           ))}
         </div>
-        {visibleCaseRows < library.analytics.caseMatrix.length && (
+        {visibleCaseRows < displayCaseMatrix.length && (
           <button className="catalog-load-button case-load-button" type="button" onClick={() => setVisibleCaseRows((current) => current + 8)}>
-            {text.loadMore} · {formatNumber(visibleCaseRows, language)} / {formatNumber(library.analytics.caseMatrix.length, language)}
+            {text.loadMore} · {formatNumber(visibleCaseRows, language)} / {formatNumber(displayCaseMatrix.length, language)}
           </button>
         )}
       </div>
@@ -4956,11 +4502,11 @@ function IntelligenceBoard({
           </div>
           <span className="panel-badge">
             <BookOpenCheck size={14} />
-            {formatNumber(library.caseDossiers.length, language)}
+            {formatNumber(displayCaseDossiers.length, language)}
           </span>
         </div>
         <div className="dossier-grid">
-          {library.caseDossiers.slice(0, visibleDossiers).map((dossier) => (
+          {displayCaseDossiers.slice(0, visibleDossiers).map((dossier) => (
             <CaseDossierCard
               dossier={dossier}
               language={language}
@@ -4973,9 +4519,9 @@ function IntelligenceBoard({
             />
           ))}
         </div>
-        {visibleDossiers < library.caseDossiers.length && (
+        {visibleDossiers < displayCaseDossiers.length && (
           <button className="catalog-load-button case-load-button" type="button" onClick={() => setVisibleDossiers((current) => current + 8)}>
-            {text.loadMore} · {formatNumber(visibleDossiers, language)} / {formatNumber(library.caseDossiers.length, language)}
+            {text.loadMore} · {formatNumber(visibleDossiers, language)} / {formatNumber(displayCaseDossiers.length, language)}
           </button>
         )}
       </div>
@@ -5505,10 +5051,10 @@ function RelationshipGraph({
           <div className="graph-canvas-toolbar">
             <div><span>{focusLabel}</span><strong>{selectedNode?.label ?? text.noRelationshipLinks}</strong></div>
             <div className="graph-zoom-controls">
-              <button type="button" onClick={() => setGraphZoom((zoom) => Math.max(0.75, Number((zoom - 0.1).toFixed(2))))} disabled={graphZoom <= 0.75} title={text.zoomOut}><Minus size={15} /></button>
+              <button type="button" onClick={() => setGraphZoom((zoom) => Math.max(0.75, Number((zoom - 0.1).toFixed(2))))} disabled={graphZoom <= 0.75} title={text.zoomOut} aria-label={text.zoomOut}><Minus size={15} /></button>
               <span>{Math.round(graphZoom * 100)}%</span>
-              <button type="button" onClick={() => setGraphZoom((zoom) => Math.min(1.4, Number((zoom + 0.1).toFixed(2))))} disabled={graphZoom >= 1.4} title={text.zoomIn}><Plus size={15} /></button>
-              <button type="button" onClick={resetViewport} title={resetViewLabel}><RefreshCw size={14} /></button>
+              <button type="button" onClick={() => setGraphZoom((zoom) => Math.min(1.4, Number((zoom + 0.1).toFixed(2))))} disabled={graphZoom >= 1.4} title={text.zoomIn} aria-label={text.zoomIn}><Plus size={15} /></button>
+              <button type="button" onClick={resetViewport} title={resetViewLabel} aria-label={resetViewLabel}><RefreshCw size={14} /></button>
             </div>
           </div>
           <svg
@@ -5658,7 +5204,7 @@ function CaseDossierCard({
         <strong>{dossier.docket}</strong>
       </div>
       <h4>{dossier.shortTitle}</h4>
-      <p>{dossier.plainRead}</p>
+      <p>{caseDossierPreview(dossier.plainRead, language)}</p>
       <div className="dossier-metrics">
         <span><strong>{formatNumber(dossier.metrics.events, language)}</strong>{text.eventsShort}</span>
         <span><strong>{formatNumber(dossier.metrics.documents, language)}</strong>{text.docsShort}</span>
@@ -5690,6 +5236,13 @@ function CaseDossierCard({
       </div>
     </article>
   )
+}
+
+function caseDossierPreview(value: string, language: Language) {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  const marker = language === 'zh' ? '当前要核对的核心问题是：' : 'The immediate issues are:'
+  const markerIndex = normalized.indexOf(marker)
+  return markerIndex > 0 ? normalized.slice(0, markerIndex).trim() : normalized
 }
 
 function CaseDossierDialog({
@@ -5849,6 +5402,12 @@ function compactAuditError(value: string, language: Language = 'zh') {
     ? `${sourceLabel}网络请求失败或超时`
     : `${sourceLabel}network request failed or timed out`
   return text.slice(0, 220)
+}
+
+function diagnosticMessage(value: string, language: Language) {
+  return /fetch failed|HTTP\s+429|rate limit exceeded|throttled/i.test(value)
+    ? compactAuditError(value, language)
+    : value
 }
 
 function CompletenessAuditView({
@@ -6267,15 +5826,18 @@ function DocumentAnalysisView({
   const [catalogQuery, setCatalogQuery] = useState('')
   const [catalogPriority, setCatalogPriority] = useState<'all' | Severity>('all')
   const [catalogScope, setCatalogScope] = useState<DocumentSearchScope>('all')
-  const [catalogRows, setCatalogRows] = useState<DocumentAnalysisRecord[]>(() => library.catalog)
-  const [catalogPage, setCatalogPage] = useState(library.catalogPage)
+  const [catalogRows, setCatalogRows] = useState<DocumentAnalysisRecord[]>([])
+  const [catalogPage, setCatalogPage] = useState<DocumentAnalysisLibrary['catalogPage']>(() => ({
+    ...library.catalogPage,
+    total: 0,
+    filtered: 0,
+    hasMore: false,
+  }))
   const [catalogSearchStatus, setCatalogSearchStatus] = useState<DocumentCatalogPage['search']>(undefined)
-  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogLoading, setCatalogLoading] = useState(mode === 'files')
   const [catalogError, setCatalogError] = useState('')
-  const catalogRequestRef = useRef('')
   const catalogSequenceRef = useRef(0)
   const catalogAbortRef = useRef<AbortController | null>(null)
-  const catalogLanguageRef = useRef(language)
   const stats = mode === 'files' ? [
     { label: language === 'zh' ? '本地来源文件' : 'Local source files', value: library.counts.localAvailable },
     { label: language === 'zh' ? '唯一 PDF 内容' : 'Unique PDF contents', value: library.counts.uniquePdfContents },
@@ -6293,12 +5855,9 @@ function DocumentAnalysisView({
   ]
   const fetchCatalogPage = useCallback(async (offset: number, append: boolean) => {
     const normalizedQuery = catalogQuery.trim()
-    const requestKey = `${language}:${catalogScope}:${catalogPriority}:${normalizedQuery}:${offset}:${append ? 'append' : 'replace'}`
-    if (catalogRequestRef.current === requestKey) return
     catalogAbortRef.current?.abort()
     const controller = new AbortController()
     catalogAbortRef.current = controller
-    catalogRequestRef.current = requestKey
     const requestSequence = catalogSequenceRef.current + 1
     catalogSequenceRef.current = requestSequence
     const params = new URLSearchParams({
@@ -6326,8 +5885,15 @@ function DocumentAnalysisView({
       setCatalogSearchStatus(payload.search)
       setCatalogRows((current) => {
         if (!append) return payload.catalog
-        const seen = new Set(current.map((record) => record.id))
-        return [...current, ...payload.catalog.filter((record) => !seen.has(record.id))]
+        const seenIds = new Set(current.map((record) => record.id))
+        const seenSources = new Set(current.map((record) => record.sourceUrl))
+        const additions = payload.catalog.filter((record) => {
+          if (seenIds.has(record.id) || seenSources.has(record.sourceUrl)) return false
+          seenIds.add(record.id)
+          seenSources.add(record.sourceUrl)
+          return true
+        })
+        return [...current, ...additions]
       })
     } catch (fetchError) {
       if (fetchError instanceof DOMException && fetchError.name === 'AbortError') return
@@ -6336,28 +5902,18 @@ function DocumentAnalysisView({
     } finally {
       if (requestSequence === catalogSequenceRef.current) {
         setCatalogLoading(false)
-        catalogRequestRef.current = ''
         if (catalogAbortRef.current === controller) catalogAbortRef.current = null
       }
     }
   }, [catalogPriority, catalogQuery, catalogScope, language])
 
   useEffect(() => {
-    if (catalogQuery.trim() || catalogPriority !== 'all' || catalogScope !== 'all') return
-    const languageChanged = catalogLanguageRef.current !== language
-    catalogLanguageRef.current = language
-    if (!languageChanged && catalogRows.length > library.catalogPage.limit) return
-    setCatalogRows(library.catalog)
-    setCatalogPage(library.catalogPage)
-    setCatalogError('')
-  }, [catalogPriority, catalogQuery, catalogRows.length, catalogScope, language, library.generatedAt, library.catalog, library.catalogPage])
-
-  useEffect(() => {
+    if (mode !== 'files') return undefined
     const handle = window.setTimeout(() => {
       void fetchCatalogPage(0, false)
     }, catalogQuery.trim() ? 220 : 0)
     return () => window.clearTimeout(handle)
-  }, [catalogQuery, fetchCatalogPage])
+  }, [catalogQuery, fetchCatalogPage, language, library.generatedAt, mode])
 
   useEffect(() => () => catalogAbortRef.current?.abort(), [])
 
@@ -6372,7 +5928,7 @@ function DocumentAnalysisView({
 
   function loadMoreCatalog() {
     if (catalogLoading) return
-    void fetchCatalogPage(catalogRows.length, true)
+    void fetchCatalogPage(catalogPage.offset + catalogPage.limit, true)
   }
 
   return (
@@ -6603,7 +6159,7 @@ function SettingsView({
   onTestLocalAi: () => void
 }) {
   const [draft, setDraft] = useState<AppSettingsRecord | null>(payload?.settings ?? null)
-  const [activeSection, setActiveSection] = useState('settings-overview')
+  const [activeSection, setActiveSection] = useState(() => window.location.hash.startsWith('#settings-') ? window.location.hash.slice(1) : 'settings-overview')
   const settingsGridRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     if (payload?.settings) setDraft(payload.settings)
@@ -6754,6 +6310,10 @@ function SettingsView({
   const configuredCloudProviders = Object.entries(cloudProviderSecretKeys).filter(([, secretKey]) => payload.secrets[secretKey]?.configured).map(([provider]) => provider)
   const selectedCloudReady = selectedCloudProviders.length > 0 && selectedCloudProviders.every((provider) => payload.secrets[cloudProviderSecretKeys[provider]]?.configured)
   const localAiEnabled = draft.aiProvider === 'ollama' || draft.translationProvider === 'ollama'
+  const compatibleAiEnabled = draft.aiProvider === 'openai_compatible' || draft.translationProvider === 'openai_compatible'
+  const cloudAnalysisEnabled = draft.aiProvider in cloudProviderSecretKeys
+  const cloudTranslationEnabled = draft.translationProvider in cloudProviderSecretKeys
+  const generativeProviderEnabled = selectedCloudProviders.length > 0 || localAiEnabled
   const localAiReady = diagnosticFor('local-ai')?.status === 'ok'
   const connectedState = (id: string, configured: boolean): CapabilityState => {
     if (!configured) return 'needs_setup'
@@ -6775,6 +6335,7 @@ function SettingsView({
     { id: 'nfsc-criminal-mirror', label: text.sourceNfsc, detail: text.capabilityNfscDetail, state: 'limited', diagnostic: diagnosticFor('nfsc-criminal-mirror') as SourceStatus | null },
   ]
   const hasUnsavedSecrets = Object.values(draftSecrets).some((value) => value !== undefined)
+  const hasUnsavedSettings = hasUnsavedSecrets || JSON.stringify(draft) !== JSON.stringify(payload.settings)
   const aiSettingsChanged = draft.aiModel !== payload.settings.aiModel
     || draft.translationModel !== payload.settings.translationModel
     || draft.compatibleAiBaseUrl !== payload.settings.compatibleAiBaseUrl
@@ -6801,7 +6362,7 @@ function SettingsView({
               <button type="button" className={language === 'zh' ? 'active' : ''} onClick={() => onLanguageChange('zh')}>{language === 'zh' ? '中文' : 'ZH'}</button>
               <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => onLanguageChange('en')}>EN</button>
             </div>
-            <button className="settings-save-button" type="button" onClick={() => onSave(draft)} disabled={saving}>
+            <button className="settings-save-button" type="button" onClick={() => onSave(draft)} disabled={saving || !hasUnsavedSettings}>
               {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />}
               {saving ? text.saving : text.saveSettings}
             </button>
@@ -6811,13 +6372,13 @@ function SettingsView({
         <div className="settings-layout">
           <aside className="settings-sidebar">
             <nav aria-label={text.settingsNavLabel}>
-              <a className={activeSection === 'settings-overview' ? 'active' : ''} href="#settings-overview"><ClipboardCheck size={15} />{text.settingsOverview}</a>
-              <a className={activeSection === 'settings-credentials' ? 'active' : ''} href="#settings-credentials"><KeyRound size={15} />{text.settingsCredentials}</a>
-              <a className={activeSection === 'settings-ai' ? 'active' : ''} href="#settings-ai"><Bot size={15} />{text.settingsAiPrivacy}</a>
-              <a className={activeSection === 'settings-automation' ? 'active' : ''} href="#settings-automation"><RefreshCw size={15} />{text.settingsAutomation}</a>
-              <a className={activeSection === 'settings-processing' ? 'active' : ''} href="#settings-processing"><ScanText size={15} />{text.settingsProcessing}</a>
-              <a className={activeSection === 'settings-pacer' ? 'active' : ''} href="#settings-pacer"><Scale size={15} />{text.settingsPacer}</a>
-              <a className={activeSection === 'settings-diagnostics' ? 'active' : ''} href="#settings-diagnostics"><DatabaseZap size={15} />{text.settingsData}</a>
+              <a className={activeSection === 'settings-overview' ? 'active' : ''} href="#settings-overview" onClick={() => setActiveSection('settings-overview')}><ClipboardCheck size={15} />{text.settingsOverview}</a>
+              <a className={activeSection === 'settings-credentials' ? 'active' : ''} href="#settings-credentials" onClick={() => setActiveSection('settings-credentials')}><KeyRound size={15} />{text.settingsCredentials}</a>
+              <a className={activeSection === 'settings-ai' ? 'active' : ''} href="#settings-ai" onClick={() => setActiveSection('settings-ai')}><Bot size={15} />{text.settingsAiPrivacy}</a>
+              <a className={activeSection === 'settings-automation' ? 'active' : ''} href="#settings-automation" onClick={() => setActiveSection('settings-automation')}><RefreshCw size={15} />{text.settingsAutomation}</a>
+              <a className={activeSection === 'settings-processing' ? 'active' : ''} href="#settings-processing" onClick={() => setActiveSection('settings-processing')}><ScanText size={15} />{text.settingsProcessing}</a>
+              <a className={activeSection === 'settings-pacer' ? 'active' : ''} href="#settings-pacer" onClick={() => setActiveSection('settings-pacer')}><Scale size={15} />{text.settingsPacer}</a>
+              <a className={activeSection === 'settings-diagnostics' ? 'active' : ''} href="#settings-diagnostics" onClick={() => setActiveSection('settings-diagnostics')}><DatabaseZap size={15} />{text.settingsData}</a>
             </nav>
             <div className="settings-local-state">
               <span><LockKeyhole size={14} />{text.localOnly}</span>
@@ -6942,36 +6503,42 @@ function SettingsView({
           <SettingsCard id="settings-ai" icon={<Bot size={18} />} eyebrow={text.aiTitle} title={text.aiTitle}>
             <div className="settings-form-grid two">
               <SettingSelect label={text.aiProvider} value={draft.aiProvider} options={cloudProviderOptions} onChange={(value) => update('aiProvider', value)} />
-              <SettingInput label={text.aiModel} value={draft.aiModel} onChange={(value) => update('aiModel', value)} />
-              <SettingSelect label={text.aiReasoningEffort} value={draft.aiReasoningEffort} options={[["none", text.reasoningNone], ["low", text.reasoningLow], ["medium", text.reasoningMedium], ["high", text.reasoningHigh], ["xhigh", text.reasoningXHigh], ["max", text.reasoningMax]]} onChange={(value) => update('aiReasoningEffort', value)} />
               <SettingSelect label={text.translationProvider} value={draft.translationProvider} options={cloudProviderOptions.map(([value, label]) => [value, value === 'local' ? text.noCloudTranslation : label])} onChange={(value) => update('translationProvider', value)} />
-              <SettingInput label={text.translationModel} value={draft.translationModel} onChange={(value) => update('translationModel', value)} />
-              <SettingInput label={text.compatibleAiBaseUrl} value={draft.compatibleAiBaseUrl} onChange={(value) => update('compatibleAiBaseUrl', value)} />
+              {cloudAnalysisEnabled && <SettingInput label={text.aiModel} value={draft.aiModel} onChange={(value) => update('aiModel', value)} />}
+              {cloudAnalysisEnabled && <SettingSelect label={text.aiReasoningEffort} value={draft.aiReasoningEffort} options={[["none", text.reasoningNone], ["low", text.reasoningLow], ["medium", text.reasoningMedium], ["high", text.reasoningHigh], ["xhigh", text.reasoningXHigh], ["max", text.reasoningMax]]} onChange={(value) => update('aiReasoningEffort', value)} />}
+              {cloudTranslationEnabled && <SettingInput label={text.translationModel} value={draft.translationModel} onChange={(value) => update('translationModel', value)} />}
+              {compatibleAiEnabled && <SettingInput label={text.compatibleAiBaseUrl} value={draft.compatibleAiBaseUrl} onChange={(value) => update('compatibleAiBaseUrl', value)} />}
             </div>
-            <div className="settings-form-grid two">
+            {localAiEnabled && <div className="settings-form-grid two">
               <SettingInput label={text.localAiBaseUrl} value={draft.localAiBaseUrl} onChange={(value) => update('localAiBaseUrl', value)} />
               <SettingInput label={text.localAiModel} value={draft.localAiModel} onChange={(value) => update('localAiModel', value)} />
               <SettingNumber label={text.localAiTimeout} value={draft.localAiTimeoutMs} min={10000} max={600000} step={1000} onChange={(value) => update('localAiTimeoutMs', value)} />
               <SettingNumber label={text.localAiContext} value={draft.localAiContextChars} min={20000} max={500000} step={10000} onChange={(value) => update('localAiContextChars', value)} />
-            </div>
-            <div className="settings-info"><Cpu size={15} />{text.reasoningDetail}</div>
-            <div className="settings-info"><ShieldAlert size={15} />{text.modelQualityDetail}</div>
-            <div className="settings-info"><Network size={15} />{text.compatibleAiDetail}</div>
-            <div className="settings-info"><Bot size={15} />{text.localAiDetail}</div>
-            <div className="settings-info"><Languages size={15} />{text.localTranslationDetail}</div>
-            <div className="settings-inline-actions">
-              <a className="connection-button" href="https://ollama.com/download" target="_blank" rel="noreferrer">{text.providerPortal}<ArrowUpRight size={12} /></a>
-            </div>
-            <div className="settings-inline-actions">
-              <button type="button" className={`connection-button ${localAiTestResult?.status === 'ok' ? 'passed' : localAiTestResult?.status === 'error' ? 'failed' : ''}`} onClick={onTestLocalAi} disabled={testingSourceId === 'local-ai'}>
-                {testingSourceId === 'local-ai' && <Loader2 className="spin" size={13} />}
-                {testingSourceId === 'local-ai' ? text.testingConnection : localAiTestResult?.status === 'ok' ? text.connectionPassed : localAiTestResult?.status === 'error' ? text.connectionFailed : text.testConnection}
-              </button>
-              {localAiTestResult?.message && <small className={`connection-message ${localAiTestResult.status === 'ok' ? 'passed' : 'failed'}`}>{localAiTestResult.message}{localAiTestResult.latencyMs ? ` · ${localAiTestResult.latencyMs} ms` : ''}</small>}
-            </div>
-            <ToggleRow label={text.aiPrivacy} detail={text.aiPrivacyDetail} checked={draft.sendSnippetsToAi} onChange={(value) => update('sendSnippetsToAi', value)} />
-            <ToggleRow label={text.aiRedaction} detail={text.aiRedactionDetail} checked={draft.redactSensitiveDataBeforeAi} onChange={(value) => update('redactSensitiveDataBeforeAi', value)} />
-            <div className="settings-info"><ShieldCheck size={15} />{text.aiDataBoundary}</div>
+            </div>}
+            {generativeProviderEnabled && <div className="settings-form-grid two">
+              <SettingNumber label={text.researchChatContext} value={draft.researchChatContextChars} min={20000} max={1500000} step={10000} onChange={(value) => update('researchChatContextChars', value)} />
+            </div>}
+            {generativeProviderEnabled && <div className="settings-info"><MessageSquareText size={15} />{text.researchChatContextDetail}</div>}
+            {cloudAnalysisEnabled && <div className="settings-info"><Cpu size={15} />{text.reasoningDetail}</div>}
+            {generativeProviderEnabled && <div className="settings-info"><ShieldAlert size={15} />{text.modelQualityDetail}</div>}
+            {compatibleAiEnabled && <div className="settings-info"><Network size={15} />{text.compatibleAiDetail}</div>}
+            {localAiEnabled && <>
+              <div className="settings-info"><Bot size={15} />{text.localAiDetail}</div>
+              <div className="settings-inline-actions">
+                <a className="connection-button" href="https://ollama.com/download" target="_blank" rel="noreferrer">{text.providerPortal}<ArrowUpRight size={12} /></a>
+                <button type="button" className={`connection-button ${localAiTestResult?.status === 'ok' ? 'passed' : localAiTestResult?.status === 'error' ? 'failed' : ''}`} onClick={onTestLocalAi} disabled={testingSourceId === 'local-ai'}>
+                  {testingSourceId === 'local-ai' && <Loader2 className="spin" size={13} />}
+                  {testingSourceId === 'local-ai' ? text.testingConnection : localAiTestResult?.status === 'ok' ? text.connectionPassed : localAiTestResult?.status === 'error' ? text.connectionFailed : text.testConnection}
+                </button>
+                {localAiTestResult?.message && <small className={`connection-message ${localAiTestResult.status === 'ok' ? 'passed' : 'failed'}`}>{localAiTestResult.message}{localAiTestResult.latencyMs ? ` · ${localAiTestResult.latencyMs} ms` : ''}</small>}
+              </div>
+            </>}
+            {draft.translationProvider === 'local' && <div className="settings-info"><Languages size={15} />{text.localTranslationDetail}</div>}
+            {selectedCloudProviders.length > 0 && <>
+              <ToggleRow label={text.aiPrivacy} detail={text.aiPrivacyDetail} checked={draft.sendSnippetsToAi} onChange={(value) => update('sendSnippetsToAi', value)} />
+              <ToggleRow label={text.aiRedaction} detail={text.aiRedactionDetail} checked={draft.redactSensitiveDataBeforeAi} onChange={(value) => update('redactSensitiveDataBeforeAi', value)} />
+              <div className="settings-info"><ShieldCheck size={15} />{text.aiDataBoundary}</div>
+            </>}
           </SettingsCard>
 
           <SettingsCard id="settings-automation" icon={<RefreshCw size={18} />} eyebrow={text.automationTitle} title={text.automationTitle}>
@@ -7079,10 +6646,10 @@ function CapabilityRow({ language, text, label, detail, state, diagnostic }: { l
         <small>{text.lastChecked}: {checked}{diagnostic?.latencyMs != null ? ` · ${diagnostic.latencyMs} ms` : ''}</small>
         {diagnostic && <small>{text.diagnosticItems}: {diagnostic.itemCount ?? 0}</small>}
       </div>
-      {diagnostic?.message && <p className="capability-message">{diagnostic.message}</p>}
+      {diagnostic?.message && <p className="capability-message">{diagnosticMessage(diagnostic.message, language)}</p>}
       {diagnostic?.lastAttempt?.message && (
         <p className="capability-message">
-          {language === 'en' ? 'Latest refresh attempt failed' : '最近一次刷新尝试失败'}: {diagnostic.lastAttempt.message}
+          {language === 'en' ? 'Latest refresh attempt failed' : '最近一次刷新尝试失败'}: {diagnosticMessage(diagnostic.lastAttempt.message, language)}
         </p>
       )}
     </div>
@@ -7181,24 +6748,24 @@ function DocumentAnalysisRow({
         <DocumentSourceAlternatives record={record} language={language} text={text} />
       </div>
       <div className="analysis-document-side">
-        <div className="lawyer-read">
+        <div className="lawyer-read analysis-read-section read-section-plain">
           <span>{text.plainRead}</span>
           <p>{record.plainEnglish || record.summary}</p>
         </div>
-        <div className="mini-task-list">
+        <div className="mini-task-list analysis-read-section read-section-legal">
           <strong>{text.lawyerRead}</strong>
           {record.legalReading.slice(0, 3).map((item) => (
             <span key={item}>{item}</span>
           ))}
         </div>
-        <div className="mini-task-list">
+        <div className="mini-task-list analysis-read-section read-section-connections">
           <strong>{text.caseConnections}</strong>
           {record.caseConnections.slice(0, 2).map((item) => (
             <span key={item}>{item}</span>
           ))}
         </div>
         {(relationshipEvidence.length > 0 || relationshipControlWarning) && (
-          <div className="mini-task-list relationship-mini-list">
+          <div className="mini-task-list relationship-mini-list analysis-read-section read-section-evidence">
             <strong>{text.relationshipEvidence}</strong>
             {relationshipEvidence.slice(0, emphasis ? 5 : 2).map((evidence, index) => (
               <a href={safeExternalHref(evidence.sourceUrl || record.sourceUrl)} target="_blank" rel="noreferrer" key={`${record.id}-relationship-${index}`}>
@@ -7210,14 +6777,14 @@ function DocumentAnalysisRow({
             {relationshipControlWarning && <p>{relationshipControlWarning}</p>}
           </div>
         )}
-        <div className="mini-task-list">
+        <div className="mini-task-list analysis-read-section read-section-verification">
           <strong>{text.verification}</strong>
           {verificationItems.slice(0, emphasis ? 5 : 2).map((task) => (
             <span key={task}>{task}</span>
           ))}
         </div>
         {record.aiFindings?.length > 0 && (
-          <div className="ai-finding-citations analysis-findings">
+          <div className="ai-finding-citations analysis-findings analysis-read-section read-section-citations">
             <strong>{text.aiConclusionCitations}</strong>
             {record.aiFindings.map((finding, index) => (
               <article key={`${record.id}-ai-finding-${index}`}>
@@ -7325,12 +6892,13 @@ function DocumentQueueRow({
             type="button"
             onClick={() => onOpenDocument({ sourceUrl: record.sourceUrl, title: record.title, docNumber: record.docNumber, sourceLabel: record.sourceLabel, variantLabel: record.variantLabel })}
             title={text.openFile}
+            aria-label={text.openFile}
           >
             <BookOpenCheck size={14} />
           </button>
         )}
         {record.status === 'error' && <span className="catalog-unavailable">{text.fileUnavailable}</span>}
-        <a href={safeExternalHref(record.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage}>
+        <a href={safeExternalHref(record.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage} aria-label={text.sourcePage}>
           <ArrowUpRight size={14} />
         </a>
       </div>
@@ -7389,11 +6957,12 @@ function DocumentCatalogRow({
             type="button"
             onClick={() => onOpenDocument({ sourceUrl: record.sourceUrl, title: record.title, docNumber: record.docNumber, sourceLabel: record.sourceLabel, variantLabel: record.variantLabel })}
             title={text.openFile}
+            aria-label={text.openFile}
           >
             <BookOpenCheck size={13} />
           </button>
         )}
-        <a href={safeExternalHref(record.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage}>
+        <a href={safeExternalHref(record.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage} aria-label={text.sourcePage}>
           <ArrowUpRight size={13} />
         </a>
       </div>
@@ -7515,6 +7084,7 @@ function DocumentSourceAlternatives({
                   variantLabel: alternative.label,
                 })}
                 title={text.openFile}
+                aria-label={text.openFile}
               >
                 <BookOpenCheck size={11} />
               </button>
@@ -7710,21 +7280,21 @@ function PdfReaderDialog({
           <span>{target.variantLabel} · {target.sourceLabel}</span>
         </div>
         <div className="pdf-reader-controls">
-          <button type="button" onClick={() => setPageNumber((value) => Math.max(1, value - 1))} disabled={!pdfDocument || pageNumber <= 1} title={text.previousPage}>
+          <button type="button" onClick={() => setPageNumber((value) => Math.max(1, value - 1))} disabled={!pdfDocument || pageNumber <= 1} title={text.previousPage} aria-label={text.previousPage}>
             <ChevronLeft size={16} />
           </button>
           <span>{text.pdfPage} {pageNumber} / {pdfDocument?.numPages ?? '?'}</span>
-          <button type="button" onClick={() => setPageNumber((value) => Math.min(pdfDocument?.numPages ?? value, value + 1))} disabled={!pdfDocument || pageNumber >= pdfDocument.numPages} title={text.nextPage}>
+          <button type="button" onClick={() => setPageNumber((value) => Math.min(pdfDocument?.numPages ?? value, value + 1))} disabled={!pdfDocument || pageNumber >= pdfDocument.numPages} title={text.nextPage} aria-label={text.nextPage}>
             <ChevronRight size={16} />
           </button>
-          <button type="button" onClick={() => setScale((value) => Math.max(0.7, Number((value - 0.15).toFixed(2))))} disabled={!pdfDocument || scale <= 0.7} title={text.zoomOut}>
+          <button type="button" onClick={() => setScale((value) => Math.max(0.7, Number((value - 0.15).toFixed(2))))} disabled={!pdfDocument || scale <= 0.7} title={text.zoomOut} aria-label={text.zoomOut}>
             <Minus size={16} />
           </button>
           <span>{Math.round(scale * 100)}%</span>
-          <button type="button" onClick={() => setScale((value) => Math.min(2.2, Number((value + 0.15).toFixed(2))))} disabled={!pdfDocument || scale >= 2.2} title={text.zoomIn}>
+          <button type="button" onClick={() => setScale((value) => Math.min(2.2, Number((value + 0.15).toFixed(2))))} disabled={!pdfDocument || scale >= 2.2} title={text.zoomIn} aria-label={text.zoomIn}>
             <Plus size={16} />
           </button>
-          <a href={safeExternalHref(target.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage}><ArrowUpRight size={15} /></a>
+          <a href={safeExternalHref(target.sourceUrl)} target="_blank" rel="noreferrer" title={text.sourcePage} aria-label={text.sourcePage}><ArrowUpRight size={15} /></a>
         </div>
       </div>
       <div className="pdf-reader-stage">
@@ -7936,7 +7506,11 @@ function DocumentFileRow({
         <strong>{file.docNumber ? `${language === 'zh' ? '文件' : 'Doc'} ${file.docNumber}` : fileName}</strong>
         <span className="document-variant-label">{file.variantLabel}</span>
         <p>{file.title}</p>
-        <span>{text.bytes}: {formatBytes(file.bytes, language)} · {file.sourceLabel ?? file.sourceId}</span>
+        <span>
+          {language === 'zh' ? '法院提交日期' : 'Filed'}: {formatDate(file.filedAt, language)}
+          {' · '}{text.bytes}: {formatBytes(file.bytes, language)}
+          {' · '}{file.sourceLabel ?? file.sourceId}
+        </span>
         {file.error && <small>{file.error}</small>}
       </div>
       <div className="document-actions">

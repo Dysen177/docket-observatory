@@ -9,7 +9,7 @@ import { humanDocumentResearch } from './human-legal-research.js'
 import { translateLegalTextToZh } from './i18n.js'
 import { runtimeSetting } from './settings-store.js'
 import { sortCaseDocuments } from './case-dossier-utils.js'
-import { allCaseRecords, localizeCaseRecord } from './discovered-case-records.js'
+import { localizeCaseRecord } from './discovered-case-records.js'
 import { evidenceForAi, textForAi } from './ai-data-boundary.js'
 import { compareDocketNumbers } from './docket-number.js'
 import {
@@ -31,9 +31,15 @@ import {
   ollamaTranslateText,
 } from './local-legal-ai.js'
 
+const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
+
+function userFacingCaseRecords(state, manifest) {
+  void manifest
+  return (state?.cases ?? []).filter((caseRecord) => !standaloneWithdrawalCasePattern.test(String(caseRecord.id ?? '')))
+}
+
 const cacheRoot = path.resolve(process.env.GUO_INTEL_CACHE_DIR ?? path.join(process.cwd(), 'server', 'cache'))
 const runPath = path.join(cacheRoot, 'automation-run.json')
-const selectionCursorPath = path.join(cacheRoot, 'automation-selection-cursor.json')
 const translationDir = path.join(cacheRoot, 'translations')
 const caseAiDir = path.join(cacheRoot, 'case-ai')
 const extractionCacheVersion = 8
@@ -215,7 +221,6 @@ async function executeRun(run, callbacks, options) {
 
   manifest = manifest ?? await callbacks.loadRawDocumentManifest()
   const candidates = await selectAutomationFiles(manifest, callbacks.getState(), run)
-  const extractionByUrl = new Map()
 
   await runStep(run, 'extract', async (step) => {
     step.total = candidates.length
@@ -225,7 +230,6 @@ async function executeRun(run, callbacks, options) {
           pageLimit: run.requested.pageLimit,
           charLimit: run.requested.charLimit,
         })
-        extractionByUrl.set(file.url, extraction)
         if (extraction.status === 'extracted') run.outputs.extracted += 1
         else recordItemFailure(run, file, 'extraction', extraction.warning || extraction.status, lang)
       } catch (error) {
@@ -245,7 +249,12 @@ async function executeRun(run, callbacks, options) {
     const capabilityBlockedFiles = new Set()
     for (const file of candidates) {
       try {
-        const extraction = extractionByUrl.get(file.url)
+        // Extraction is content-addressed on disk. Re-reading one cached result
+        // here keeps full-corpus runs from retaining every PDF body in memory.
+        const extraction = await extractPdfSnippetForFile(file, {
+          pageLimit: run.requested.pageLimit,
+          charLimit: run.requested.charLimit,
+        })
         const translations = []
         for (const outputLanguage of outputLanguages) translations.push(await translateExtraction(file, extraction, outputLanguage))
         const successful = translations.every((translated) => ['translated', 'no_translation_needed'].includes(translated.status))
@@ -283,7 +292,7 @@ async function executeRun(run, callbacks, options) {
     step.total = includeAi ? candidates.length : 0
     if (!includeAi) return
     const provider = activeAiProvider()
-    if (provider.kind === 'local_rules') {
+    if (candidates.length > 0 && provider.kind === 'local_rules') {
       const message = lang === 'en'
         ? 'No generative AI provider is available; batch document reads were generated with local deterministic rules.'
         : '当前没有可用生成式 AI；批量文件解读已使用本地确定性规则生成。'
@@ -315,8 +324,13 @@ async function executeRun(run, callbacks, options) {
 
   await runStep(run, 'dossier', async (step) => {
     const state = callbacks.getState()
-    const caseRecords = allCaseRecords(state, manifest)
+    const allCaseRecords = userFacingCaseRecords(state, manifest)
+    const affectedCaseIds = new Set(candidates.map((file) => file.caseId).filter(Boolean))
+    const caseRecords = run.requested.processingScope === 'all'
+      ? allCaseRecords
+      : allCaseRecords.filter((caseRecord) => affectedCaseIds.has(caseRecord.id))
     step.total = caseRecords.length
+    if (!caseRecords.length) return
     await buildDocumentAnalysis(await callbacks.loadRawDocumentManifest(), state, lang, {
       catalog: 'compact',
       catalogLimit: 12,
@@ -329,7 +343,7 @@ async function executeRun(run, callbacks, options) {
       let generated = 0
       let localFallbacks = 0
       for (const outputLanguage of outputLanguages) {
-        const result = await writeCaseAiDossiers(state, manifest, outputLanguage, run)
+        const result = await writeCaseAiDossiers(state, manifest, outputLanguage, run, caseRecords)
         generated += result.generative
         localFallbacks += result.localRules
       }
@@ -345,7 +359,7 @@ async function executeRun(run, callbacks, options) {
   })
 
   await runStep(run, 'index', async (step) => {
-    if (typeof callbacks.refreshDocumentSearchIndex !== 'function') return
+    if (!candidates.length || typeof callbacks.refreshDocumentSearchIndex !== 'function') return
     const result = await callbacks.refreshDocumentSearchIndex(manifest)
     step.total = result?.coverage?.uniquePdfContents ?? 0
     step.done = result?.coverage?.indexedOriginals ?? 0
@@ -414,7 +428,9 @@ async function failRun(run, message) {
 async function selectAutomationFiles(manifest, state, run) {
   const limit = limitForRun(run)
   const files = (manifest.files ?? []).filter((file) => file.status !== 'error' && file.path && file.url)
-  const processingGaps = await buildProcessingGapIndex(files, run)
+  const processingGaps = run.requested.processingScope === 'all'
+    ? await buildProcessingGapIndex(files, run)
+    : new Map()
   const records = files
     .map((file) => ({
       file,
@@ -440,58 +456,43 @@ async function selectAutomationFiles(manifest, state, run) {
       if (priorityDelta) return priorityDelta
       return compareDocNumber(right.file.docNumber, left.file.docNumber)
     })
-  if (limit === Number.MAX_SAFE_INTEGER || records.length <= limit) return records.map((item) => item.file)
+  return selectAutomationRecords(records, {
+    limit,
+    processingScope: run.requested.processingScope,
+  }).map((item) => item.file)
+}
 
-  const fresh = records.filter((item) => ['downloaded', 'downloaded_new_version'].includes(item.file.status))
-  const existing = records.filter((item) => !['downloaded', 'downloaded_new_version'].includes(item.file.status))
-  const selected = fresh.slice(0, limit)
-  let remaining = Math.max(0, limit - selected.length)
-  if (!remaining || !existing.length) return selected.map((item) => item.file)
-
-  const gaps = existing.filter((item) => processingGapWeight(item.processingGap) > 0)
-  const selectedGaps = gaps.slice(0, remaining)
-  selected.push(...selectedGaps)
-  remaining -= selectedGaps.length
-  if (!remaining) return selected.map((item) => item.file)
-
-  const cursorState = await readJsonFile(selectionCursorPath)
-  const rotating = existing.filter((item) => processingGapWeight(item.processingGap) === 0)
-  if (!rotating.length) return selected.map((item) => item.file)
-  const start = boundedCursor(cursorState?.nextIndex, rotating.length)
-  const existingCount = Math.min(remaining, rotating.length)
-  for (let offset = 0; offset < existingCount; offset += 1) {
-    selected.push(rotating[(start + offset) % rotating.length])
-  }
-  await writeJsonFile(selectionCursorPath, {
-    schemaVersion: 1,
-    nextIndex: (start + existingCount) % rotating.length,
-    candidateCount: rotating.length,
-    selectedCount: existingCount,
-    updatedAt: new Date().toISOString(),
-  })
-  return selected.map((item) => item.file)
+export function selectAutomationRecords(records, { limit, processingScope }) {
+  if (processingScope === 'all') return records.slice(0, limit)
+  return records
+    .filter((item) => ['downloaded', 'downloaded_new_version'].includes(item.file.status))
+    .slice(0, limit)
 }
 
 async function buildProcessingGapIndex(files, run) {
-  const [extractions, translations, analyses] = await Promise.all([
-    readJsonDirectory('pdf-text'),
-    readJsonDirectory('translations'),
-    readJsonDirectory('document-ai'),
-  ])
   const filesByUrl = new Map(files.map((file) => [file.url, file]))
   const currentHashes = new Set(files.map((file) => file.sha256).filter(Boolean))
-  const extractedHashes = new Set(extractions
-    .filter((value) => value?.cacheVersion === extractionCacheVersion && value?.status === 'extracted')
-    .map((value) => value.signature?.contentSha256 || value.signature?.manifestSha256)
-    .filter((value) => currentHashes.has(value)))
-  const translationKeys = new Set(translations
-    .filter((value) => value?.schemaVersion === translationCacheVersion
-      && filesByUrl.get(value.sourceUrl)?.sha256 === value.sourceSha256
-      && ['translated', 'assistive_only', 'no_translation_needed'].includes(value.status))
-    .map((value) => `${value.sourceUrl}|${value.sourceSha256}|${cachedLanguage(value.targetLanguage)}`))
-  const analysisKeys = new Set(analyses
-    .filter((value) => value?.aiStatus?.generated && filesByUrl.get(value.sourceUrl)?.sha256 === value.sourceSha256)
-    .map((value) => `${value.sourceUrl}|${value.sourceSha256}|${cachedAnalysisLanguage(value)}`))
+  const extractedHashes = new Set()
+  await visitJsonDirectory('pdf-text', (value) => {
+    const sha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
+    if (value?.cacheVersion === extractionCacheVersion && value?.status === 'extracted' && currentHashes.has(sha256)) {
+      extractedHashes.add(sha256)
+    }
+  })
+
+  const translationKeys = new Set()
+  await visitJsonDirectory('translations', (value) => {
+    if (value?.schemaVersion !== translationCacheVersion
+      || filesByUrl.get(value.sourceUrl)?.sha256 !== value.sourceSha256
+      || !['translated', 'assistive_only', 'no_translation_needed'].includes(value.status)) return
+    translationKeys.add(`${value.sourceUrl}|${value.sourceSha256}|${cachedLanguage(value.targetLanguage)}`)
+  })
+
+  const analysisKeys = new Set()
+  await visitJsonDirectory('document-ai', (value) => {
+    if (!value?.aiStatus?.generated || filesByUrl.get(value.sourceUrl)?.sha256 !== value.sourceSha256) return
+    analysisKeys.add(`${value.sourceUrl}|${value.sourceSha256}|${cachedAnalysisLanguage(value)}`)
+  })
   const outputLanguages = resolveAutomationOutputLanguages(run.requested.outputLanguages, run.language)
   return new Map(files.map((file) => {
     const needsExtraction = !file.sha256 || !extractedHashes.has(file.sha256)
@@ -509,16 +510,16 @@ function processingGapWeight(gap) {
   return (gap.needsExtraction ? 8 : 0) + (gap.needsAnalysis ? 4 : 0) + (gap.needsTranslation ? 2 : 0)
 }
 
-async function readJsonDirectory(relativeDirectory) {
+async function visitJsonDirectory(relativeDirectory, visit) {
   const directory = path.join(cacheRoot, relativeDirectory)
   const entries = await readdir(directory, { withFileTypes: true }).catch(() => [])
   const filenames = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json')).map((entry) => entry.name)
-  const values = []
-  for (let index = 0; index < filenames.length; index += 32) {
-    const batch = await Promise.all(filenames.slice(index, index + 32).map((filename) => readJsonFile(path.join(directory, filename))))
-    values.push(...batch.filter(Boolean))
+  for (let index = 0; index < filenames.length; index += 2) {
+    const batch = await Promise.all(filenames.slice(index, index + 2).map((filename) => readJsonFile(path.join(directory, filename))))
+    for (const value of batch) {
+      if (value) visit(value)
+    }
   }
-  return values
 }
 
 function cachedLanguage(value) {
@@ -533,13 +534,6 @@ function cachedAnalysisLanguage(value) {
     value?.plainEnglish,
     ...(value?.legalReading ?? []),
   ].filter(Boolean).join(' ')) ? 'zh' : 'en'
-}
-
-function boundedCursor(value, length) {
-  if (!length) return 0
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || parsed < 0) return 0
-  return Math.floor(parsed) % length
 }
 
 function limitForRun(run) {
@@ -774,7 +768,7 @@ async function cloudTranslateText(provider, text, targetLanguage, segmentLabel =
   return { text: translated.join('\n\n'), redacted: preparedText !== sourceText }
 }
 
-async function writeCaseAiDossiers(state, manifest, lang, run, caseRecords = allCaseRecords(state, manifest)) {
+async function writeCaseAiDossiers(state, manifest, lang, run, caseRecords = userFacingCaseRecords(state, manifest)) {
   await mkdir(caseAiDir, { recursive: true, mode: 0o700 })
   const files = Array.isArray(manifest.files) ? manifest.files : []
   const provider = activeAiProvider()
@@ -833,7 +827,7 @@ async function writeCaseAiDossiers(state, manifest, lang, run, caseRecords = all
   return { generative: generated, localRules }
 }
 
-async function writeLocalCaseDossiers(state, manifest, lang, run, caseRecords = allCaseRecords(state, manifest)) {
+async function writeLocalCaseDossiers(state, manifest, lang, run, caseRecords = userFacingCaseRecords(state, manifest)) {
   await mkdir(caseAiDir, { recursive: true, mode: 0o700 })
   const files = Array.isArray(manifest.files) ? manifest.files : []
   let generated = 0
@@ -1183,6 +1177,7 @@ function translateRunText(value, lang) {
     ['尚未在设置页配置 OpenAI；批量 AI 只能使用本地规则。', 'OpenAI is not configured in Settings; batch AI used local rules only.'],
     ['尚未配置 OPENAI_API_KEY；批量 AI 只能使用本地规则。', 'OPENAI_API_KEY is not configured; batch AI used local rules only.'],
     ['上次任务因 API 重启而中断。', 'Previous run was interrupted by API restart.'],
+    ['当前没有可用生成式 AI；批量文件解读已使用本地确定性规则生成。', 'No generative AI provider is available; batch document reads were generated with local deterministic rules.'],
   ])
   if (exactTranslations.has(value)) return exactTranslations.get(value)
   const sourceRefresh = value.match(/^来源刷新完成，共\s*(\d+)\s*个来源。$/u)

@@ -1,19 +1,17 @@
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
 import { createReadStream } from 'node:fs'
-import { readFile, readdir, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import { inspectReleaseAssetSizes } from './release-asset-size-check.mjs'
+import { verifyReleaseInstallerLayout } from './release-layout-check.mjs'
 
 const root = process.cwd()
 const releaseDirectory = path.resolve(process.argv[2] ?? path.join(root, 'release'))
+const evidenceDirectory = path.resolve(process.argv[3] ?? path.join(root, 'output', 'release-evidence'))
 const artifactPattern = /\.(?:dmg|exe|zip|tar\.gz)$/i
-const publicEvidenceNames = [
-  'corpus-manifest.json',
-  'corpus-publication-review.md',
-  'corpus-review-decisions.json',
-  'seed-cache-manifest.json',
-]
+const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'))
 
 function parseArtifactSourceCommits(value) {
   if (!value) return {}
@@ -42,17 +40,14 @@ async function sha256(filePath) {
 
 const entries = await readdir(releaseDirectory, { withFileTypes: true }).catch(() => [])
 const artifactNames = entries.filter((entry) => entry.isFile() && artifactPattern.test(entry.name)).map((entry) => entry.name).sort()
-const publicEvidence = publicEvidenceNames.filter((name) => entries.some((entry) => entry.isFile() && entry.name === name))
 if (!artifactNames.some((name) => name.endsWith('.dmg')) || !artifactNames.some((name) => name.endsWith('.exe'))) {
   throw new Error('Final release assets must include at least one DMG and one EXE before metadata is generated.')
 }
 
-const installerNames = artifactNames.filter((name) => /\.(?:dmg|exe)$/i.test(name))
-const unsignedInstallers = installerNames.filter((name) => name.includes('-unsigned.'))
-if (unsignedInstallers.length > 0 && unsignedInstallers.length !== installerNames.length) {
-  throw new Error('Do not mix signed and explicitly unsigned installers in one release set.')
-}
-const releaseMode = unsignedInstallers.length === installerNames.length ? 'community_unsigned' : 'platform_signed'
+const { releaseMode } = await verifyReleaseInstallerLayout(releaseDirectory)
+
+await inspectReleaseAssetSizes(releaseDirectory)
+await mkdir(evidenceDirectory, { recursive: true })
 
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const sbomResult = spawnSync(npmCommand, ['sbom', '--omit=dev', '--sbom-format=cyclonedx'], {
@@ -64,10 +59,9 @@ const sbomResult = spawnSync(npmCommand, ['sbom', '--omit=dev', '--sbom-format=c
 if (sbomResult.status !== 0 || !sbomResult.stdout.trim()) {
   throw new Error(`SBOM generation failed: ${(sbomResult.stderr || 'unknown error').trim()}`)
 }
-const sbomPath = path.join(releaseDirectory, 'SBOM.cdx.json')
+const sbomPath = path.join(evidenceDirectory, 'SBOM.cdx.json')
 await writeFile(sbomPath, `${sbomResult.stdout.trim()}\n`, { mode: 0o600 })
 
-const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'))
 const defaultSourceCommit = process.env.RELEASE_SOURCE_COMMIT || process.env.GITHUB_SHA || null
 const artifactSourceCommitOverrides = parseArtifactSourceCommits(process.env.RELEASE_ARTIFACT_SOURCE_COMMITS)
 for (const name of Object.keys(artifactSourceCommitOverrides)) {
@@ -98,7 +92,7 @@ for (const name of artifactNames) {
 const artifactSourceCommits = Object.fromEntries(artifacts.map(({ name, sourceCommit }) => [name, sourceCommit]))
 const distinctSourceCommits = [...new Set(Object.values(artifactSourceCommits).filter(Boolean))]
 
-const provenancePath = path.join(releaseDirectory, 'BUILD-PROVENANCE.json')
+const provenancePath = path.join(evidenceDirectory, 'BUILD-PROVENANCE.json')
 await writeFile(provenancePath, `${JSON.stringify({
   schemaVersion: 1,
   statementType: 'Docket Observatory local release build record; not a SLSA attestation',
@@ -107,7 +101,7 @@ await writeFile(provenancePath, `${JSON.stringify({
   version: packageJson.version,
   releaseMode,
   signingStatus: releaseMode === 'community_unsigned'
-    ? 'Installers have no trusted publisher identity and are not notarized. macOS app bundles use identity-free ad-hoc signatures for structural integrity. Verify SHA-256 and follow the operating-system confirmation flow.'
+    ? 'Installers have no trusted publisher identity and are not notarized. macOS app bundles use identity-free ad-hoc signatures for structural integrity. Follow the documented operating-system confirmation flow.'
     : 'Installers are expected to carry platform-trusted signatures verified by the formal release pipeline.',
   sourceCommit: distinctSourceCommits.length === 1 ? distinctSourceCommits[0] : null,
   artifactSourceCommits,
@@ -117,9 +111,4 @@ await writeFile(provenancePath, `${JSON.stringify({
   artifacts,
 }, null, 2)}\n`, { mode: 0o600 })
 
-const checksumNames = [...artifactNames, ...publicEvidence, path.basename(sbomPath), path.basename(provenancePath)].sort()
-const checksumLines = []
-for (const name of checksumNames) checksumLines.push(`${await sha256(path.join(releaseDirectory, name))}  ${name}`)
-await writeFile(path.join(releaseDirectory, 'SHA256SUMS.txt'), `${checksumLines.join('\n')}\n`, { mode: 0o600 })
-
-console.log(`Finalized ${artifactNames.length} ${releaseMode} release assets with SBOM, provenance record, and SHA-256 checksums.`)
+console.log(`Finalized ${artifactNames.length} ${releaseMode} release assets. Internal SBOM and provenance evidence: ${evidenceDirectory}.`)

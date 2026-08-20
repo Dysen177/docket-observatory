@@ -48,6 +48,13 @@ function catalogRecord(url, docNumber, sourceId = 'courtlistener-recap', sourceL
   }
 }
 
+function filingRecord(url, overrides = {}) {
+  return {
+    ...catalogRecord(url, overrides.docNumber ?? '712', overrides.sourceId ?? 'courtlistener-recap', overrides.sourceLabel ?? 'CourtListener / RECAP'),
+    ...overrides,
+  }
+}
+
 function extraction(sha256, pages) {
   return {
     cacheVersion: 8,
@@ -74,8 +81,25 @@ async function writeJson(relativePath, value) {
   }
 }
 
-async function search(manifest, records, query) {
-  return searchDocumentCatalog(manifest, records, { query, scope: 'original', priority: 'all', offset: 0, limit: 20 })
+function assertNoRepeatedResults(result, query) {
+  const sourceUrls = result.catalog.map((record) => record.sourceUrl)
+  assert.equal(new Set(sourceUrls).size, sourceUrls.length, `${query} repeated a canonical source URL`)
+  const filingCoordinates = result.catalog
+    .map((record) => {
+      const docket = String(record.docketNumber ?? '').trim().toLowerCase()
+        .replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '')
+        .replace(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)(?:-[a-z]{1,6})+$/, '$1$2')
+      const document = String(record.docNumber ?? '').trim().toLowerCase()
+      return docket && document ? `${docket}|${document}` : ''
+    })
+    .filter(Boolean)
+  assert.equal(new Set(filingCoordinates).size, filingCoordinates.length, `${query} repeated a logical docket filing`)
+}
+
+async function search(manifest, records, query, scope = 'original') {
+  const result = await searchDocumentCatalog(manifest, records, { query, scope, priority: 'all', offset: 0, limit: 20 })
+  assertNoRepeatedResults(result, query || '<unfiltered>')
+  return result
 }
 
 try {
@@ -108,6 +132,24 @@ try {
   assert.equal((await search(firstManifest, firstRecords, '"alpha omega"')).filtered, 0)
   assert.equal((await search(firstManifest, firstRecords, 'alpha nonexistent')).filtered, 0)
 
+  const geyerUrl = 'https://storage.courtlistener.com/recap/geyer.712.0.pdf'
+  const geyerMirrorUrl = 'https://nfsc.example/archive/geyer.712.0.pdf'
+  const geyerManifest = { files: [
+    manifestFile(geyerUrl, originalSha256, '712'),
+    manifestFile(geyerMirrorUrl, originalSha256, '712', 'nfsc-criminal-mirror', 'NFSC backup mirror'),
+  ] }
+  const geyerRecords = [
+    filingRecord(geyerUrl, { id: 'geyer-court', caseId: 'courtlistener-geyer', docketNumber: '1:23-cr-00118', title: 'Geyer filing / Doc 712' }),
+    filingRecord(geyerMirrorUrl, { id: 'geyer-mirror', caseId: 'nfsc-geyer', docketNumber: '1:23-cr-00118-AT', sourceId: 'nfsc-criminal-mirror', sourceLabel: 'NFSC backup mirror', title: 'Geyer filing / Doc 712' }),
+  ]
+  await refreshDocumentSearchIndex(geyerManifest)
+  const docketAliasSearch = await search(geyerManifest, geyerRecords, 'Geyer', 'all')
+  assert.equal(docketAliasSearch.filtered, 1)
+  assert.equal(docketAliasSearch.total, 1)
+  assert.match(docketAliasSearch.catalog[0].searchMatches[0].snippet, /Geyer/)
+  assert.equal(docketAliasSearch.catalog[0].sourceAlternatives.some((source) => source.sourceUrl === geyerMirrorUrl), true)
+
+  await refreshDocumentSearchIndex(firstManifest)
   const commaNumber = await search(firstManifest, firstRecords, '6,537')
   const plainNumber = await search(firstManifest, firstRecords, '6537')
   assert.equal(commaNumber.filtered, 1)
@@ -149,7 +191,7 @@ try {
 
   console.log(JSON.stringify({
     status: 'ok',
-    scenarios: ['exact-content-deduplication', 'canonical-source-preference', 'alternate-source-retention', 'cross-page-and', 'quoted-phrase-boundary', 'case-preserving-snippet', 'numeric-normalization', 'new-file-indexing', 'rewritten-cache-invalidation', 'missing-body-background-recovery', 'corrupt-index-recovery'],
+    scenarios: ['query-independent-deduplication', 'exact-content-deduplication', 'docket-judge-suffix-deduplication', 'canonical-source-preference', 'alternate-source-retention', 'cross-page-and', 'quoted-phrase-boundary', 'case-preserving-snippet', 'numeric-normalization', 'new-file-indexing', 'rewritten-cache-invalidation', 'missing-body-background-recovery', 'corrupt-index-recovery'],
   }, null, 2))
 } finally {
   await rm(cacheRoot, { recursive: true, force: true })

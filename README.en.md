@@ -61,7 +61,8 @@ Free and unsigned means that no Apple Developer ID or commercial Windows publish
 | --- | --- |
 | Docket monitoring | Refreshes allowlisted public feeds while online, discovers new or changed public material, and preserves source URLs, filing dates, and update status. |
 | PDF library | Bundles 1,838 valid PDFs and supports full-text search for docket numbers, document numbers, people, companies, and keywords. |
-| Historical public record | Separately indexes 2,523 accessible livestream/video copies from January 26, 2017 through March 14, 2023, searchable by year, platform, title, repost account, and keyword. This is a closed historical index, not a feed awaiting future livestreams; developments after March 15, 2023 enter docket monitoring. |
+| Historical public record | Separately indexes 2,523 accessible livestream/video source records from January 26, 2017 through March 14, 2023, plus a bundled catalog of 3,187 historical videos and 3,063 searchable original-language transcript records. Selecting a record immediately displays all locally stored transcript text on the right without another dialog. A keyword may match many distinct broadcasts, and every matching broadcast remains independently visible. Long-form broadcasts and excerpts/short videos are labeled separately; 239 public copies with a suspicious duration, start/end gap, low coverage ratio, or unusually sparse text are marked as possibly incomplete. Another 124 records are clearly marked as having no usable body. |
+| Whole-library AI research chat | A separate sidebar workspace retrieves across court PDFs, translations and legal reads, transcript text, case timelines, entities, and policy material before a user-configured OpenAI, Claude, Gemini, compatible gateway, or Ollama model produces a cited answer. If no usable model is configured, chat is disabled instead of presenting ordinary retrieval as an AI judgment. |
 | Bilingual reading | Places the source filing, available Chinese and English reading assistance, source links, source type, and verification status in one document view. |
 | Plain-language and professional reads | Explains what happened, why it matters, and what remains uncertain while preserving court, docket, document, filing-date, source, and limitation details for professional research. |
 | Case and relationship analysis | Organizes timelines and relationships across cases, parties, people, companies, funds, and bankruptcy-estate material. It separates public-record relationships from items requiring verification. |
@@ -100,6 +101,7 @@ The current `v0.1.2` source release candidate includes:
 
 - 1,865 material records;
 - 2,523 content-deduplicated historical livestream/public-video records covering January 26, 2017 through March 14, 2023; 2,406 have an independently checked alternate copy;
+- 3,187 historical video catalog entries, 3,063 searchable transcript records, and timed segments. Locally available transcript bodies, search indexes, and external recording links ship with the complete installer; third-party images, video, and audio are not stored;
 - 1,838 valid PDFs totaling 1,570,950,358 bytes;
 - all 1,795 content-deduplicated PDFs indexed for full-text search, with 1,770 complete extractions and 25 partial extractions limited by scan quality or source structure;
 - a bilingual legal-reading baseline for every unique PDF: 88 version-locked professional editorial reviews and 1,707 deterministic local-rule first reads;
@@ -120,6 +122,7 @@ Automated publication checks flagged 240 files for possible privacy, sealing-lan
 | New source refresh and downloads | Uses limited public feeds and search without a token; it cannot replace PACER. | A CourtListener/RECAP token can expand public docket pagination and PDF discovery. |
 | Text extraction, OCR, and indexing | Runs locally with no cloud charge. | Still runs locally; new files can optionally be sent to the selected model after consent. |
 | Generative translation and AI reads for new files | No-key mode does not pretend to be cloud AI; it provides deterministic local organization and assistive output. | Use a local Ollama model or an approved cloud model. Quality depends on the selected model. |
+| Whole-library AI research chat | Chat is disabled; independent full-text search for court records and transcripts remains available. | Configure any supported model for multi-turn questions across the local library. Answers keep judicial findings, litigation claims, public statements, and policy context separate and expose the underlying evidence. |
 | Official PACER docket | Login, paid retrieval, and automatic charges are not implemented in this version. | PACER fields are reserved in Settings; the application does not initiate paid requests. |
 
 ### AI Support And Quality Boundaries

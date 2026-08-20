@@ -51,6 +51,8 @@ jobs:
           "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Verify installed x64 application and complete corpus
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
         shell: pwsh
         run: |
           $app = Join-Path $env:INSTALL_DIR '案卷观察台.exe'
@@ -69,11 +71,13 @@ jobs:
           }
           if ($machine -ne 0x8664) { throw "Installed application is not x86-64; PE machine is 0x$($machine.ToString('x4'))" }
           $pdfCount = (Get-ChildItem (Join-Path $resources 'court-files') -Recurse -Filter '*.pdf').Count
-          if ($pdfCount -ne 1838) { throw "Installed corpus contains $pdfCount PDFs instead of 1838." }
           $corpus = Get-Content (Join-Path $resources 'court-files\manifest.json') -Raw | ConvertFrom-Json
           $seed = Get-Content (Join-Path $resources 'seed-cache-manifest.json') -Raw | ConvertFrom-Json
-          if ($corpus.files.Count -ne 1865) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of 1865." }
-          if ($seed.seedFiles -ne 16825) { throw "Installed seed contains $($seed.seedFiles) files instead of 16825." }
+          $expectedVersion = $env:RELEASE_TAG.TrimStart('v')
+          if ($seed.appVersion -ne $expectedVersion) { throw "Installed seed version $($seed.appVersion) does not match release $expectedVersion." }
+          if ($pdfCount -ne $seed.corpusValidPdfs) { throw "Installed corpus contains $pdfCount PDFs instead of the manifest-declared $($seed.corpusValidPdfs)." }
+          if ($corpus.files.Count -ne $seed.corpusFiles) { throw "Installed corpus manifest contains $($corpus.files.Count) records instead of the seed-declared $($seed.corpusFiles)." }
+          if ($seed.files.Count -ne $seed.seedFiles) { throw "Installed seed manifest lists $($seed.files.Count) files instead of its declared $($seed.seedFiles)." }
           $canvasBinding = Join-Path $resources 'app.asar.unpacked\node_modules\@napi-rs\canvas-win32-x64-msvc\skia.win32-x64-msvc.node'
           if (-not (Test-Path $canvasBinding)) { throw 'Windows PDF canvas native binding is missing.' }
           $versionInfo = (Get-Item $app).VersionInfo
@@ -103,7 +107,11 @@ jobs:
                       $parsed.readyAt -and
                       $parsed.version -eq $expectedVersion -and
                       $parsed.platform -eq 'win32' -and
-                      $parsed.arch -eq 'x64'
+                      $parsed.arch -eq 'x64' -and
+                      $parsed.transcriptCorpus.searchableTranscripts -eq 5097 -and
+                      $parsed.transcriptCorpus.englishRecords -eq 5097 -and
+                      $parsed.transcriptCorpus.englishMissingRecords -eq 0 -and
+                      $parsed.transcriptCorpus.englishComplete -eq $true
                     ) {
                       return $parsed
                     }

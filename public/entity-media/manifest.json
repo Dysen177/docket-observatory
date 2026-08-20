@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-08-16",
+  "purpose": "Small local identification images for the entity workspace; never treated as docket evidence.",
+  "items": [
+    {
+      "entityId": "ho-wan-kwok",
+      "path": "/entity-media/ho-wan-kwok.jpg",
+      "sourceUrl": "https://gettr.com/user/milesguo",
+      "sourceType": "NFSC-managed public GETTR profile portrait",
+      "credit": "Formal profile portrait published by the Miles Guo GETTR account, identified on the profile as maintained by NFSC",
+      "license": "Source-platform material; editorial identification use; excluded from the MIT license",
+      "sha256": "6e571408c03907ad5c6b9d6771955c415bd3cd53f21d0b5126ae510beb552064"
+    },
+    {
+      "entityId": "kin-ming-je",
+      "path": "/entity-media/kin-ming-je.jpg",
+      "sourceUrl": "https://www.hk01.com/01%E5%81%B5%E6%9F%A5/878085/",
+      "sourceType": "public-event identification photo",
+      "credit": "2017 YIDA event photo, credited by HK01 to YIDA Facebook",
+      "license": "Third-party editorial material; identification use only; excluded from the MIT license",
+      "sha256": "04a21d9e82cb0cffd023863454de8f9b0d586f3614c83fcd8e10400d9d1353dc"
+    },
+    {
+      "entityId": "yanping-wang",
+      "path": "/entity-media/yanping-wang.jpg",
+      "sourceUrl": "https://china.caixin.com/2024-05-06/102193164.html",
+      "sourceType": "news identification image",
+      "credit": "Historical image published with Caixin's May 6, 2024 profile of Yvette Wang",
+      "license": "Third-party editorial material; identification use only; excluded from the MIT license",
+      "sha256": "7626806047745dee8f55e879b5c9d0e4dba3f70c7df413ea35d6b28c2be069df"
+    },
+    {
+      "entityId": "himalaya-exchange",
+      "path": "/entity-media/himalaya-exchange.jpg",
+      "sourceUrl": "https://x.com/HimalayaXchange",
+      "sourceType": "official social-profile mark",
+      "credit": "Profile mark published by the Himalaya Exchange Official X account",
+      "license": "Organization mark; editorial identification use; excluded from the MIT license",
+      "sha256": "ee5d91ec6ee3ec54ad15bcf00d64d240c3ed4f7ec8e9edab57ce0f292ff46a43"
+    }
+  ]
+}

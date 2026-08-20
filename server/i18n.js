@@ -9,6 +9,7 @@ const sourceTypeZh = {
   'Official Court': '官方法院',
   'Party / Counsel Project Site': '当事方/律师项目网站',
   'Historical Web Archive': '历史网页存档',
+  'News Report': '新闻报道',
 }
 
 const categoryZh = {
@@ -27,6 +28,7 @@ const categoryZh = {
   'Civil Enforcement': '民事执法',
   'Fair Fund': '公平基金',
   Indictment: '起诉',
+  'News Context': '新闻背景',
 }
 
 const monthZh = {
@@ -57,6 +59,7 @@ const monthZh = {
 }
 
 const statusMessageZh = {
+  'fetch failed': '连接失败。',
   'Ready for refresh.': '等待刷新。',
   Disabled: '已停用。',
   'Parsed 160 docket-linked PDF entries from the public mirror.': '已从公开镜像解析 160 条带 PDF 链接的案卷条目。',
@@ -87,6 +90,8 @@ function localizedMirrorTimelineStatus(value) {
 }
 
 function localizedPublicRecapStatus(value) {
+  const expanded = String(value ?? '').match(/^CourtListener public RECAP sources scanned (\d+)\/(\d+) tracked docket\(s\) plus (\d+) accepted related docket\(s\), returned (\d+) recent feed entries, (\d+) structured tracked entries, (\d+) related-search entries, and exposed (\d+) public PDF\(s\)\. A token is optional and adds full docket-entry pagination\.$/)
+  if (expanded) return `CourtListener 公开 RECAP 已扫描 ${expanded[1]}/${expanded[2]} 个固定监控案卷及 ${expanded[3]} 个已接纳关联案卷，返回 ${expanded[4]} 条近期 Feed 记录、${expanded[5]} 条固定案卷结构化记录、${expanded[6]} 条关联搜索记录，并公开 ${expanded[7]} 份 PDF。Token 可选，用于完整案卷条目分页。`
   const structured = String(value ?? '').match(/^CourtListener public RECAP sources scanned (\d+)\/(\d+) tracked docket\(s\), returned (\d+) recent feed entries, (\d+) structured search entries, and exposed (\d+) public PDF\(s\)\. A token is optional and adds full docket-entry pagination\.$/)
   if (structured) return `CourtListener 公开 RECAP 来源已扫描 ${structured[1]}/${structured[2]} 个固定监控案卷，返回 ${structured[3]} 条近期 Feed 记录、${structured[4]} 条结构化搜索记录，并公开 ${structured[5]} 份可下载 PDF。Token 属于可选增强，可增加完整案卷条目分页。`
   const match = String(value ?? '').match(/^CourtListener public RECAP feeds scanned (\d+)\/(\d+) tracked docket\(s\) and returned (\d+) recent docket entries\. A token is optional and adds structured API pagination, descriptions, and PDF discovery\.$/)
@@ -112,6 +117,12 @@ const sourceTranslations = {
     name: 'DOJ 判刑新闻稿',
     coverage: 'DOJ 关于 Miles Guo 量刑的官方公告。',
     limitations: '可能遇到反爬验证；关键事实仍需与判决书和庭审记录核对。',
+  },
+  'abc-march-2023-fire-report': {
+    shortName: 'ABC 火灾报道',
+    name: 'ABC News 2023 年 3 月 15 日火灾报道',
+    coverage: '补充 2023 年 3 月 15 日逮捕时间及约六小时后住所所在建筑 18 楼火灾的新闻时间线。',
+    limitations: '新闻报道不是法院认定。起火原因及是否与逮捕有关，在报道时仍处于调查中。',
   },
   'sec-press-2023-50': {
     shortName: 'SEC 起诉稿',
@@ -167,6 +178,7 @@ const sourceEnglishOverrides = {
   'nfsc-criminal-mirror': { shortName: 'NFSC Mirror' },
   'doj-victim-page': { shortName: 'DOJ Victim Page' },
   'doj-sentencing-release': { shortName: 'DOJ Sentencing' },
+  'abc-march-2023-fire-report': { shortName: 'ABC Fire Report' },
   'sec-press-2023-50': { shortName: 'SEC Release' },
   'gtv-fair-fund': { shortName: 'GTV Fair Fund' },
   'himalaya-restoration': { shortName: 'Himalaya Restoration' },
@@ -503,6 +515,11 @@ const eventTranslations = {
     title: '纽约南区刑事案起诉 Miles Guo 和 Kin Ming Je',
     summary: 'DOJ 受害者信息页列明针对 Ho Wan Kwok、Kin Ming Je 和 Yanping Wang 的联邦刑事案，涉及欺诈、敲诈勒索、证券和洗钱线。',
     impact: '这是刑事案卷、相关没收、受害者通知和后续上诉程序的起点。',
+  },
+  'abc-guo-apartment-fire-2023-03-15': {
+    title: 'ABC 报道郭文贵被捕约六小时后，住所所在建筑 18 楼发生火灾',
+    summary: 'ABC News 报道，郭文贵约于当日上午 6 时被捕；FDNY 约于中午 12 时 02 分处置其住所所在建筑 18 楼的火灾。报道记载无人受伤，起火原因当时仍在调查。',
+    impact: '这是单独注明来源的新闻时间线事项，不是法院文件或司法认定。报道没有确认火灾由逮捕引发或与逮捕存在关联，程序不得暗示纵火、毁灭证据或其他因果解释。',
   },
   'dconn-22-50073-bankruptcy-filed-2022-02-15': {
     title: 'Ho Wan Kwok 康州破产案开始',
@@ -994,6 +1011,7 @@ function assertionTypeZh(value) {
     'Party filing': '当事人文件',
     'Docket entry': '案卷条目',
     'Public RECAP feed metadata': '公开 RECAP Feed 元数据',
+    'Secondary news report': '新闻媒体辅助报道',
   }
   return exact[value] ?? translateLegalTextToZh(value)
 }
@@ -1574,6 +1592,7 @@ export function localizePayload(payload, lang) {
             .replace(/^OpenAI 结构化分析（(.+)）$/, 'OpenAI structured analysis ($1)')
             .replace('本地确定性法律规则分析（非生成式 AI）；云端 AI 为可选增强', 'Deterministic local legal rules (not generative AI); cloud AI is an optional enhancement')
             .replace('本地确定性法律规则分析（非生成式 AI）；云端或本机模型为可选增强', 'Deterministic local legal rules (not generative AI); cloud or local models are optional enhancements')
+            .replace('本地规则分析 · AI 可选增强', 'Local rules · Optional AI enhancement')
             .replace(/^云端 AI 结构化分析（(.+)）$/, 'Cloud AI structured analysis ($1)')
         : payload.aiMode,
     cases: payload.cases.map((item) => localizeCase(item, locale)),

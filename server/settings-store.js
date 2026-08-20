@@ -18,7 +18,8 @@ const defaultSettings = {
   localAiBaseUrl: process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434',
   localAiModel: process.env.OLLAMA_MODEL || 'llama3.1:8b',
   localAiTimeoutMs: 180000,
-  localAiContextChars: 90000,
+  localAiContextChars: 48000,
+  researchChatContextChars: 180000,
   translationProvider: 'local',
   autoRefresh: true,
   refreshIntervalMinutes: 30,
@@ -322,6 +323,7 @@ function normalizeSettings(value) {
   }
   result.localAiTimeoutMs = boundedInteger(value.localAiTimeoutMs, 10000, 600000, defaultSettings.localAiTimeoutMs)
   result.localAiContextChars = boundedInteger(value.localAiContextChars, 20000, 500000, defaultSettings.localAiContextChars)
+  result.researchChatContextChars = boundedInteger(value.researchChatContextChars, 20000, 1500000, defaultSettings.researchChatContextChars)
   for (const key of ['autoRefresh', 'autoProcessDocuments', 'includeTranslation', 'includeAi', 'sendSnippetsToAi', 'redactSensitiveDataBeforeAi', 'localOcrEnabled']) {
     if (typeof value[key] === 'boolean') result[key] = value[key]
   }

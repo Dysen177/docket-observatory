@@ -1,6 +1,12 @@
 import * as cheerio from 'cheerio'
+import { mkdir, readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { atomicWriteJson } from './atomic-write.js'
 import { readTextWithLimit, safeFetch } from './safe-fetch.js'
 import { resolvedSecret } from './settings-store.js'
+
+const cacheRoot = path.resolve(process.env.GUO_INTEL_CACHE_DIR ?? path.join(process.cwd(), 'server', 'cache'))
+const publicSearchCooldownPath = path.join(cacheRoot, 'courtlistener-public-search-cooldown.json')
 
 const recapTargets = [
   { caseId: 'sdny-23-cr-118', courtId: 'nysd', court: 'S.D.N.Y.', docketNumber: '1:23-cr-00118', courtListenerDocketId: 67012324, label: 'S.D.N.Y. criminal case' },
@@ -347,6 +353,7 @@ function publicSearchTargetResult(target, row) {
 
 async function fetchPublicSearchJson(url) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    await enforcePublicSearchCooldown()
     await reservePublicSearchRequestSlot()
     const response = await safeFetch(url, {
       headers: {
@@ -362,9 +369,11 @@ async function fetchPublicSearchJson(url) {
         await sleep(retryDelayMs)
         continue
       }
+      await recordPublicSearchCooldown(retryDelayMs)
     }
     const error = new Error(`CourtListener public search returned HTTP ${response.status}: ${body.slice(0, 220)}`)
     error.statusCode = response.status
+    if (response.status === 429) applyRetryMetadata(error, await readPublicSearchCooldown())
     throw error
   }
   throw new Error('CourtListener public search retry was exhausted.')
@@ -379,7 +388,45 @@ function publicSearchRetryDelay(response, body) {
     : Number.isFinite(bodySeconds) && bodySeconds >= 0
       ? bodySeconds
       : 60
-  return Math.min(65_000, Math.max(1_000, Math.ceil(seconds * 1000) + 500))
+  return Math.min(24 * 60 * 60 * 1000, Math.max(1_000, Math.ceil(seconds * 1000) + 500))
+}
+
+async function enforcePublicSearchCooldown() {
+  const cooldown = await readPublicSearchCooldown()
+  if (!cooldown?.retryAt || Date.parse(cooldown.retryAt) <= Date.now()) return
+  const error = new Error(`CourtListener public search is paused until ${cooldown.retryAt} after HTTP 429.`)
+  error.statusCode = 429
+  applyRetryMetadata(error, cooldown)
+  throw error
+}
+
+async function recordPublicSearchCooldown(retryDelayMs) {
+  const retryAt = new Date(Date.now() + retryDelayMs).toISOString()
+  const value = {
+    schemaVersion: 1,
+    recordedAt: new Date().toISOString(),
+    retryAt,
+    retryAfterMs: retryDelayMs,
+  }
+  await mkdir(cacheRoot, { recursive: true, mode: 0o700 })
+  await atomicWriteJson(publicSearchCooldownPath, value)
+  return value
+}
+
+async function readPublicSearchCooldown() {
+  try {
+    const value = JSON.parse(await readFile(publicSearchCooldownPath, 'utf8'))
+    return typeof value?.retryAt === 'string' ? value : null
+  } catch {
+    return null
+  }
+}
+
+function applyRetryMetadata(error, cooldown) {
+  if (!cooldown?.retryAt) return error
+  error.retryAt = cooldown.retryAt
+  error.retryAfterMs = Math.max(0, Date.parse(cooldown.retryAt) - Date.now())
+  return error
 }
 
 async function reservePublicSearchRequestSlot() {

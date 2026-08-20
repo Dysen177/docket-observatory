@@ -1,9 +1,11 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const root = process.cwd()
+const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'))
 const ignoredDirectories = new Set(['.git', 'node_modules', 'dist', 'release', 'release-data', 'downloads', 'output', '.playwright-cli', 'server/cache'])
 const codeExtensions = new Set(['.js', '.cjs', '.mjs', '.ts', '.tsx', '.html'])
 const findings = []
@@ -67,6 +69,81 @@ async function scanRiskPatterns(files) {
 function approvedRiskPattern(ruleId, file, content) {
   if (ruleId !== 'subprocess') return false
   const relative = relativePath(file)
+  const translationToolControls = {
+    'scripts/repair-public-record-translation-glossary.mjs': {
+      spawnCount: 1,
+      required: [
+        'const workerResult = await run(process.execPath, [',
+        "path.join(projectRoot, 'scripts/translate-public-record-transcripts-fast.mjs')",
+        "path.join(projectRoot, 'scripts/translate-public-record-transcripts-en.mjs')",
+      ],
+    },
+    'scripts/retry-failed-public-record-translations.mjs': {
+      spawnCount: 1,
+      required: [
+        'await run(process.execPath, [',
+        "'scripts/translate-public-record-transcripts-fast.mjs'",
+      ],
+    },
+    'scripts/run-local-transcript-translation-to-completion.mjs': {
+      spawnCount: 1,
+      required: [
+        'await run(process.execPath, [',
+        "await run('npm', ['run', 'test:public-record-transcripts'])",
+        "if (removeModelOnSuccess) await run('ollama', ['rm', model])",
+      ],
+    },
+    'scripts/start-fast-transcript-translation.mjs': {
+      spawnCount: 1,
+      required: [
+        "const child = spawn('caffeinate', [",
+        "'nice',",
+        "'scripts/translate-public-record-transcripts-fast.mjs'",
+      ],
+    },
+    'scripts/start-local-transcript-translation.mjs': {
+      spawnCount: 1,
+      required: [
+        "const child = spawn('caffeinate', [",
+        "'scripts/run-local-transcript-translation-to-completion.mjs'",
+        "'--removeModelOnSuccess'",
+      ],
+    },
+    'scripts/start-public-record-translation-retry.mjs': {
+      spawnCount: 1,
+      required: [
+        'const child = spawn(process.execPath, [',
+        "'scripts/retry-failed-public-record-translations.mjs'",
+      ],
+    },
+    'scripts/translate-public-record-transcripts-fast.mjs': {
+      spawnCount: 1,
+      required: [
+        'const workerExitCode = await run(pythonPath, pythonArgs, {',
+        'const compileExitCode = await run(process.execPath, [',
+        "'scripts/translate-public-record-transcripts-en.mjs'",
+      ],
+    },
+    'scripts/wait-and-run-local-transcript-translation.mjs': {
+      spawnCount: 2,
+      required: [
+        "while (!(await commandSucceeds('ollama', ['show', model])))",
+        "await run('npm', [",
+        "await commandSucceeds('launchctl', ['unsetenv', variable])",
+        "await commandSucceeds('brew', ['services', 'restart', 'ollama'])",
+      ],
+    },
+  }
+  const translationTool = translationToolControls[relative]
+  if (translationTool) {
+    const packageFilesExcludeScripts = !JSON.stringify(packageJson.build?.files ?? []).includes('scripts')
+    return packageFilesExcludeScripts
+      && content.includes("import { spawn } from 'node:child_process'")
+      && translationTool.required.every((control) => content.includes(control))
+      && (content.match(/\bspawn\s*\(/g) ?? []).length === translationTool.spawnCount
+      && !content.includes('shell: true')
+      && !content.includes('exec(')
+  }
   if (relative === 'server/document-search.js') {
     return false
   }
@@ -82,6 +159,17 @@ function approvedRiskPattern(ruleId, file, content) {
     return content.includes("import { execFileSync } from 'node:child_process'")
       && content.includes("execFileSync('xcrun', [")
       && (content.match(/\bexecFileSync\s*\(/g) ?? []).length === 1
+      && !content.includes('shell: true')
+      && !content.includes('...process.env')
+  }
+  if (relative === 'scripts/import-public-record-transcripts.mjs') {
+    const gitCalls = content.match(/execFileAsync\('git',\s*\[[\s\S]*?\]\s*(?:,\s*\{[\s\S]*?\})?\)/g) ?? []
+    const allowedGitOperations = /\[\s*(?:'clone'|'-C',\s*[^,]+,\s*(?:'sparse-checkout'|'checkout'|'rev-parse'))/u
+    return content.includes("import { execFile } from 'node:child_process'")
+      && content.includes('const execFileAsync = promisify(execFile)')
+      && gitCalls.length === 10
+      && gitCalls.every((call) => allowedGitOperations.test(call))
+      && (content.match(/\bexecFileAsync\s*\(/g) ?? []).length === gitCalls.length
       && !content.includes('shell: true')
       && !content.includes('...process.env')
   }
@@ -420,13 +508,13 @@ async function assertProjectControls() {
   if (!automationRunner.includes("['downloaded', 'downloaded_new_version'].includes(right.file.status)")) {
     addFinding('automation-fresh-file-priority', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must prioritize files downloaded or updated in the current run so new filings cannot starve behind older high-priority records.')
   }
-  if (!automationRunner.includes('automation-selection-cursor.json') || !automationRunner.includes('nextIndex: (start + existingCount) % rotating.length')) {
-    addFinding('automation-existing-file-fairness', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must persist a rotating cursor so the local corpus eventually receives extraction, translation assistance, and legal reads instead of repeating the same first batch forever.')
+  if (!automationRunner.includes("run.requested.processingScope === 'all'\n    ? await buildProcessingGapIndex(files, run)\n    : new Map()")
+    || !automationRunner.includes(".filter((item) => ['downloaded', 'downloaded_new_version'].includes(item.file.status))")) {
+    addFinding('automation-incremental-only', 'high', path.join(root, 'server', 'automation-runner.js'), 'Scheduled priority processing must avoid scanning or rotating through the historical corpus and process only files downloaded or changed in the current run.')
   }
-  if (!automationRunner.includes('buildProcessingGapIndex(files, run)')
-    || !automationRunner.includes('processingGapWeight(item.processingGap) > 0')
-    || !automationRunner.includes('selected.push(...selectedGaps)')) {
-    addFinding('automation-processing-gap-priority', 'high', path.join(root, 'server', 'automation-runner.js'), 'Bounded automatic processing must fill missing extraction, translation, and legal-read caches before rotating through already-complete files.')
+  if (!automationRunner.includes("if (processingScope === 'all') return records.slice(0, limit)")
+    || !automationRunner.includes('processingGapWeight(right.processingGap) - processingGapWeight(left.processingGap)')) {
+    addFinding('automation-explicit-full-rebuild', 'high', path.join(root, 'server', 'automation-runner.js'), 'Explicit full processing must retain historical rebuild behavior and prioritize documents with missing extraction, translation, or legal-read caches.')
   }
   if (!automationRunner.includes('caseDossierSchema') || !automationRunner.includes('validateCaseDossierAnalysis')) {
     addFinding('case-ai-schema-validation', 'high', path.join(root, 'server', 'automation-runner.js'), 'Case-level AI must use Structured Outputs and validate evidence ids and page citations before caching.')

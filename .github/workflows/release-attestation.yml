@@ -27,10 +27,9 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           VERSION="${RELEASE_TAG#v}"
-          shopt -s nullglob
-          arm64=(release-assets/Docket-Observatory-${VERSION}-macOS-arm64*.dmg)
-          x64=(release-assets/Docket-Observatory-${VERSION}-macOS-x64*.dmg)
-          windows=(release-assets/Docket-Observatory-${VERSION}-Windows-x64*.exe)
+          mapfile -d '' arm64 < <(find release-assets -maxdepth 1 -type f -name "Docket-Observatory-${VERSION}-macOS-arm64*.dmg" -print0)
+          mapfile -d '' x64 < <(find release-assets -maxdepth 1 -type f -name "Docket-Observatory-${VERSION}-macOS-x64*.dmg" -print0)
+          mapfile -d '' windows < <(find release-assets -maxdepth 1 -type f -name "Docket-Observatory-${VERSION}-Windows-x64*.exe" -print0)
           test "${#arm64[@]}" = "1"
           test "${#x64[@]}" = "1"
           test "${#windows[@]}" = "1"

@@ -1,7 +1,7 @@
 import express from 'express'
-import { createHash, timingSafeEqual } from 'node:crypto'
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto'
 import { createReadStream } from 'node:fs'
-import { open, readFile, realpath } from 'node:fs/promises'
+import { open, readFile, realpath, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { analyzeEvent, buildPortfolioAnalysis, localAnalyzeEvent } from './analysis.js'
@@ -21,9 +21,12 @@ import { readRelationshipAudit, refreshRelationshipAudit } from './relationship-
 import { compareDocketNumbers, normalizeDocketNumber } from './docket-number.js'
 import { documentVariantKey } from './document-variant.js'
 import { ollamaGenerateJson } from './local-legal-ai.js'
-import { getDocumentSearchProcessingSnapshot, refreshDocumentSearchIndex, warmDocumentSearchIndex } from './document-search.js'
+import { refreshDocumentSearchIndex } from './document-search.js'
 import { cloudGenerateText, cloudModelForPurpose, cloudProviderConfigured, cloudProviderLabel, isCloudAiProvider } from './cloud-ai.js'
 import { queryPublicRecords } from './public-records.js'
+import { getPublicRecordTranscript, queryPublicRecordTranscripts } from './public-record-transcripts.js'
+import { answerResearchChat, detectResearchChatAnswerLanguage, researchChatStatus } from './research-chat.js'
+import { deleteResearchConversation, findResearchConversationTurn, getResearchConversation, listResearchConversations, recordResearchConversationTurn, renameResearchConversation } from './research-chat-history.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -36,8 +39,24 @@ const bundledDocumentRoot = process.env.GUO_INTEL_BUNDLED_DOWNLOAD_DIR
 const documentManifestPath = path.join(documentRoot, 'manifest.json')
 const auditOutputDir = path.resolve(process.env.GUO_INTEL_AUDIT_OUTPUT_DIR ?? path.join(__dirname, '..', 'output', 'audit'))
 const port = Number(process.env.GUO_INTEL_API_PORT ?? 4177)
+const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
+const withdrawalPortfolioCaseId = 'dconn-26-withdrawal-reference'
+
+function portfolioCaseId(caseId) {
+  return standaloneWithdrawalCasePattern.test(String(caseId ?? '')) ? withdrawalPortfolioCaseId : caseId
+}
+
+function userFacingCases(cases) {
+  return cases.filter((caseRecord) => !standaloneWithdrawalCasePattern.test(String(caseRecord.id ?? '')))
+}
+
+function dashboardEventBelongsToCase(event, caseId) {
+  return portfolioCaseId(event.caseId) === caseId || event.relatedCaseIds?.some((relatedCaseId) => portfolioCaseId(relatedCaseId) === caseId)
+}
 const dashboardCache = new Map()
-const { isAllowedLocalhostOrigin, isAllowedOutboundUrl } = networkPolicy
+const documentManifestCache = new Map()
+let mergedDocumentManifestCache = null
+const { isAllowedExternalUrl, isAllowedLocalhostOrigin, isAllowedOutboundUrl } = networkPolicy
 const expensiveRequestTimes = []
 
 await initializeSettingsStore()
@@ -59,6 +78,7 @@ app.use([
   '/api/completeness-audit/refresh',
   '/api/relationship-audit/refresh',
   '/api/refresh',
+  '/api/research-chat',
   '/api/settings/test-ai',
   '/api/settings/test-local-ai',
   '/api/settings/test-source',
@@ -106,7 +126,7 @@ function corsForLocalApp(request, response, next) {
     if (origin) response.setHeader('Access-Control-Allow-Origin', origin)
     response.setHeader('Vary', 'Origin')
   }
-  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Docket-Observatory-Request, X-Docket-Observatory-Session')
   if (request.method === 'OPTIONS') {
     if (!isAllowedLocalhostOrigin(origin)) {
@@ -254,12 +274,12 @@ async function runAutomaticWork() {
           limit: processingScope === 'all' ? 'all' : processingLimit,
         },
       )
-      if (automaticRefreshNeedsRetry()) scheduleAutomaticRetry()
+      scheduleAutomaticRetry(automaticRetryDelayMs())
       return
     }
     await refreshStateFromSources()
     await refreshAutomaticCompletenessAudit()
-    if (automaticRefreshNeedsRetry()) scheduleAutomaticRetry()
+    scheduleAutomaticRetry(automaticRetryDelayMs())
   } catch (error) {
     console.error(`Automatic work failed: ${error instanceof Error ? error.message : String(error)}`)
     scheduleAutomaticRetry()
@@ -290,19 +310,23 @@ async function refreshAutomaticCompletenessAudit() {
   }
 }
 
-function automaticRefreshNeedsRetry() {
+function automaticRetryDelayMs() {
   const enabledSourceIds = new Set(state.sources.filter((source) => source.enabled).map((source) => source.id))
   const currentStatuses = state.sourceStatuses.filter((status) => enabledSourceIds.has(status.sourceId))
   const publicNetworkStatuses = currentStatuses.filter((status) => !['needs_credentials', 'needs_implementation'].includes(status.status))
-  return publicNetworkStatuses.some((status) => status.retryable === true
+  const retryableStatuses = publicNetworkStatuses.filter((status) => status.retryable === true
     || status.status === 'error'
     || status.lastAttempt?.retryable === true
     || status.lastAttempt?.status === 'error')
+  if (!retryableStatuses.length) return null
+  const baseDelayMs = getPublicSettings().settings.networkRetryMinutes * 60 * 1000
+  const retryTimes = retryableStatuses.map((status) => Date.parse(status.lastAttempt?.retryAt ?? status.retryAt ?? ''))
+  if (retryTimes.some((retryAt) => !Number.isFinite(retryAt) || retryAt <= Date.now())) return baseDelayMs
+  return Math.max(baseDelayMs, Math.min(...retryTimes) - Date.now())
 }
 
-function scheduleAutomaticRetry() {
-  if (!getPublicSettings().settings.autoRefresh || automaticRetryTimer) return
-  const delayMs = getPublicSettings().settings.networkRetryMinutes * 60 * 1000
+function scheduleAutomaticRetry(delayMs = automaticRetryDelayMs()) {
+  if (!getPublicSettings().settings.autoRefresh || automaticRetryTimer || !Number.isFinite(delayMs) || delayMs <= 0) return
   automaticRetryTimer = setTimeout(() => {
     automaticRetryTimer = null
     void runAutomaticWork()
@@ -416,7 +440,15 @@ function sanitizeEventDateConfidence(event, sourceId) {
 }
 
 function safePublicSourceUrl(value) {
-  return isAllowedOutboundUrl(value, { includeOpenAI: false }) ? String(value) : ''
+  try {
+    const url = new URL(String(value))
+    return url.protocol === 'https:' && (
+      isAllowedOutboundUrl(url.toString(), { includeOpenAI: false })
+      || isAllowedExternalUrl(url.toString())
+    ) ? url.toString() : ''
+  } catch {
+    return ''
+  }
 }
 
 async function saveState() {
@@ -435,12 +467,6 @@ async function loadDocumentManifest() {
   try {
     const manifest = await loadRawDocumentManifest()
     const files = Array.isArray(manifest.files) ? manifest.files : []
-    let processingSnapshot = null
-    try {
-      processingSnapshot = await getDocumentSearchProcessingSnapshot(manifest, 'zh')
-    } catch {
-      // The document library remains usable while a missing or stale search index rebuilds.
-    }
     const availableFiles = files
       .filter((file) => file.status !== 'error')
       .sort((a, b) => compareDocumentOrder(b, a))
@@ -467,9 +493,9 @@ async function loadDocumentManifest() {
         localAvailable: downloadedCount + newVersionCount + skippedExistingCount,
         errors: totalErrorCount || manifest.counts?.errors || 0,
         officialOrRecapFiles: localFiles.filter((file) => ['pacer', 'courtlistener-recap'].includes(file.sourceId)).length,
-        uniquePdfContents: processingSnapshot?.uniquePdfContents ?? null,
-        professionalReviewDocuments: processingSnapshot?.professionalReviewDocuments ?? null,
-        pendingProfessionalReviewDocuments: processingSnapshot?.pendingProfessionalReviewDocuments ?? null,
+        uniquePdfContents: null,
+        professionalReviewDocuments: null,
+        pendingProfessionalReviewDocuments: null,
       },
       sourcePages: manifest.sourcePages,
       credentialRequired: manifest.credentialRequired,
@@ -486,14 +512,25 @@ async function loadRawDocumentManifest() {
   const bundledManifest = bundledDocumentRoot
     ? await readDocumentManifest(bundledDocumentRoot, 'bundled')
     : null
-  return mergeDocumentManifests(bundledManifest, writableManifest)
+  if (mergedDocumentManifestCache?.writable === writableManifest
+    && mergedDocumentManifestCache?.bundled === bundledManifest) {
+    return mergedDocumentManifestCache.value
+  }
+  const value = mergeDocumentManifests(bundledManifest, writableManifest)
+  mergedDocumentManifestCache = { writable: writableManifest, bundled: bundledManifest, value }
+  return value
 }
 
 async function readDocumentManifest(root, storage) {
   try {
-    const raw = await readFile(path.join(root, 'manifest.json'), 'utf8')
+    const manifestPath = path.join(root, 'manifest.json')
+    const info = await stat(manifestPath)
+    const signature = `${info.size}:${Math.round(info.mtimeMs)}`
+    const cached = documentManifestCache.get(manifestPath)
+    if (cached?.signature === signature && cached.storage === storage) return cached.value
+    const raw = await readFile(manifestPath, 'utf8')
     const manifest = JSON.parse(raw)
-    return {
+    const value = {
       ...manifest,
       root,
       sourcePages: (manifest.sourcePages ?? []).flatMap((page) => {
@@ -554,6 +591,8 @@ async function readDocumentManifest(root, storage) {
         }
       }),
     }
+    documentManifestCache.set(manifestPath, { signature, storage, value })
+    return value
   } catch (error) {
     if (error?.code !== 'ENOENT') throw error
     return null
@@ -669,6 +708,7 @@ function documentFileSummary(file) {
   return {
     title: file.title,
     docNumber: file.docNumber,
+    filedAt: file.filedAt ?? null,
     caseId: file.caseId,
     sourceId: file.sourceId,
     sourceLabel: file.sourceLabel,
@@ -705,6 +745,8 @@ function emptyDocumentManifest() {
 }
 
 function compareDocumentOrder(left, right) {
+  const filedDateOrder = String(left.filedAt ?? '').localeCompare(String(right.filedAt ?? ''))
+  if (filedDateOrder) return filedDateOrder
   const docketOrder = compareDocketNumbers(left.docNumber, right.docNumber)
   if (docketOrder) return docketOrder
   return String(left.title ?? left.url ?? '').localeCompare(String(right.title ?? right.url ?? ''))
@@ -808,9 +850,10 @@ function dashboardPayload(lang = 'zh') {
   const latestAnalysis = latestEvent ? localAnalyzeEvent(latestEvent, state, lang) : null
   const sourceStatusById = new Map(state.sourceStatuses.map((status) => [status.sourceId, status]))
 
-  const cases = state.cases.map((caseRecord) => {
-    const directEvents = events.filter((event) => event.caseId === caseRecord.id)
-    const relatedEvents = events.filter((event) => event.caseId === caseRecord.id || event.relatedCaseIds.includes(caseRecord.id))
+  const visibleCases = userFacingCases(state.cases)
+  const cases = visibleCases.map((caseRecord) => {
+    const directEvents = events.filter((event) => portfolioCaseId(event.caseId) === caseRecord.id)
+    const relatedEvents = events.filter((event) => dashboardEventBelongsToCase(event, caseRecord.id))
     return {
       ...caseRecord,
       eventCount: relatedEvents.length,
@@ -833,11 +876,11 @@ function dashboardPayload(lang = 'zh') {
     lastRefresh: state.lastRefresh ?? null,
     aiMode: isCloudAiProvider(selectedAiProvider) && cloudProviderConfigured(selectedAiProvider)
       ? `${cloudProviderLabel(selectedAiProvider)} 结构化分析（${cloudModelForPurpose('analysis')}）`
-      : '本地确定性法律规则分析（非生成式 AI）；云端或本机模型为可选增强',
+      : '本地规则分析 · AI 可选增强',
     metrics: {
       totalEvents: events.length,
       criticalEvents: events.filter((event) => event.severity === 'critical').length,
-      monitoredCases: state.cases.length,
+      monitoredCases: visibleCases.length,
       monitoredEntities: state.entities.length,
       officialCount,
       officialCourtCount: events.filter((event) => event.sourceType === 'Official Court').length,
@@ -1049,6 +1092,147 @@ app.get('/api/public-records', async (request, response, next) => {
   try {
     response.json(await queryPublicRecords(request.query, requestLanguage(request)))
   } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/public-record-transcripts', async (request, response, next) => {
+  try {
+    response.json(await queryPublicRecordTranscripts(request.query, requestLanguage(request)))
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/public-record-transcripts/:id', async (request, response, next) => {
+  try {
+    const transcript = await getPublicRecordTranscript(String(request.params.id ?? ''), requestLanguage(request))
+    if (!transcript) {
+      const error = new Error('Public-record transcript was not found.')
+      error.statusCode = 404
+      throw error
+    }
+    response.json({ transcript })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/research-chat/status', async (request, response, next) => {
+  try {
+    response.json(await researchChatStatus(requestLanguage(request)))
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/research-conversations', async (_request, response, next) => {
+  try {
+    response.json({ conversations: await listResearchConversations() })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.get('/api/research-conversations/:id', async (request, response, next) => {
+  try {
+    const conversation = await getResearchConversation(request.params.id)
+    if (!conversation) {
+      const error = new Error('Conversation was not found.')
+      error.statusCode = 404
+      throw error
+    }
+    response.json({ conversation })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.put('/api/research-conversations/:id', async (request, response, next) => {
+  try {
+    response.json({ conversation: await renameResearchConversation(request.params.id, request.body?.title) })
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.delete('/api/research-conversations/:id', async (request, response, next) => {
+  try {
+    response.json(await deleteResearchConversation(request.params.id))
+  } catch (error) {
+    next(error)
+  }
+})
+
+app.post('/api/research-chat', async (request, response, next) => {
+  const controller = new AbortController()
+  request.once('aborted', () => controller.abort())
+  response.once('close', () => {
+    if (!response.writableEnded) controller.abort()
+  })
+  try {
+    const interfaceLanguage = requestLanguage(request)
+    const historyRequest = request.body?.message && request.body?.conversationId && request.body?.turnId
+    let messages = request.body?.messages
+    let conversationId = null
+    let turnId = null
+    let userMessage = null
+    if (historyRequest) {
+      conversationId = String(request.body.conversationId)
+      turnId = String(request.body.turnId)
+      const completed = await findResearchConversationTurn(conversationId, turnId)
+      if (completed) {
+        response.json({ ...completed.response, conversation: completed.conversation })
+        return
+      }
+      const existingConversation = await getResearchConversation(conversationId)
+      const content = String(request.body.message?.content ?? '').trim().slice(0, 20000)
+      if (!content) {
+        const error = new Error(interfaceLanguage === 'en' ? 'Enter a question.' : '请输入问题。')
+        error.statusCode = 400
+        throw error
+      }
+      userMessage = {
+        id: String(request.body.message?.id ?? randomUUID()),
+        role: 'user',
+        content,
+        createdAt: new Date().toISOString(),
+      }
+      messages = [
+        ...(existingConversation?.messages ?? []).map((message) => ({ role: message.role, content: message.content })),
+        { role: 'user', content },
+      ]
+    }
+    const answerLanguage = detectResearchChatAnswerLanguage(messages, interfaceLanguage)
+    const result = await answerResearchChat({
+      input: { messages },
+      interfaceLanguage,
+      answerLanguage,
+      manifest: await loadRawDocumentManifest(),
+      state,
+      dashboard: dashboardPayload(answerLanguage),
+      signal: controller.signal,
+    })
+    if (controller.signal.aborted) return
+    if (!historyRequest) {
+      response.json(result)
+      return
+    }
+    const saved = await recordResearchConversationTurn({
+      conversationId,
+      turnId,
+      userMessage,
+      assistantMessage: {
+        id: randomUUID(),
+        role: 'assistant',
+        content: result.answer,
+        response: result,
+        createdAt: new Date().toISOString(),
+      },
+    })
+    response.json({ ...saved.response, conversation: saved.conversation })
+  } catch (error) {
+    if (controller.signal.aborted || error?.name === 'AbortError') return
     next(error)
   }
 })
@@ -1309,10 +1493,6 @@ export const apiServerReady = new Promise((resolve, reject) => {
   server.once('error', reject)
   server.once('listening', () => {
     console.log(`Docket Observatory API listening on http://127.0.0.1:${port}`)
-    void loadRawDocumentManifest()
-      .then((manifest) => warmDocumentSearchIndex(manifest))
-      .then((result) => console.log(`Full-text search index ready: ${result.coverage.indexedOriginals}/${result.coverage.uniquePdfContents} unique PDF contents`))
-      .catch((error) => console.error(`Full-text search warmup failed: ${error instanceof Error ? error.message : String(error)}`))
     resolve(server)
   })
 })

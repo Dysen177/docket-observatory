@@ -121,7 +121,7 @@ async function performPdfExtraction(file, options = {}) {
     let ocr = null
     const sparseTextLayer = ocrEnabled && shouldUseLocalOcr(normalizedText, effectivePageSnippets)
     if (sparseTextLayer) {
-      const ocrResult = await extractWithLocalOcr(parser, ocrPageLimit, charLimit)
+      const ocrResult = await extractWithLocalOcr(parser, ocrPageLimit, charLimit, result.total)
       if (ocrResult.text.length > normalizedText.length) {
         ocr = ocrResult
         normalizedText = ocr.text
@@ -161,6 +161,7 @@ async function performPdfExtraction(file, options = {}) {
     rememberExtractionCache(cachePath, payload)
     return payload
   } catch (error) {
+    const warning = error instanceof Error ? error.message : String(error)
     const payload = {
       cacheVersion: extractionCacheVersion,
       status: 'error',
@@ -178,7 +179,8 @@ async function performPdfExtraction(file, options = {}) {
       pageSnippets: [],
       textHash: null,
       signature,
-      warning: error instanceof Error ? error.message : String(error),
+      warning,
+      retryable: isRetryableExtractionWarning(warning),
     }
     await atomicWriteJson(cachePath, payload, { directoryMode: 0o700 })
     rememberExtractionCache(cachePath, payload)
@@ -223,15 +225,7 @@ export function extractionCapability() {
   }
 }
 
-async function extractWithLocalOcr(parser, pageLimit, charLimit) {
-  const screenshots = await parser.getScreenshot({
-    first: pageLimit,
-    desiredWidth: 1800,
-    imageBuffer: true,
-    imageDataUrl: false,
-  })
-  if (!screenshots.pages?.length) return { text: '', pageSnippets: [], pagesParsed: 0 }
-
+async function extractWithLocalOcr(parser, pageLimit, charLimit, totalPages = null) {
   const englishData = require('@tesseract.js-data/eng')
   const chineseData = require('@tesseract.js-data/chi_sim')
   const langPath = await ensureBundledLanguageDirectory([englishData, chineseData])
@@ -248,10 +242,21 @@ async function extractWithLocalOcr(parser, pageLimit, charLimit) {
       user_defined_dpi: '220',
     })
     const pageTexts = []
-    for (const page of screenshots.pages) {
-      if (pageTexts.reduce((total, item) => total + item.text.length, 0) >= charLimit) break
+    let extractedCharacters = 0
+    const pagesToProcess = Math.min(pageLimit, Number.isFinite(Number(totalPages)) ? Number(totalPages) : pageLimit)
+    for (let pageNumber = 1; pageNumber <= pagesToProcess && extractedCharacters < charLimit; pageNumber += 1) {
+      const screenshots = await parser.getScreenshot({
+        partial: [pageNumber],
+        desiredWidth: 1800,
+        imageBuffer: true,
+        imageDataUrl: false,
+      })
+      const page = screenshots.pages?.[0]
+      if (!page?.data) continue
       const result = await worker.recognize(Buffer.from(page.data))
-      pageTexts.push({ pageNumber: page.pageNumber, text: normalizeExtractedText(result.data?.text) })
+      const text = normalizeExtractedText(result.data?.text)
+      pageTexts.push({ pageNumber: page.pageNumber ?? pageNumber, text })
+      extractedCharacters += text.length
     }
     const pageSnippets = buildPageSnippets(pageTexts.map((page) => ({ num: page.pageNumber, text: page.text })), charLimit)
     return {
@@ -368,13 +373,19 @@ async function reusableExtractionCache(cacheDir, cachePath, signature, options) 
   if (!contentSha256) return null
   const index = await extractionCacheIndex(cacheDir)
   const candidates = index.get(extractionReuseKey(contentSha256, options)) ?? []
-  return candidates
+  const ranked = candidates
     .filter((entry) => extractionCacheMatches(entry.payload, signature, options))
-    .sort((left, right) => compareReusableExtractions(left.payload, right.payload))[0] ?? null
+    .sort((left, right) => compareReusableExtractions(left.payload, right.payload))
+  for (const entry of ranked) {
+    const payload = await readExtractionCache(entry.filePath)
+    if (extractionCacheMatches(payload, signature, options)) return { filePath: entry.filePath, payload }
+  }
+  return null
 }
 
 function extractionCacheMatches(cached, signature, options) {
   if (!cached || cached.cacheVersion !== extractionCacheVersion) return false
+  if (cached.status === 'error' && (cached.retryable === true || isRetryableExtractionWarning(cached.warning))) return false
   const cachedSha256 = cached.signature?.contentSha256 || cached.signature?.manifestSha256
   const currentSha256 = signature?.contentSha256 || signature?.manifestSha256
   return Boolean(cachedSha256 && currentSha256 && cachedSha256 === currentSha256)
@@ -382,6 +393,10 @@ function extractionCacheMatches(cached, signature, options) {
     && Number(cached.charLimit) === Number(options.charLimit)
     && Boolean(cached.ocrEnabled) === Boolean(options.ocrEnabled)
     && Number(cached.ocrPageLimit) === Number(options.ocrPageLimit)
+}
+
+function isRetryableExtractionWarning(value) {
+  return /native binding|Cannot load .*canvas|DOMMatrix is not defined/iu.test(String(value ?? ''))
 }
 
 async function extractionCacheIndex(cacheDir) {
@@ -410,7 +425,7 @@ async function buildExtractionCacheIndex(cacheDir) {
       if (!contentSha256 || payload?.cacheVersion !== extractionCacheVersion) continue
       const key = extractionReuseKey(contentSha256, payload)
       const values = index.get(key) ?? []
-      values.push({ filePath, payload })
+      values.push({ filePath, payload: compactExtractionCacheIndexValue(payload) })
       index.set(key, values)
     }
   })
@@ -425,9 +440,27 @@ function rememberExtractionCache(filePath, payload) {
     if (!contentSha256) return
     const key = extractionReuseKey(contentSha256, payload)
     const values = (index.get(key) ?? []).filter((entry) => entry.filePath !== filePath)
-    values.push({ filePath, payload })
+    values.push({ filePath, payload: compactExtractionCacheIndexValue(payload) })
     index.set(key, values)
   })
+}
+
+function compactExtractionCacheIndexValue(payload) {
+  return {
+    cacheVersion: payload?.cacheVersion,
+    pageLimit: payload?.pageLimit,
+    charLimit: payload?.charLimit,
+    ocrEnabled: payload?.ocrEnabled,
+    ocrPageLimit: payload?.ocrPageLimit,
+    coverage: payload?.coverage,
+    pagesParsed: payload?.pagesParsed,
+    charCount: payload?.charCount,
+    extractedAt: payload?.extractedAt,
+    signature: {
+      manifestSha256: payload?.signature?.manifestSha256,
+      contentSha256: payload?.signature?.contentSha256,
+    },
+  }
 }
 
 function extractionReuseKey(contentSha256, options) {

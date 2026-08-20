@@ -11,8 +11,30 @@ const manifest = JSON.parse(await readFile(path.join(root, 'downloads', 'court-f
 const cachedState = await readFile(path.join(root, 'server', 'cache', 'state.json'), 'utf8').catch(() => '')
 const state = cachedState ? JSON.parse(cachedState) : createSeedState()
 
-async function search(query, scope = 'all', limit = 5) {
-  return buildDocumentCatalog(manifest, state, 'zh', { query, scope, priority: 'all', offset: 0, limit })
+function normalizeDocket(value) {
+  return String(value ?? '').trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '')
+    .replace(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)(?:-[a-z]{1,6})+$/, '$1$2')
+    .replace(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)$/, '$1$2')
+}
+
+function assertNoRepeatedResults(result, query) {
+  const sourceUrls = result.catalog.map((record) => record.sourceUrl)
+  assert.equal(new Set(sourceUrls).size, sourceUrls.length, `${query} repeated a canonical source URL`)
+
+  const filingCoordinates = result.catalog
+    .map((record) => {
+      const docket = normalizeDocket(record.docketNumber)
+      const document = String(record.docNumber ?? '').trim().toLowerCase()
+      return docket && document ? `${docket}|${document}` : ''
+    })
+    .filter(Boolean)
+  assert.equal(new Set(filingCoordinates).size, filingCoordinates.length, `${query} repeated a logical docket filing`)
+}
+
+async function search(query, scope = 'all', limit = 5, offset = 0) {
+  const result = await buildDocumentCatalog(manifest, state, 'zh', { query, scope, priority: 'all', offset, limit })
+  assertNoRepeatedResults(result, query || '<unfiltered>')
+  return result
 }
 
 const docket = await search('Doc 612')
@@ -53,11 +75,17 @@ for (const query of ['HID', '"Bradford Geyer"', '"Rule 32.2"', '"21 U.S.C. § 85
 
 const geyer = await search('geyer', 'all', 100)
 assert.equal(geyer.catalog.filter((record) => record.docNumber === '761').length, 1)
-assert.equal(
-  new Set(geyer.catalog.map((record) => record.sourceUrl)).size,
-  geyer.catalog.length,
-  'logical search results must not repeat the same canonical source',
-)
+assert.equal(geyer.catalog.filter((record) => record.docNumber === '712').length, 1)
+
+const deduplicationQueries = ['Kwok', 'Guo', 'GTV', 'Himalaya', 'bankruptcy', 'motion', 'Wang', '郭文贵']
+for (const query of deduplicationQueries) {
+  const firstPage = await search(query, 'all', 100)
+  assert.ok(firstPage.filtered > 0, `${query} should exercise at least one real catalog result`)
+  if (!firstPage.hasMore) continue
+  const secondPage = await search(query, 'all', 100, 100)
+  const combined = { catalog: [...firstPage.catalog, ...secondPage.catalog] }
+  assertNoRepeatedResults(combined, `${query} across pages`)
+}
 
 const renameCandidate = manifest.files.find((file) => file?.path && file?.sha256 && file?.status !== 'error')
 assert.ok(renameCandidate, 'A local PDF is required for the cache identity check')
@@ -84,6 +112,7 @@ console.log(JSON.stringify({
   status: 'ok',
   indexedOriginals: refreshedIndex.coverage.indexedOriginals,
   uniquePdfContents: refreshedIndex.coverage.uniquePdfContents,
-  checkedQueries: 13,
+  checkedQueries: 21,
+  deduplicationQueries,
   cacheIdentity: 'sha256-stable-across-path-and-url-change',
 }, null, 2))

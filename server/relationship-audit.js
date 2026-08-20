@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
 import { atomicWriteJson, atomicWriteText } from './atomic-write.js'
+import { normalizeLegalMetadataText } from './legal-metadata.js'
 
 const schemaVersion = 3
 
@@ -609,7 +610,7 @@ function compactExcerpt(value, index, radius) {
 }
 
 function clean(value) {
-  return String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, 12000)
+  return normalizeLegalMetadataText(value).replace(/\s+/g, ' ').trim().slice(0, 12000)
 }
 
 function unique(values) {

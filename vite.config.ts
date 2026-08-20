@@ -11,6 +11,17 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 5173,
     strictPort: true,
+    watch: {
+      ignored: [
+        '**/downloads/**',
+        '**/output/**',
+        '**/release/**',
+        '**/release-data/**',
+        '**/release-metadata/**',
+        '**/server/cache/**',
+        '**/server/public-record-transcripts/**',
+      ],
+    },
     proxy: {
       '/api': process.env.GUO_INTEL_VITE_API_URL ?? 'http://127.0.0.1:4177',
     },

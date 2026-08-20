@@ -55,6 +55,7 @@ export async function cloudGenerateText({
   maxOutputTokens = 4000,
   timeoutMs = 180000,
   reasoning = purpose === 'analysis',
+  signal = null,
 }) {
   if (!isCloudAiProvider(provider)) throw providerError(provider, 'is not a supported cloud protocol.')
   const definition = providerDefinitions[provider]
@@ -63,15 +64,15 @@ export async function cloudGenerateText({
   if (!model) throw providerError(provider, 'requires a model ID in Settings.', 400)
 
   if (provider === 'openai') {
-    return openAiGenerate({ apiKey, model, system, user, schema, schemaName, maxOutputTokens, timeoutMs, reasoning })
+    return openAiGenerate({ apiKey, model, system, user, schema, schemaName, maxOutputTokens, timeoutMs, reasoning, signal })
   }
   if (provider === 'anthropic') {
-    return anthropicGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs })
+    return anthropicGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal })
   }
   if (provider === 'gemini') {
-    return geminiGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs })
+    return geminiGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal })
   }
-  return compatibleGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs })
+  return compatibleGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal })
 }
 
 export function parseStructuredModelOutput(value, context = 'AI response') {
@@ -91,7 +92,7 @@ export function parseStructuredModelOutput(value, context = 'AI response') {
   }
 }
 
-async function openAiGenerate({ apiKey, model, system, user, schema, schemaName, maxOutputTokens, timeoutMs, reasoning }) {
+async function openAiGenerate({ apiKey, model, system, user, schema, schemaName, maxOutputTokens, timeoutMs, reasoning, signal }) {
   const response = await safeFetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
@@ -118,13 +119,14 @@ async function openAiGenerate({ apiKey, model, system, user, schema, schemaName,
         },
       } : {}),
     }),
+    signal,
   }, { timeoutMs })
   const body = await readTextWithLimit(response, 4 * 1024 * 1024)
   if (!response.ok) throw httpError('OpenAI', response.status, body)
   return responseOutputText(JSON.parse(body), 'OpenAI response')
 }
 
-async function anthropicGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs }) {
+async function anthropicGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal }) {
   const response = await safeFetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -138,6 +140,7 @@ async function anthropicGenerate({ apiKey, model, system, user, schema, maxOutpu
       system: systemWithSchema(system, schema),
       messages: [{ role: 'user', content: user }],
     }),
+    signal,
   }, { timeoutMs })
   const body = await readTextWithLimit(response, 4 * 1024 * 1024)
   if (!response.ok) throw httpError('Anthropic', response.status, body)
@@ -149,7 +152,7 @@ async function anthropicGenerate({ apiKey, model, system, user, schema, maxOutpu
   return output
 }
 
-async function geminiGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs }) {
+async function geminiGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal }) {
   const normalizedModel = model.replace(/^models\//u, '')
   const response = await safeFetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(normalizedModel)}:generateContent`, {
     method: 'POST',
@@ -165,6 +168,7 @@ async function geminiGenerate({ apiKey, model, system, user, schema, maxOutputTo
         ...(schema ? { responseMimeType: 'application/json' } : {}),
       },
     }),
+    signal,
   }, { timeoutMs })
   const body = await readTextWithLimit(response, 4 * 1024 * 1024)
   if (!response.ok) throw httpError('Gemini', response.status, body)
@@ -180,7 +184,7 @@ async function geminiGenerate({ apiKey, model, system, user, schema, maxOutputTo
   return output
 }
 
-async function compatibleGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs }) {
+async function compatibleGenerate({ apiKey, model, system, user, schema, maxOutputTokens, timeoutMs, signal }) {
   const endpoint = compatibleEndpoint(runtimeSetting('compatibleAiBaseUrl'))
   const request = async (tokenField) => {
     const response = await safeFetch(endpoint, {
@@ -197,6 +201,7 @@ async function compatibleGenerate({ apiKey, model, system, user, schema, maxOutp
         ],
         [tokenField]: maxOutputTokens,
       }),
+      signal,
     }, { timeoutMs, allowedOrigins: [new URL(endpoint).origin] })
     return { response, body: await readTextWithLimit(response, 4 * 1024 * 1024) }
   }

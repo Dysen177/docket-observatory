@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads'
 import { gzip as gzipCallback, gunzip as gunzipCallback } from 'node:zlib'
 import { atomicWriteJson } from './atomic-write.js'
+import { normalizeLegalMetadataText } from './legal-metadata.js'
 
 const searchIndexVersion = 'document-search-v4'
 const extractionCacheVersion = 8
@@ -145,7 +146,7 @@ function buildLogicalCatalogRecordKeys(records, compiled) {
     if (record.resourceKind === 'web_page') return
     const docNumber = String(record.docNumber ?? '').trim().toLowerCase()
     if (docNumber) {
-      const docket = String(record.docketNumber ?? '').trim().toLowerCase().replace(/\s+/g, '')
+      const docket = normalizeDocketCoordinate(record.docketNumber)
       const filingKeys = [
         docket ? `docket:${docket}:${docNumber}` : '',
         record.caseId ? `case:${record.caseId}:${docNumber}` : '',
@@ -165,13 +166,24 @@ function buildLogicalCatalogRecordKeys(records, compiled) {
 
   for (const indexes of hashGroups.values()) {
     const dockets = new Set(indexes
-      .map((index) => String(records[index].docketNumber ?? '').trim().toLowerCase().replace(/\s+/g, ''))
+      .map((index) => normalizeDocketCoordinate(records[index].docketNumber))
       .filter(Boolean))
     if (dockets.size > 1) continue
     for (const index of indexes.slice(1)) union(indexes[0], index)
   }
 
   return new Map(records.map((record, index) => [catalogRecordIdentity(record), `logical:${find(index)}`]))
+}
+
+function normalizeDocketCoordinate(value) {
+  const docket = String(value ?? '').trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '')
+  if (!docket) return ''
+  // District docket exports sometimes append the judge's initials to the same filing coordinate.
+  // Keep defendant/sequence suffixes intact; only strip a final alphabetic judge suffix.
+  const match = docket.match(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)(?:-[a-z]{1,6})+$/)
+  if (match) return `${match[1]}${match[2]}`
+  const canonical = docket.match(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)$/)
+  return canonical ? `${canonical[1]}${canonical[2]}` : docket
 }
 
 function catalogRecordIdentity(record) {
@@ -407,8 +419,7 @@ export function normalizeDocumentSearchText(value) {
 }
 
 function normalizeDocumentSearchSurface(value) {
-  return String(value ?? '')
-    .normalize('NFKC')
+  return normalizeLegalMetadataText(value)
     .replace(/([A-Za-z])-\s*\n\s*([a-z])/g, '$1$2')
     .replace(/[‐‑‒–—―]/g, '-')
     .replace(/(\d)[,_，](?=\d)/g, '$1')
@@ -462,6 +473,12 @@ function runSearchIndexWorker(manifest, signature) {
     const worker = new Worker(new URL(import.meta.url), {
       env: searchIndexWorkerEnvironment(),
       workerData: { task: 'build-document-search-index', manifest, signature },
+      resourceLimits: {
+        maxOldGenerationSizeMb: 512,
+        maxYoungGenerationSizeMb: 64,
+        codeRangeSizeMb: 32,
+        stackSizeMb: 4,
+      },
     })
     let settled = false
     const timeout = setTimeout(() => {
@@ -569,28 +586,28 @@ async function buildDocumentSearchIndex(manifest, signature) {
   const files = (manifest?.files ?? []).filter((file) => localFileStatuses.has(file?.status) && file?.url && file?.sha256)
   const currentByUrl = new Map(files.map((file) => [file.url, file]))
   const currentHashes = new Set(files.map((file) => file.sha256))
-  const [extractions, translations, analyses] = await Promise.all([
-    scanJsonDirectory('pdf-text', async (value, cacheFile) => {
-      const sha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
-      if (value?.cacheVersion !== extractionCacheVersion || !currentHashes.has(sha256) || value?.status !== 'extracted') return null
-      return { sha256, entry: await indexedOriginal(value, cacheFile) }
-    }),
-    scanJsonDirectory('translations', async (value, cacheFile) => {
-      const file = currentByUrl.get(value?.sourceUrl)
-      const sha256 = value?.sourceSha256 || file?.sha256
-      if (value?.schemaVersion !== translationCacheVersion || !file || file.sha256 !== sha256) return null
-      if (!['translated', 'assistive_only', 'no_translation_needed'].includes(value?.status) || !translationPages(value).length) return null
-      return { sha256, language: normalizedTargetLanguage(value.targetLanguage), entry: await indexedTranslation(value, cacheFile) }
-    }),
-    scanJsonDirectory('document-ai', async (value, cacheFile) => {
-      const file = currentByUrl.get(value?.sourceUrl)
-      if (!file || value?.sourceSha256 !== file.sha256 || !value?.aiStatus?.generated) return null
-      const chunks = legalAnalysisChunks(value)
-      if (!chunks.length) return null
-      const language = documentAnalysisLanguage(value)
-      return { sha256: file.sha256, language, entry: await indexedAnalysis(value, cacheFile, chunks) }
-    }),
-  ])
+  // A full install contains more than a gigabyte across these JSON caches.
+  // Scan cache families in stages so their parsed PDF bodies do not overlap.
+  const extractions = await scanJsonDirectory('pdf-text', async (value, cacheFile) => {
+    const sha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
+    if (value?.cacheVersion !== extractionCacheVersion || !currentHashes.has(sha256) || value?.status !== 'extracted') return null
+    return { sha256, entry: await indexedOriginal(value, cacheFile) }
+  })
+  const translations = await scanJsonDirectory('translations', async (value, cacheFile) => {
+    const file = currentByUrl.get(value?.sourceUrl)
+    const sha256 = value?.sourceSha256 || file?.sha256
+    if (value?.schemaVersion !== translationCacheVersion || !file || file.sha256 !== sha256) return null
+    if (!['translated', 'assistive_only', 'no_translation_needed'].includes(value?.status) || !translationPages(value).length) return null
+    return { sha256, language: normalizedTargetLanguage(value.targetLanguage), entry: await indexedTranslation(value, cacheFile) }
+  })
+  const analyses = await scanJsonDirectory('document-ai', async (value, cacheFile) => {
+    const file = currentByUrl.get(value?.sourceUrl)
+    if (!file || value?.sourceSha256 !== file.sha256 || !value?.aiStatus?.generated) return null
+    const chunks = legalAnalysisChunks(value)
+    if (!chunks.length) return null
+    const language = documentAnalysisLanguage(value)
+    return { sha256: file.sha256, language, entry: await indexedAnalysis(value, cacheFile, chunks) }
+  })
 
   const extractionByHash = new Map()
   for (const { sha256, entry } of extractions) {
@@ -931,11 +948,15 @@ function searchCatalogMetadata(record, query, scope) {
 }
 
 function metadataMatch(record, query, kind, score) {
+  const originalTitle = String(record.originalTitle ?? '')
+  const titleSnippet = originalTitle && textMatchesQuery(normalizeDocumentSearchText(originalTitle), query)
+    ? originalTitle
+    : record.title
   return {
     kind,
     score,
     pageNumber: null,
-    snippet: kind === 'docket_number' || kind === 'title' ? record.title : record.plainEnglish || record.summary || record.title,
+    snippet: kind === 'docket_number' ? record.title : kind === 'title' ? titleSnippet : record.plainEnglish || record.summary || record.title,
     terms: query.terms.map((term) => term.raw),
     language: detectLanguage(record.title),
     coverage: kind === 'web_page' ? (record.researchQuality?.key === 'body_verified' ? 'complete' : 'partial') : 'metadata',
@@ -1279,7 +1300,7 @@ async function scanJsonDirectory(relativeDirectory, transform) {
     throw error
   }
   const filenames = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json')).map((entry) => entry.name)
-  const values = await mapWithConcurrency(filenames, 3, async (filename) => {
+  const values = await mapWithConcurrency(filenames, 2, async (filename) => {
     const value = await readJsonFile(path.join(directory, filename))
     return value ? transform(value, path.posix.join(relativeDirectory, filename)) : null
   })

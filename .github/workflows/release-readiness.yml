@@ -34,6 +34,10 @@ jobs:
           npm run test:zero-key
           npm run test:settings
           npm run release:test-seed-install
+          npm run test:automation-selection
+          npm run test:public-records
+          npm run test:public-record-transcripts
+          npm run test:research-chat
           npm run test:search:fixture
           npm run security:check
 

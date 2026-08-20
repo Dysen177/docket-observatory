@@ -45,6 +45,7 @@ const expectedSettings = {
   localAiModel: 'fixture-local-model:latest',
   localAiTimeoutMs: 123000,
   localAiContextChars: 110000,
+  researchChatContextChars: 240000,
   translationProvider: 'ollama',
   autoRefresh: false,
   refreshIntervalMinutes: 42,

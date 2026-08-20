@@ -47,6 +47,15 @@ jobs:
       - name: Verify release-seed installation logic
         run: npm run release:test-seed-install
 
+      - name: Verify incremental background processing selection
+        run: npm run test:automation-selection
+
+      - name: Verify public records, transcripts, translations, and AI retrieval
+        run: |
+          npm run test:public-records
+          npm run test:public-record-transcripts
+          npm run test:research-chat
+
       - name: Verify search fixture
         run: npm run test:search:fixture
 

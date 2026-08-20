@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, safeStorage, session, shell } = require('electron')
 const { randomBytes } = require('node:crypto')
-const { appendFile, chmod, mkdir, readFile, writeFile } = require('node:fs/promises')
+const { appendFile, chmod, mkdir, readFile, stat, writeFile } = require('node:fs/promises')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
 const { APPLICATION_NAME } = require('./app-identity.cjs')
@@ -143,11 +143,13 @@ function createWindow() {
   return mainWindow.loadURL(targetUrl).then(async () => {
     if (mainFrameFailure) throw mainFrameFailure
     await waitForRenderer(mainWindow)
+    const transcriptCorpus = await verifyBundledTranscriptCorpus()
     await writeFile(path.join(app.getPath('userData'), 'startup-ready.json'), `${JSON.stringify({
       readyAt: new Date().toISOString(),
       version: app.getVersion(),
       platform: process.platform,
       arch: process.arch,
+      transcriptCorpus,
     }, null, 2)}\n`, { mode: 0o600 }).catch((error) => recordDiagnostic('Startup-ready marker could not be written', error))
     startupWindow?.close()
     startupWindow = null
@@ -156,6 +158,48 @@ function createWindow() {
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.destroy()
     throw error
   })
+}
+
+async function verifyBundledTranscriptCorpus() {
+  const corpusRoot = path.join(__dirname, '..', 'server', 'public-record-transcripts')
+  const [sourceManifest, englishManifest] = await Promise.all([
+    readJsonFile(path.join(corpusRoot, 'manifest.json')),
+    readJsonFile(path.join(corpusRoot, 'en', 'manifest.json')),
+  ])
+  const shardFiles = [
+    ...(sourceManifest.shards ?? []).flatMap((shard) => [
+      path.join(corpusRoot, shard.dataFilename),
+      path.join(corpusRoot, shard.searchFilename),
+    ]),
+    ...(englishManifest.shards ?? []).flatMap((shard) => [
+      path.join(corpusRoot, 'en', shard.dataFilename),
+      path.join(corpusRoot, 'en', shard.searchFilename),
+    ]),
+  ]
+  if (!shardFiles.length) throw new Error('Bundled transcript corpus contains no data or search shards.')
+  for (const shardPath of shardFiles) {
+    const info = await stat(shardPath)
+    if (!info.isFile() || info.size <= 0) throw new Error(`Bundled transcript shard is empty: ${path.basename(shardPath)}`)
+  }
+  const inventory = {
+    catalogRecords: Number(sourceManifest.coverage?.importedRecords ?? sourceManifest.records?.length ?? 0),
+    searchableTranscripts: Number(sourceManifest.coverage?.availableTranscripts ?? 0),
+    englishRecords: Number(englishManifest.coverage?.translatedRecords ?? 0),
+    englishMissingRecords: Number(englishManifest.coverage?.missingRecords ?? -1),
+    englishComplete: englishManifest.coverage?.complete === true,
+    shardFiles: shardFiles.length,
+  }
+  if (inventory.searchableTranscripts <= 0
+    || inventory.englishRecords !== inventory.searchableTranscripts
+    || inventory.englishMissingRecords !== 0
+    || !inventory.englishComplete) {
+    throw new Error(`Bundled transcript corpus is incomplete: ${JSON.stringify(inventory)}`)
+  }
+  return inventory
+}
+
+async function readJsonFile(filePath) {
+  return JSON.parse(await readFile(filePath, 'utf8'))
 }
 
 async function waitForRenderer(window, timeoutMs = 30000) {
