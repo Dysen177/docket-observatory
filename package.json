@@ -216,14 +216,14 @@
     }
   },
   "dependencies": {
-    "@napi-rs/canvas": "0.1.80",
+    "@napi-rs/canvas": "1.0.7",
     "@tesseract.js-data/chi_sim": "^1.0.0",
     "@tesseract.js-data/eng": "^1.0.0",
     "cheerio": "^1.2.0",
     "express": "^5.2.1",
-    "lucide-react": "^1.31.0",
+    "lucide-react": "^1.32.0",
     "pdf-parse": "^2.4.5",
-    "pdfjs-dist": "^5.4.296",
+    "pdfjs-dist": "^6.2.108",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tesseract.js": "^7.0.0"
