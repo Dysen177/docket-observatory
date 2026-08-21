@@ -48,7 +48,7 @@ jobs:
         run: npm run release:verify:mac
 
       - name: Upload complete-data payload for the Windows-native build
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: complete-release-input
           retention-days: 3
@@ -65,7 +65,7 @@ jobs:
             release-metadata/release-input-manifest.json
 
       - name: Upload signed macOS installers
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: signed-macos-installers
           retention-days: 7
@@ -74,7 +74,7 @@ jobs:
           path: release/*.dmg
 
       - name: Upload release evidence
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-evidence
           retention-days: 7
@@ -127,7 +127,7 @@ jobs:
         run: npm run release:verify:win
 
       - name: Upload signed Windows installer
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: signed-windows-installer
           retention-days: 7
@@ -181,7 +181,7 @@ jobs:
         run: npm run release:finalize
 
       - name: Upload complete signed release set
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: complete-signed-release
           retention-days: 14
