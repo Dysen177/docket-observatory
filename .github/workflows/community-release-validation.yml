@@ -120,12 +120,24 @@ jobs:
 
           $desktopShortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) '案卷观察台.lnk'
           $startShortcut = Join-Path ([Environment]::GetFolderPath('Programs')) '案卷观察台.lnk'
-          $shell = New-Object -ComObject WScript.Shell
+          $wscriptShell = New-Object -ComObject WScript.Shell
+          $windowsShell = New-Object -ComObject Shell.Application
           foreach ($shortcutPath in @($desktopShortcut, $startShortcut)) {
             if (-not (Test-Path $shortcutPath)) { throw "Expected installed shortcut is missing: $shortcutPath" }
-            $shortcut = $shell.CreateShortcut($shortcutPath)
-            if ([IO.Path]::GetFullPath($shortcut.TargetPath) -ne [IO.Path]::GetFullPath($app)) {
-              throw "Shortcut has unexpected target $($shortcut.TargetPath): $shortcutPath"
+            $shortcutTarget = $wscriptShell.CreateShortcut($shortcutPath).TargetPath
+            if ([string]::IsNullOrWhiteSpace($shortcutTarget)) {
+              # WScript.Shell can return an empty target for a valid Unicode
+              # shortcut on an English runner. Shell.Application reads the
+              # same link through the Windows shell namespace.
+              $shortcutFolder = $windowsShell.NameSpace((Split-Path $shortcutPath -Parent))
+              $shortcutItem = $shortcutFolder.ParseName((Split-Path $shortcutPath -Leaf))
+              $shortcutTarget = $shortcutItem.GetLink.Path
+            }
+            if ([string]::IsNullOrWhiteSpace($shortcutTarget)) {
+              throw "Windows could not resolve installed shortcut target: $shortcutPath"
+            }
+            if ([IO.Path]::GetFullPath($shortcutTarget) -ne [IO.Path]::GetFullPath($app)) {
+              throw "Shortcut has unexpected target ${shortcutTarget}: $shortcutPath"
             }
           }
 
