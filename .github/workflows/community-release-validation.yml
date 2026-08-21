@@ -41,13 +41,18 @@ jobs:
           & 7z t $installer.FullName
           if ($LASTEXITCODE -ne 0) { throw "7-Zip installer test failed with exit code $LASTEXITCODE" }
 
-      - name: Install complete edition silently
+      - name: Install complete edition to the real default location
         shell: pwsh
         run: |
           $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
-          $installDir = 'C:\docket-observatory-release-test'
-          $process = Start-Process -FilePath $installer.FullName -ArgumentList '/S', "/D=$installDir" -Wait -PassThru
+          $defaultProgramsRoot = Join-Path $env:LOCALAPPDATA 'Programs'
+          $process = Start-Process -FilePath $installer.FullName -ArgumentList '/S' -Wait -PassThru
           if ($process.ExitCode -ne 0) { throw "NSIS install failed with exit code $($process.ExitCode)" }
+          $installedApps = @(Get-ChildItem $defaultProgramsRoot -Recurse -Filter '案卷观察台.exe' -File -ErrorAction SilentlyContinue)
+          if ($installedApps.Count -ne 1) {
+            throw "Expected exactly one application under the per-user default root $defaultProgramsRoot; found $($installedApps.Count)."
+          }
+          $installDir = $installedApps[0].DirectoryName
           "INSTALL_DIR=$installDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Verify installed x64 application and complete corpus
@@ -82,7 +87,60 @@ jobs:
           if (-not (Test-Path $canvasBinding)) { throw 'Windows PDF canvas native binding is missing.' }
           $versionInfo = (Get-Item $app).VersionInfo
           if ([string]::IsNullOrWhiteSpace($versionInfo.ProductName)) { throw 'Windows executable is missing product metadata and icon resource editing did not run.' }
-          Write-Host "Validated Windows x64 install with $pdfCount PDFs and $($seed.seedFiles) seed files."
+          if ($versionInfo.ProductName -ne '案卷观察台') { throw "Windows executable has unexpected product name $($versionInfo.ProductName)." }
+
+          Add-Type @'
+          using System;
+          using System.Runtime.InteropServices;
+          public static class ReleaseIconResources {
+            private delegate bool EnumResNameProc(IntPtr module, IntPtr type, IntPtr name, IntPtr parameter);
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            private static extern IntPtr LoadLibraryEx(string fileName, IntPtr file, uint flags);
+            [DllImport("kernel32.dll", SetLastError = true)]
+            private static extern bool FreeLibrary(IntPtr module);
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+            private static extern bool EnumResourceNames(IntPtr module, IntPtr type, EnumResNameProc callback, IntPtr parameter);
+            public static int CountGroupIcons(string fileName) {
+              IntPtr module = LoadLibraryEx(fileName, IntPtr.Zero, 0x00000002);
+              if (module == IntPtr.Zero) throw new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error());
+              int count = 0;
+              try {
+                EnumResNameProc callback = delegate { count++; return true; };
+                EnumResourceNames(module, new IntPtr(14), callback, IntPtr.Zero);
+                return count;
+              } finally {
+                FreeLibrary(module);
+              }
+            }
+          }
+          '@
+          $installer = Get-ChildItem release-assets\*Windows-x64-unsigned.exe | Select-Object -First 1
+          if ([ReleaseIconResources]::CountGroupIcons($installer.FullName) -lt 1) { throw 'Windows installer has no embedded icon resource.' }
+          if ([ReleaseIconResources]::CountGroupIcons($app) -lt 1) { throw 'Installed application has no embedded icon resource.' }
+
+          $desktopShortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) '案卷观察台.lnk'
+          $startShortcut = Join-Path ([Environment]::GetFolderPath('Programs')) '案卷观察台.lnk'
+          $shell = New-Object -ComObject WScript.Shell
+          foreach ($shortcutPath in @($desktopShortcut, $startShortcut)) {
+            if (-not (Test-Path $shortcutPath)) { throw "Expected installed shortcut is missing: $shortcutPath" }
+            $shortcut = $shell.CreateShortcut($shortcutPath)
+            if ([IO.Path]::GetFullPath($shortcut.TargetPath) -ne [IO.Path]::GetFullPath($app)) {
+              throw "Shortcut has unexpected target $($shortcut.TargetPath): $shortcutPath"
+            }
+          }
+
+          $installedEntries = Get-ChildItem $env:INSTALL_DIR -Recurse -Force
+          $longestPath = $installedEntries | Sort-Object { $_.FullName.Length } -Descending | Select-Object -First 1
+          $longestName = $installedEntries | Sort-Object { $_.Name.Length } -Descending | Select-Object -First 1
+          if ($longestPath.FullName.Length -gt 240) { throw "Installed path exceeds the 240-character release safety cap: $($longestPath.FullName)" }
+          if ($longestName.Name.Length -gt 120) { throw "Installed filename exceeds the 120-character release safety cap: $($longestName.Name)" }
+
+          $installerSignature = Get-AuthenticodeSignature $installer.FullName
+          $appSignature = Get-AuthenticodeSignature $app
+          if ($installerSignature.Status -ne 'NotSigned' -or $appSignature.Status -ne 'NotSigned') {
+            throw "Community executables must be explicitly unsigned, not invalidly signed: installer=$($installerSignature.Status), app=$($appSignature.Status)"
+          }
+          Write-Host "Validated default-path Windows x64 install with $pdfCount PDFs, $($seed.seedFiles) seed files, embedded icons, two working shortcuts, longest path $($longestPath.FullName.Length), and longest filename $($longestName.Name.Length)."
 
       - name: Verify renderer startup and running-app upgrade
         env:
@@ -169,4 +227,6 @@ jobs:
           if (Test-Path $uninstaller) {
             $process = Start-Process -FilePath $uninstaller -ArgumentList '/S' -Wait -PassThru
             if ($process.ExitCode -ne 0) { throw "NSIS uninstall failed with exit code $($process.ExitCode)" }
+            Start-Sleep -Seconds 3
+            if (Test-Path (Join-Path $env:INSTALL_DIR '案卷观察台.exe')) { throw 'NSIS uninstall left the application executable installed.' }
           }

@@ -25,17 +25,19 @@
 
 1. 双击下载的 DMG。
 2. 把“案卷观察台”图标拖到“应用程序”文件夹。
-3. 等待复制完成，再从 Finder 的“应用程序”中打开，不要长期从 DMG 窗口里运行。
+3. 等待复制进度完全结束，推出 DMG，再从 Finder 的“应用程序”中打开。不要双击 DMG 窗口里的应用图标。
 
 <p align="center"><img src="./docs/install/macos-dmg-install-zh.png" width="760" alt="把案卷观察台拖入应用程序文件夹"></p>
 
-### 3. macOS：首次打开时先点“完成”
+### 3. macOS：先分清首次打开提示
 
-首次双击应用时，macOS 可能显示“Apple 无法验证”。这表示当前社区版没有 Apple Developer ID 和公证，不是“程序已经被 Apple 证实包含恶意软件”。
+从“应用程序”首次双击时，macOS 通常显示“Apple 无法验证”。这表示当前社区版没有 Apple Developer ID 和公证，不是“程序已经被 Apple 证实包含恶意软件”。
 
 先点 **完成**，不要点“移到废纸篓”。Apple 官方图中使用“示例 App”，实际安装时会显示“案卷观察台”。
 
 <p align="center"><img src="./docs/install/macos-alert-zh-apple.png" width="420" alt="Apple 无法验证应用的中文提示"></p>
+
+如果文字明确写着 **“已损坏，无法打开”**，先点 **取消**，不要在 DMG 窗口里点“移到废纸篓”。只读 DMG 无法执行这个删除操作，Finder 随后可能再显示误导性的“名称太长或字符无效”。请按本页“常见问题”先核对完整性和安装位置。
 
 ### 4. macOS：进入“隐私与安全性”
 
@@ -92,8 +94,9 @@
 
 ### 常见问题
 
-- **显示“应用已损坏”：** 不要继续使用早期下载的 macOS 安装包。删除旧 DMG，从 GitHub Release 重新下载当前版本，并确认下载链接来自本项目官方仓库。
-- **只看到“移到废纸篓”：** 先点“完成”，然后按本文进入“隐私与安全性”。
+- **显示“应用已损坏”：** 点“取消”，确认程序已经完整复制到“应用程序”，不要从 DMG 内直接运行。删除“应用程序”中的残缺副本后重新复制，并用发布说明中的 SHA-256 核对 DMG。哈希匹配但仍报错时，查看“隐私与安全性”是否出现“仍要打开”；如果没有，不要删除隔离属性或关闭 Gatekeeper，这台 Mac 的当前策略不接受未公证社区版，应等待 Developer ID 签名并公证的版本。
+- **点“移到废纸篓”后显示名称无效：** 这是 Finder 尝试从只读 DMG 删除应用失败的二次报错，不代表应用名称本身无效。点“好”，推出 DMG，再按上面的安装步骤重试。
+- **“Apple 无法验证”且只有“完成/移到废纸篓”：** 点“完成”，然后按本文进入“隐私与安全性”。
 - **没有 Touch ID：** 选择“改用密码”，输入 Mac 登录密码。
 - **Windows 没有显示 SmartScreen 或 UAC：** 不是故障，Windows 版本、安全策略和安装方式不同时，某些确认步骤可能不出现。
 
@@ -116,17 +119,19 @@ To identify your Mac, open **Apple menu > About This Mac** and check **Chip** or
 
 1. Double-click the downloaded DMG.
 2. Drag Docket Observatory into the Applications folder.
-3. Wait for copying to finish, then open the app from Finder's Applications folder instead of continuing to run it from the DMG window.
+3. Wait until copying has completely finished, eject the DMG, and then launch the app from Finder's Applications folder. Do not launch the app icon inside the DMG window.
 
 <p align="center"><img src="./docs/install/macos-dmg-install-en.png" width="760" alt="Drag Docket Observatory into Applications"></p>
 
-### 3. macOS: select Done on the first alert
+### 3. macOS: distinguish the first-launch alerts
 
-On first launch, macOS can display an alert that Apple could not verify the app. This means the free community build has no Apple Developer ID and notarization. It does not mean that Apple has confirmed the application contains malware.
+On first launch from Applications, macOS normally displays an alert that Apple could not verify the app. This means the free community build has no Apple Developer ID and notarization. It does not mean that Apple has confirmed the application contains malware.
 
 Select **Done**, not **Move to Trash**. Apple's official screenshot uses "Example App"; the actual alert names Docket Observatory.
 
 <p align="center"><img src="./docs/install/macos-alert-en-apple.png" width="420" alt="Apple could not verify Example App alert"></p>
+
+If the alert explicitly says the app **is damaged and cannot be opened**, select **Cancel**. Do not select Move to Trash while launching from the read-only DMG. That delete attempt can fail with a second, misleading Finder message saying the name is too long or contains invalid characters. Use the troubleshooting checks below first.
 
 ### 4. macOS: use Privacy & Security
 
@@ -183,8 +188,9 @@ The complete edition is not an empty library. The `v0.1.2` baseline contains 1,8
 
 ### Troubleshooting
 
-- **macOS says the app is damaged:** Do not continue using an early macOS asset. Delete the old DMG and download the current installer from this project's official GitHub Release.
-- **The first alert only offers Move to Trash:** Select Done, then follow the Privacy & Security steps above.
+- **macOS says the app is damaged:** Select Cancel, confirm that the app was fully copied into Applications, and do not launch it from the DMG. Remove an incomplete Applications copy, copy it again, and verify the DMG against the release SHA-256. If the hash matches but the error remains, check Privacy & Security for Open Anyway. If that control is absent, do not remove quarantine attributes or disable Gatekeeper; this Mac's current policy does not accept the unnotarized community build, so use a future Developer ID signed and notarized release.
+- **Finder reports an invalid or overly long name after Move to Trash:** Finder failed to delete the app from the read-only DMG. It does not mean the application name itself is invalid. Dismiss the message, eject the DMG, and repeat the installation steps above.
+- **The Apple-cannot-verify alert offers Done and Move to Trash:** Select Done, then follow the Privacy & Security steps above.
 - **No Touch ID:** Select Use Password and enter the Mac login password.
 - **No SmartScreen or UAC prompt:** This is not an error. Windows version, security policy, and installation scope can change which confirmation steps appear.
 
