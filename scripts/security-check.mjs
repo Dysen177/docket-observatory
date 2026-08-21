@@ -430,9 +430,13 @@ async function assertProjectControls() {
     addFinding('redirect-credential-leak', 'high', path.join(root, 'server', 'safe-fetch.js'), 'Sensitive headers must be removed across redirect origins.')
   }
 
-  for (const relative of ['server/adapters.js', 'server/recap-client.js', 'server/download-documents.js', 'server/analysis.js', 'server/document-analysis.js', 'server/automation-runner.js', 'server/index.js']) {
+  for (const relative of ['server/adapters.js', 'server/recap-client.js', 'server/download-documents.js', 'server/analysis.js', 'server/document-analysis.js', 'server/automation-runner.js', 'server/index.js', 'server/local-legal-ai.js', 'server/research-chat.js']) {
     const content = await readFile(path.join(root, relative), 'utf8')
     if (/\bfetch\s*\(/.test(content)) addFinding('direct-outbound-fetch', 'high', path.join(root, relative), 'Outbound calls must use safeFetch so redirect and timeout policy cannot be bypassed.')
+  }
+  const localAi = await readFile(path.join(root, 'server', 'local-legal-ai.js'), 'utf8')
+  if (!localAi.includes('maxRedirects: 0') || !localAi.includes('allowedOrigins: [origin]')) {
+    addFinding('local-ai-redirect-policy', 'high', path.join(root, 'server', 'local-legal-ai.js'), 'Loopback AI requests must reject redirects and remain restricted to the validated local origin.')
   }
 
   const downloader = await readFile(path.join(root, 'server', 'download-documents.js'), 'utf8')

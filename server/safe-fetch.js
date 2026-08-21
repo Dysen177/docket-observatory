@@ -5,7 +5,7 @@ const redirectStatuses = new Set([301, 302, 303, 307, 308])
 const sensitiveHeaders = new Set(['authorization', 'cookie', 'proxy-authorization'])
 
 export async function safeFetch(url, options = {}, safety = {}) {
-  const timeoutMs = boundedInteger(safety.timeoutMs, 1000, 300000, 30000)
+  const timeoutMs = boundedInteger(safety.timeoutMs, 1000, 1200000, 30000)
   const maxRedirects = boundedInteger(safety.maxRedirects, 0, 10, 5)
   const policyOptions = {
     includeOpenAI: safety.includeOpenAI !== false,

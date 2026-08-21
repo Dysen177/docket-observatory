@@ -3,7 +3,7 @@ import { cloudBodyTransmissionAllowed, cloudGenerateText, cloudModelForPurpose, 
 import { buildGuoResearchSkillPrompt, buildProgramScopeEvidence } from './guo-wengui-research-skill.js'
 import { expandKnowledgeSearchValues, retrieveKnowledgeDossierEvidence } from './knowledge-dossiers.js'
 import { retrieveGhotArchiveEvidence } from './ghot-text-archive.js'
-import { localAiAvailable, ollamaGenerateJson } from './local-legal-ai.js'
+import { localAiAvailable, ollamaGenerateJson, ollamaModelInstalled } from './local-legal-ai.js'
 import { getPublicRecordCorpusSummary, retrieveTranscriptEvidence } from './public-record-transcripts.js'
 import { runtimeSetting } from './settings-store.js'
 
@@ -1628,21 +1628,16 @@ function statusPayload(ready, provider, model, reason, language) {
 
 async function probeLocalModel(model) {
   const now = Date.now()
-  if (localStatusCache && localStatusCache.model === model && now - localStatusCache.checkedAt < 10000) return localStatusCache.result
   const base = String(runtimeSetting('localAiBaseUrl') ?? '').replace(/\/+$/u, '')
+  if (localStatusCache && localStatusCache.base === base && localStatusCache.model === model && now - localStatusCache.checkedAt < 10000) return localStatusCache.result
   try {
-    const response = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(2500) })
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    const body = await response.json()
-    const names = (body?.models ?? []).flatMap((item) => [item?.name, item?.model]).filter(Boolean).map(String)
-    const requested = String(model).replace(/:latest$/u, '')
-    const installed = names.some((name) => name === model || name.replace(/:latest$/u, '') === requested)
+    const installed = await ollamaModelInstalled(model, 2500)
     const result = installed ? { ready: true, reason: 'ready' } : { ready: false, reason: 'local_model_missing' }
-    localStatusCache = { model, checkedAt: now, result }
+    localStatusCache = { base, model, checkedAt: now, result }
     return result
   } catch {
     const result = { ready: false, reason: 'local_unreachable' }
-    localStatusCache = { model, checkedAt: now, result }
+    localStatusCache = { base, model, checkedAt: now, result }
     return result
   }
 }

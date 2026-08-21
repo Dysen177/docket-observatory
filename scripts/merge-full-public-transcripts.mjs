@@ -1325,7 +1325,7 @@ function canonicalMediaUrl(value) {
     const url = new URL(String(value ?? ''))
     const host = url.hostname.replace(/^www\./u, '').toLowerCase()
     if (host === 'youtu.be') return `youtube:${url.pathname.replace(/^\//u, '')}`
-    if (host.endsWith('youtube.com') && url.pathname === '/watch') return `youtube:${url.searchParams.get('v') ?? ''}`
+    if ((host === 'youtube.com' || host.endsWith('.youtube.com')) && url.pathname === '/watch') return `youtube:${url.searchParams.get('v') ?? ''}`
     url.hash = ''
     url.hostname = host
     url.pathname = url.pathname.replace(/\/+$/u, '') || '/'
@@ -1352,15 +1352,15 @@ function canonicalUrl(value) {
 function platformForUrlString(value) {
   try {
     const host = new URL(value).hostname.replace(/^www\./u, '').toLowerCase()
-    if (host.includes('youtube') || host === 'youtu.be') return 'youtube'
-    if (host.includes('gettr')) return 'gettr'
-    if (host.includes('rumble')) return 'rumble'
-    if (host === 'x.com' || host.includes('twitter')) return 'x'
-    if (host.includes('odysee')) return 'odysee'
-    if (host.includes('github')) return 'github_transcript'
-    if (host.includes('archive.org')) return 'internet_archive'
-    if (host.includes('bearblog')) return 'bearblog_transcript'
-    if (host.includes('gwins')) return 'gwins.org'
+    if (host === 'youtu.be' || host === 'youtube.com' || host.endsWith('.youtube.com')) return 'youtube'
+    if (host === 'gettr.com' || host.endsWith('.gettr.com')) return 'gettr'
+    if (host === 'rumble.com' || host.endsWith('.rumble.com')) return 'rumble'
+    if (host === 'x.com' || host === 'twitter.com' || host.endsWith('.twitter.com')) return 'x'
+    if (host === 'odysee.com' || host.endsWith('.odysee.com')) return 'odysee'
+    if (host === 'github.com' || host.endsWith('.github.com')) return 'github_transcript'
+    if (host === 'archive.org' || host.endsWith('.archive.org')) return 'internet_archive'
+    if (host === 'bearblog.dev' || host.endsWith('.bearblog.dev')) return 'bearblog_transcript'
+    if (host === 'gwins.org' || host.endsWith('.gwins.org')) return 'gwins.org'
     return host
   } catch {
     return 'public_source'

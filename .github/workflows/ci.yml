@@ -44,6 +44,9 @@ jobs:
       - name: Verify local settings persistence
         run: npm run test:settings
 
+      - name: Verify cloud and local AI adapters
+        run: npm run test:ai-adapters
+
       - name: Verify release-seed installation logic
         run: npm run release:test-seed-install
 

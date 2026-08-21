@@ -50,6 +50,7 @@
     "release:finalize": "npm run release:check-layout && npm run release:check-size && node scripts/finalize-release-assets.mjs release",
     "test:settings": "node scripts/settings-persistence-check.mjs",
     "test:cloud-ai": "node scripts/cloud-ai-adapter-check.mjs",
+    "test:ai-adapters": "node scripts/cloud-ai-adapter-check.mjs && node scripts/local-ai-adapter-check.mjs",
     "test:safe-storage": "electron scripts/electron-safe-storage-check.cjs",
     "test:safe-storage:native": "electron scripts/electron-safe-storage-check.cjs --native",
     "test:keychain:no-ui": "npm run build:native:mac && electron scripts/macos-keychain-addon-check.cjs",

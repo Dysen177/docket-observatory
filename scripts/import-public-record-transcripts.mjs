@@ -528,11 +528,11 @@ function parseSrtSegments(value) {
   const segments = []
   for (const block of blocks) {
     const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
-    const timingIndex = lines.findIndex((line) => /-->/u.test(line))
+    const timingIndex = lines.findIndex((line) => line.includes('-->'))
     if (timingIndex < 0) continue
     const timing = lines[timingIndex].match(/(\d{1,2}:\d{2}:\d{2}[,.]\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2}[,.]\d{1,3})/u)
     if (!timing) continue
-    const text = normalizeWhitespace(lines.slice(timingIndex + 1).join(' ').replace(/<[^>]+>/gu, ''))
+    const text = normalizeWhitespace(cheerio.load(lines.slice(timingIndex + 1).join(' '), null, false).text())
     if (!text) continue
     segments.push({ start: parseSrtTimestamp(timing[1]), end: parseSrtTimestamp(timing[2]), text })
   }
@@ -1312,7 +1312,7 @@ function extractLegacyPublicLinks(markdown) {
 
 function normalizeLegacyMediaUrl(url) {
   const host = url.hostname.replace(/^www\./u, '').toLowerCase()
-  if (host === 'youtu.be' || host.endsWith('youtube.com')) {
+  if (host === 'youtu.be' || host === 'youtube.com' || host.endsWith('.youtube.com')) {
     const rawId = host === 'youtu.be' ? url.pathname.replace(/^\//u, '') : url.searchParams.get('v') ?? ''
     const videoId = rawId.match(/^[A-Za-z0-9_-]{11}/u)?.[0]
     if (!videoId) return null
@@ -1517,10 +1517,13 @@ function isLegacySameDateCompositeDuplicate(candidate, records) {
 }
 
 function legacySourceLinks(candidate) {
-  return candidate.sourcePageUrls.map((url) => ({
-    platform: new URL(url).hostname.endsWith('blogspot.com') ? 'blogspot_transcript' : 'github_transcript',
-    url,
-  }))
+  return candidate.sourcePageUrls.map((url) => {
+    const host = new URL(url).hostname.toLowerCase()
+    return {
+      platform: host === 'blogspot.com' || host.endsWith('.blogspot.com') ? 'blogspot_transcript' : 'github_transcript',
+      url,
+    }
+  })
 }
 
 function legacyTitleSimilarity(left, right) {
@@ -2071,7 +2074,7 @@ function canonicalMediaUrl(value) {
     const url = new URL(String(value ?? ''))
     const host = url.hostname.replace(/^www\./u, '').toLowerCase()
     if (host === 'youtu.be') return `youtube:${url.pathname.replace(/^\//u, '')}`
-    if (host.endsWith('youtube.com') && url.pathname === '/watch') return `youtube:${url.searchParams.get('v') ?? ''}`
+    if ((host === 'youtube.com' || host.endsWith('.youtube.com')) && url.pathname === '/watch') return `youtube:${url.searchParams.get('v') ?? ''}`
     url.hash = ''
     url.hostname = host
     url.pathname = url.pathname.replace(/\/+$/u, '') || '/'

@@ -1,6 +1,6 @@
 import networkPolicy from './network-policy.cjs'
 import { evidenceForAi, textForAi } from './ai-data-boundary.js'
-import { readTextWithLimit } from './safe-fetch.js'
+import { readTextWithLimit, safeFetch } from './safe-fetch.js'
 import { runtimeSetting } from './settings-store.js'
 import { validateCaseDossierAnalysis } from './case-ai-schema.js'
 
@@ -101,15 +101,7 @@ export async function ollamaGenerateJson({
   onProgress = null,
   signal = null,
 }) {
-  const base = String(runtimeSetting('localAiBaseUrl') ?? '').replace(/\/+$/u, '')
-  if (!isAllowedLocalAiUrl(base)) {
-    const error = new Error('Local AI base URL must be localhost or 127.0.0.1 on an allowed port.')
-    error.statusCode = 400
-    throw error
-  }
-  const timeoutSignal = AbortSignal.timeout(Math.max(10000, Math.min(1200000, Number(timeoutMs) || 180000)))
-  const requestSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal
-  const response = await fetch(`${base}/api/generate`, {
+  const response = await fetchLocalAi('/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -123,8 +115,8 @@ export async function ollamaGenerateJson({
         ...options,
       },
     }),
-    signal: requestSignal,
-  })
+    signal,
+  }, Math.max(10000, Number(timeoutMs) || 180000))
   if (!response.ok) {
     const body = await readTextWithLimit(response, 5 * 1024 * 1024)
     throw new Error(`Local Ollama HTTP ${response.status}: ${body.slice(0, 240)}`)
@@ -132,6 +124,31 @@ export async function ollamaGenerateJson({
   const raw = (await readOllamaStreamWithLimit(response, 5 * 1024 * 1024, onProgress)).trim()
   if (!raw) throw new Error('Local Ollama returned an empty response.')
   return JSON.parse(extractJsonObject(raw))
+}
+
+export async function ollamaModelInstalled(model, timeoutMs = 2500) {
+  const response = await fetchLocalAi('/api/tags', {}, timeoutMs)
+  if (!response.ok) throw new Error(`Local Ollama HTTP ${response.status}`)
+  const body = JSON.parse(await readTextWithLimit(response, 1024 * 1024))
+  const names = (body?.models ?? []).flatMap((item) => [item?.name, item?.model]).filter(Boolean).map(String)
+  const requested = String(model).replace(/:latest$/u, '')
+  return names.some((name) => name === model || name.replace(/:latest$/u, '') === requested)
+}
+
+async function fetchLocalAi(pathname, options, timeoutMs) {
+  const base = String(runtimeSetting('localAiBaseUrl') ?? '').replace(/\/+$/u, '')
+  if (!isAllowedLocalAiUrl(base)) {
+    const error = new Error('Local AI base URL must be localhost or 127.0.0.1 on an allowed port.')
+    error.statusCode = 400
+    throw error
+  }
+  const origin = new URL(base).origin
+  return safeFetch(new URL(pathname, `${origin}/`).toString(), options, {
+    allowedOrigins: [origin],
+    includeAi: false,
+    maxRedirects: 0,
+    timeoutMs: Math.max(1000, Math.min(1200000, Number(timeoutMs) || 180000)),
+  })
 }
 
 async function readOllamaStreamWithLimit(response, maximumBytes, onProgress) {

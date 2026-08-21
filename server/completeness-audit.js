@@ -765,7 +765,7 @@ function auditMarkdown(audit) {
 }
 
 function markdownCell(value) {
-  return String(value ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim()
+  return String(value ?? '').replace(/\\/gu, '\\\\').replace(/\|/gu, '\\|').replace(/\s+/gu, ' ').trim()
 }
 
 function candidateReason(classification) {
