@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { atomicWriteJson } from './atomic-write.js'
-import { analyzeDocumentBySourceUrl, buildDocumentAnalysis, localDocumentAnalysis } from './document-analysis.js'
+import { analyzeDocumentBySourceUrl, buildDocumentAnalysis, buildOfflineDocumentAnalysis, localDocumentAnalysis } from './document-analysis.js'
 import { runDocumentDownload } from './download-documents.js'
 import { extractPdfSnippetForFile } from './pdf-extraction.js'
 import { humanDocumentResearch } from './human-legal-research.js'
@@ -30,6 +30,7 @@ import {
   ollamaCaseDossier,
   ollamaTranslateText,
 } from './local-legal-ai.js'
+import { documentAnalysisQualityCurrent } from './document-language-quality.js'
 
 const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
 
@@ -99,6 +100,7 @@ function createRun(mode, lang, options) {
     currentStep: labelFor('starting', lang),
     requested: {
       includeAi: options.includeAi !== false,
+      forceLocalRules: options.forceLocalRules === true,
       includeTranslation: options.includeTranslation !== false,
       outputLanguages,
       pageLimit: boundedInteger(options.pageLimit, 1, 1000, fullScope ? 1000 : Number(runtimeSetting('pdfPageLimit'))),
@@ -196,6 +198,10 @@ async function executeRun(run, callbacks, options) {
   const outputLanguages = resolveAutomationOutputLanguages(run.requested.outputLanguages, lang)
 
   await runStep(run, 'refresh', async (step) => {
+    if (options.reuseCurrentManifest) {
+      addLog(run, lang === 'en' ? 'Reusing the current managed manifest; source refresh was skipped.' : '继续处理当前受管文件清单；已跳过来源刷新。')
+      return
+    }
     const result = await callbacks.refreshSources()
     step.total = result?.lastRefresh?.sourceCount ?? 0
     step.done = step.total
@@ -205,6 +211,19 @@ async function executeRun(run, callbacks, options) {
 
   let manifest = null
   await runStep(run, 'download', async (step) => {
+    if (options.reuseCurrentManifest) {
+      manifest = await callbacks.loadRawDocumentManifest()
+      step.done = manifest?.files?.length ?? 0
+      step.total = step.done
+      run.outputs.manifestFiles = step.done
+      run.outputs.downloaded = (manifest?.files ?? []).filter((file) => ['downloaded', 'downloaded_new_version'].includes(file.status)).length
+      run.outputs.skippedExisting = (manifest?.files ?? []).filter((file) => file.status === 'skipped_existing').length
+      run.outputs.downloadErrors = (manifest?.files ?? []).filter((file) => file.status === 'error').length
+      addLog(run, lang === 'en'
+        ? `Reused the current managed manifest and preserved ${run.outputs.downloaded} unprocessed download marker(s).`
+        : `已复用当前受管文件清单，并保留 ${run.outputs.downloaded} 个待处理的新下载标记。`)
+      return
+    }
     manifest = await runDocumentDownload({
       log: (message) => addLog(run, message),
       newDownloadLimit: run.mode === 'full' || run.requested.limit === 'all' ? 'all' : limitForRun(run),
@@ -291,7 +310,7 @@ async function executeRun(run, callbacks, options) {
   await runStep(run, 'ai', async (step) => {
     step.total = includeAi ? candidates.length : 0
     if (!includeAi) return
-    const provider = activeAiProvider()
+    const provider = options.forceLocalRules ? { kind: 'local_rules', label: 'Local deterministic rules' } : activeAiProvider()
     if (candidates.length > 0 && provider.kind === 'local_rules') {
       const message = lang === 'en'
         ? 'No generative AI provider is available; batch document reads were generated with local deterministic rules.'
@@ -301,7 +320,11 @@ async function executeRun(run, callbacks, options) {
     for (const file of candidates) {
       try {
         const analyses = []
-        for (const outputLanguage of outputLanguages) analyses.push(await analyzeDocumentBySourceUrl(file.url, manifest, callbacks.getState(), outputLanguage))
+        for (const outputLanguage of outputLanguages) {
+          analyses.push(options.forceLocalRules
+            ? await buildOfflineDocumentAnalysis(file, callbacks.getState(), outputLanguage)
+            : await analyzeDocumentBySourceUrl(file.url, manifest, callbacks.getState(), outputLanguage))
+        }
         if (analyses.every((analysis) => analysis.aiStatus?.generated)) {
           const providerKinds = new Set(analyses.map((analysis) => analysis.aiStatus?.provider).filter(Boolean))
           if (providerKinds.size === 1 && providerKinds.has(provider.kind) && provider.kind !== 'local_rules') run.outputs.aiAnalyzed += 1
@@ -338,7 +361,7 @@ async function executeRun(run, callbacks, options) {
     })
     run.outputs.caseDossiers = caseRecords.length
     step.done = caseRecords.length
-    const provider = activeAiProvider()
+    const provider = options.forceLocalRules ? { kind: 'local_rules', label: 'Local deterministic rules' } : activeAiProvider()
     if (isCloudAiProvider(provider.kind) || provider.kind === 'ollama') {
       let generated = 0
       let localFallbacks = 0
@@ -491,7 +514,9 @@ async function buildProcessingGapIndex(files, run) {
   const analysisKeys = new Set()
   await visitJsonDirectory('document-ai', (value) => {
     if (!value?.aiStatus?.generated || filesByUrl.get(value.sourceUrl)?.sha256 !== value.sourceSha256) return
-    analysisKeys.add(`${value.sourceUrl}|${value.sourceSha256}|${cachedAnalysisLanguage(value)}`)
+    const language = cachedAnalysisLanguage(value)
+    if (!documentAnalysisQualityCurrent({ ...value, analysisLanguage: language })) return
+    analysisKeys.add(`${value.sourceUrl}|${value.sourceSha256}|${language}`)
   })
   const outputLanguages = resolveAutomationOutputLanguages(run.requested.outputLanguages, run.language)
   return new Map(files.map((file) => {

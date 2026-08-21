@@ -71,6 +71,18 @@ const snapshotTtlMs = 60_000
 const publicSearchWindowMs = 60_500
 const publicSearchWindowLimit = 5
 
+const canonicalTrackedDocumentTitles = new Map([
+  ['ca2-26-1853:14', 'Document 14: Acknowledgment and Notice of Appearance for Appellant'],
+  ['ca2-26-1853:15', 'Document 15: Criminal Appeal Transcript Information (Form B)'],
+  ['ca2-26-1853:16-1', 'Document 16-1: Motion Information Statement to Substitute Appellate Counsel'],
+  ['ca2-26-1853:17', 'Document 17: Notice of Case Manager Change'],
+])
+
+export function normalizeRecapDocumentMetadata(document) {
+  const title = canonicalTrackedDocumentTitles.get(`${document?.caseId}:${document?.docNumber}`)
+  return title && document?.sourceId === 'courtlistener-recap' ? { ...document, title } : document
+}
+
 export async function scanPublicRecapSearch(options = {}) {
   const requestedTargets = publicSearchTargets(options)
   const pageLimit = boundedInteger(options.pageLimit, 1, 5, 1)
@@ -454,12 +466,13 @@ function publicSearchEvent(target, row, document) {
   const entryNumber = publicSearchDocumentNumber(document)
   const description = cleanText(document.description || document.short_description || `RECAP docket entry ${entryNumber || ''}`)
   const category = categoryFor(description)
+  const canonicalTitle = canonicalTrackedDocumentTitles.get(`${target.caseId}:${entryNumber}`)
   return {
     id: `recap-search-${target.caseId}-${target.courtListenerDocketId}-${document.id ?? `${date}-${entryNumber}`}`,
     date,
     dateBasis: 'court_filed',
     dateConfidence: 'high',
-    title: entryNumber ? `RECAP docket entry ${entryNumber}: ${shorten(description, 112)}` : `RECAP docket update: ${shorten(description, 112)}`,
+    title: canonicalTitle ?? (entryNumber ? `RECAP docket entry ${entryNumber}: ${shorten(description, 112)}` : `RECAP docket update: ${shorten(description, 112)}`),
     summary: shorten(description, 1600),
     impact: impactFor(category),
     caseId: target.caseId,
@@ -487,7 +500,7 @@ function publicSearchDocument(target, row, document) {
   if (!url) return null
   const docNumber = publicSearchDocumentNumber(document)
   const description = cleanText(document.description || document.short_description || `RECAP document ${docNumber || document.id || ''}`)
-  return {
+  return normalizeRecapDocumentMetadata({
     sourceId: 'courtlistener-recap',
     caseId: target.caseId,
     courtId: target.courtId,
@@ -505,7 +518,7 @@ function publicSearchDocument(target, row, document) {
     pacerDocumentId: document.pacer_doc_id || null,
     pageCount: document.page_count ?? null,
     discoveryMethod: 'courtlistener_public_structured_search',
-  }
+  })
 }
 
 function publicSearchDocumentNumber(document) {
@@ -615,12 +628,13 @@ export function parsePublicRecapFeed(xml, target) {
       : parsedLink.entryNumber
     const description = summary || `${feedTitle || target.label} docket entry ${filingNumber}`
     const category = categoryFor(description)
+    const canonicalTitle = canonicalTrackedDocumentTitles.get(`${target.caseId}:${filingNumber}`)
     events.push({
       id: `recap-feed-${target.caseId}-${target.courtListenerDocketId}-${filingNumber}`,
       date,
       dateBasis: 'court_filed',
       dateConfidence: 'high',
-      title: `RECAP docket entry ${filingNumber}: ${shorten(description, 112)}`,
+      title: canonicalTitle ?? `RECAP docket entry ${filingNumber}: ${shorten(description, 112)}`,
       summary: shorten(description, 1600),
       impact: impactFor(category),
       caseId: target.caseId,
@@ -642,6 +656,92 @@ export function parsePublicRecapFeed(xml, target) {
     })
   })
   return dedupeBy(events, (event) => event.id).sort((left, right) => right.date.localeCompare(left.date) || right.id.localeCompare(left.id))
+}
+
+export function publicRecapStorageCandidate(event, knownDocuments = []) {
+  const docketId = Number(event?.courtListenerDocketId)
+  if (!Number.isInteger(docketId) || docketId <= 0) return null
+  const entry = publicDocketEntryLink(event?.sourceUrl, docketId)
+  if (!entry) return null
+
+  const template = knownDocuments.find((document) => (
+    Number(document?.courtListenerDocketId) === docketId
+    && document?.sourceId === 'courtlistener-recap'
+    && recapStorageTemplate(document?.url)
+  ))
+  const storageTemplate = recapStorageTemplate(template?.url)
+  if (!storageTemplate) return null
+
+  const attachment = entry.attachmentNumber || '0'
+  const url = courtListenerStorageUrl(`${storageTemplate.prefix}${storageTemplate.stem}.${entry.entryNumber}.${attachment}.pdf`)
+  if (!url) return null
+  const target = recapTargets.find((item) => Number(item.courtListenerDocketId) === docketId)
+  const docNumber = entry.attachmentNumber ? `${entry.entryNumber}-${entry.attachmentNumber}` : entry.entryNumber
+  const description = cleanText(event?.summary || event?.title || `RECAP docket entry ${docNumber}`)
+  return normalizeRecapDocumentMetadata({
+    sourceId: 'courtlistener-recap',
+    caseId: event.caseId || target?.caseId || `courtlistener-${docketId}`,
+    courtId: target?.courtId || null,
+    court: event.court || target?.court || '',
+    docketNumber: event.docketNumber || target?.docketNumber || '',
+    courtListenerDocketId: docketId,
+    sourcePage: entry.url,
+    sourceLabel: `${target?.label || event?.court || 'Tracked docket'} public RECAP document`,
+    title: description,
+    docNumber,
+    filedAt: /^20\d{2}-\d{2}-\d{2}$/u.test(String(event?.date ?? '')) ? event.date : null,
+    url,
+    subdir: `${event.caseId || target?.caseId || `courtlistener-${docketId}`}-recap`,
+    recapDocumentId: null,
+    pacerDocumentId: null,
+    pageCount: null,
+    discoveryMethod: 'courtlistener_public_feed_storage_probe',
+  })
+}
+
+export async function discoverPublicRecapDocuments({ events = [], knownDocuments = [], concurrency = 4 } = {}) {
+  const knownUrls = new Set(knownDocuments.map((document) => courtListenerStorageUrl(document?.url)).filter(Boolean))
+  const candidates = dedupeBy(
+    events.map((event) => publicRecapStorageCandidate(event, knownDocuments)).filter(Boolean),
+    (document) => document.url,
+  ).filter((document) => !knownUrls.has(document.url))
+  const results = await mapBounded(candidates, boundedInteger(concurrency, 1, 8, 4), async (candidate) => {
+    try {
+      const response = await safeFetch(candidate.url, {
+        method: 'HEAD',
+        headers: { 'User-Agent': 'guo-intel-local/0.1 (+local research app)' },
+      }, { timeoutMs: 12000, includeOpenAI: false })
+      const available = response.ok && /^application\/pdf(?:;|$)/iu.test(String(response.headers.get('content-type') ?? ''))
+      await response.body?.cancel().catch(() => undefined)
+      return available ? candidate : null
+    } catch {
+      return null
+    }
+  })
+  return results.filter(Boolean)
+}
+
+function recapStorageTemplate(value) {
+  const url = courtListenerStorageUrl(value)
+  if (!url) return null
+  const parsed = new URL(url)
+  const match = parsed.pathname.match(/^(\/recap\/.+\/)([^/]+)\.\d+\.\d+\.pdf$/u)
+  if (!match) return null
+  return { prefix: `${parsed.origin}${match[1]}`, stem: match[2] }
+}
+
+async function mapBounded(items, concurrency, worker) {
+  const results = new Array(items.length)
+  let cursor = 0
+  const runners = Array.from({ length: Math.min(concurrency, Math.max(1, items.length)) }, async () => {
+    while (cursor < items.length) {
+      const index = cursor
+      cursor += 1
+      results[index] = await worker(items[index], index)
+    }
+  })
+  await Promise.all(runners)
+  return results
 }
 
 export async function scanRecapArchive(options = {}) {

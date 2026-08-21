@@ -359,6 +359,15 @@ async function assertProjectControls() {
   if (!electron.includes('await serverModule.apiServerReady')) {
     addFinding('electron-api-startup-verification', 'high', path.join(root, 'electron', 'main.cjs'), 'Electron must await the API listener owned by this process before loading the application URL.')
   }
+  if (!electron.includes('findAvailableLoopbackPort()') || !electron.includes("probe.listen(0, '127.0.0.1'")) {
+    addFinding('electron-api-port-allocation', 'medium', path.join(root, 'electron', 'main.cjs'), 'Packaged Electron startup must allocate an available loopback port instead of assuming a fixed port is free.')
+  }
+  if (/^const .*require\(['"]\.\.\/server\/network-policy\.cjs['"]\)/mu.test(electron)) {
+    addFinding('electron-api-port-policy-order', 'high', path.join(root, 'electron', 'main.cjs'), 'Electron must not cache the localhost network policy before its runtime API port has been selected.')
+  }
+  if (!electron.includes('app.requestSingleInstanceLock()') || !electron.includes("app.on('second-instance'")) {
+    addFinding('electron-single-instance', 'medium', path.join(root, 'electron', 'main.cjs'), 'Electron must prevent a second process from competing for the local API and user-data files.')
+  }
   if (!electron.includes('setPermissionCheckHandler(() => false)')
     || !electron.includes('setPermissionRequestHandler((_webContents, _permission, callback) => callback(false))')) {
     addFinding('electron-permission-default', 'high', path.join(root, 'electron', 'main.cjs'), 'Electron must deny unneeded browser permission checks and requests by default.')
@@ -408,7 +417,7 @@ async function assertProjectControls() {
 
   const networkPolicy = await readFile(path.join(root, 'server', 'network-policy.cjs'), 'utf8')
   const networkManifest = await readFile(path.join(root, 'NETWORK.md'), 'utf8')
-  for (const host of ['nfsc.press', 'www.justice.gov', 'www.sec.gov', 'www.courtlistener.com', 'storage.courtlistener.com', 'www.federalregister.gov']) {
+  for (const host of ['ghot.ai', 'nfsc.press', 'www.justice.gov', 'www.sec.gov', 'www.courtlistener.com', 'storage.courtlistener.com', 'www.federalregister.gov']) {
     if (!networkPolicy.includes(host)) addFinding('network-policy-gap', 'medium', path.join(root, 'server', 'network-policy.cjs'), `Expected outbound host is missing: ${host}`)
     if (!networkManifest.includes(host)) addFinding('network-manifest-gap', 'medium', path.join(root, 'NETWORK.md'), `Expected outbound host is undocumented: ${host}`)
   }
@@ -635,7 +644,7 @@ async function assertLegalClassification() {
     addFinding('nfsc-parser-health-regression', 'high', path.join(root, 'server', 'adapters.js'), 'The NFSC adapter must distinguish a parsed dated docket row from an empty or interstitial response.')
   }
 
-  const { parsePublicRecapFeed, recapTargets } = await import(pathToFileURL(path.join(root, 'server', 'recap-client.js')).href)
+  const { parsePublicRecapFeed, publicRecapStorageCandidate, recapTargets } = await import(pathToFileURL(path.join(root, 'server', 'recap-client.js')).href)
   const recapTarget = recapTargets.find((target) => target.courtListenerDocketId === 67011674)
   const publicFeedFixture = `<?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
@@ -655,6 +664,16 @@ async function assertLegalClassification() {
     || recapFixtureEvents[0].assertionType !== 'Public RECAP feed metadata'
     || recapFixtureEvents[0].id !== 'recap-feed-sdny-23-cv-2200-67011674-69-1') {
     addFinding('public-recap-feed-boundary', 'high', path.join(root, 'server', 'recap-client.js'), 'The public RECAP feed parser must accept only the configured docket id, use the court filing date instead of feed update time, preserve attachment numbers, and reject root or foreign URLs.')
+  }
+  const recapStorageCandidate = publicRecapStorageCandidate(recapFixtureEvents[0], [{
+    sourceId: 'courtlistener-recap',
+    courtListenerDocketId: 67011674,
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.nysd.595310/gov.uscourts.nysd.595310.68.0.pdf',
+  }])
+  if (recapStorageCandidate?.docNumber !== '69-1'
+    || recapStorageCandidate?.url !== 'https://storage.courtlistener.com/recap/gov.uscourts.nysd.595310/gov.uscourts.nysd.595310.69.1.pdf'
+    || recapStorageCandidate?.discoveryMethod !== 'courtlistener_public_feed_storage_probe') {
+    addFinding('public-recap-storage-probe-regression', 'high', path.join(root, 'server', 'recap-client.js'), 'Public feed storage probing must derive only the configured docket storage path while preserving entry and attachment numbers.')
   }
 
   const adapterSource = await readFile(path.join(root, 'server', 'adapters.js'), 'utf8')

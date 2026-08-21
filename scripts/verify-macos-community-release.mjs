@@ -24,6 +24,8 @@ function run(command, args, label, timeout = 120000) {
   return output
 }
 
+const codesignScanTimeout = 15 * 60 * 1000
+
 for (const name of dmgs) {
   const filePath = path.join(releaseDirectory, name)
   run('/usr/bin/hdiutil', ['verify', filePath], `${name} disk-image integrity`, 300000)
@@ -38,8 +40,8 @@ for (const name of dmgs) {
     if (appNames.length !== 1) throw new Error(`${name} must contain exactly one application bundle.`)
 
     const appPath = path.join(mountDirectory, appNames[0])
-    run('/usr/bin/codesign', ['--verify', '--deep', '--strict', '--verbose=4', appPath], `${name} application signature`)
-    const signature = run('/usr/bin/codesign', ['-dvvv', appPath], `${name} signature metadata`)
+    run('/usr/bin/codesign', ['--verify', '--deep', '--strict', '--verbose=4', appPath], `${name} application signature`, codesignScanTimeout)
+    const signature = run('/usr/bin/codesign', ['-dvvv', appPath], `${name} signature metadata`, codesignScanTimeout)
     const codeResourcesPath = path.join(appPath, 'Contents', '_CodeSignature', 'CodeResources')
     const codeResources = await readdir(path.dirname(codeResourcesPath)).catch(() => [])
     if (!codeResources.includes('CodeResources')) throw new Error(`${name} is missing its sealed application resource manifest.`)

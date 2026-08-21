@@ -1,5 +1,10 @@
 const allowedFetchHosts = [
   {
+    host: 'ghot.ai',
+    purpose: 'Public GHOT text-archive catalog and bilingual document summaries used as a secondary research reference.',
+    dataClass: 'public archive metadata, glossary entries, and secondary document summaries',
+  },
+  {
     host: 'nfsc.press',
     purpose: 'Public mirror for court-file PDFs already linked from the source page.',
     dataClass: 'public court-file mirror metadata and PDFs',
@@ -53,6 +58,16 @@ const allowedFetchHosts = [
     host: 'storage.courtlistener.com',
     purpose: 'Public PDFs already available in the CourtListener/RECAP archive.',
     dataClass: 'public/RECAP court PDFs',
+  },
+  {
+    host: 'www.supremecourt.gov',
+    purpose: 'Official Supreme Court docket metadata and court-hosted PDFs.',
+    dataClass: 'public official-court docket pages and PDFs',
+  },
+  {
+    host: 'www.bop.gov',
+    purpose: 'Official Bureau of Prisons inmate-facility and projected-release lookup.',
+    dataClass: 'public federal custody status for a verified register number',
   },
   {
     host: 'www.federalregister.gov',

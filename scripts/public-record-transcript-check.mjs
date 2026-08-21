@@ -7,6 +7,8 @@ import path from 'node:path'
 
 const gzipAsync = promisify(gzip)
 const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'docket-transcript-check-'))
+const { expandKnowledgeSearchValues } = await import('../server/knowledge-dossiers.js')
+assert.ok(expandKnowledgeSearchValues('摩根', { publicOnly: true }).includes('Morgan'))
 const records = [
   {
     id: '2020-06-01-1',
@@ -245,6 +247,7 @@ try {
   assert.deepEqual(new Set(exact.records.map((record) => record.id)), new Set(['2020-06-01-1', '2022-02-03-1']))
   const firstFixture = exact.records.find((record) => record.id === '2020-06-01-1')
   assert.equal(firstFixture?.hits[0].matchReason, 'exact')
+  assert.equal(firstFixture?.hits[0].segmentIndex, 1)
   assert.equal(firstFixture?.hits[0].contextBefore[0].text, '今天先说明背景。')
   assert.equal(firstFixture?.hits[0].contextAfter[0].text, '自动字幕也可能识别成洗联储和洗币。')
   assert.equal(firstFixture?.hits.some((hit) => hit.text.includes('洗联储') && hit.matchReason === 'alias'), true)
@@ -262,6 +265,12 @@ try {
   assert.equal(englishTranslatedSearch.records[0].id, '2020-06-01-1')
   assert.equal(englishTranslatedSearch.records[0].translationStatus, 'translated')
   assert.match(englishTranslatedSearch.records[0].hits[0].text, /Himalaya Reserve/u)
+
+  const englishCrossLanguageSearch = await queryPublicRecordTranscripts({ q: '喜联储', limit: 20 }, 'en')
+  const englishCrossLanguageRecord = englishCrossLanguageSearch.records.find((record) => record.id === '2020-06-01-1')
+  assert.equal(englishCrossLanguageRecord?.language, 'en')
+  assert.match(englishCrossLanguageRecord?.hits[0].text ?? '', /Himalaya Reserve/u)
+  assert.doesNotMatch(englishCrossLanguageRecord?.hits[0].text ?? '', /\p{Script=Han}/u)
 
   const knowledgeAlias = await queryPublicRecordTranscripts({ q: '贺林乐', limit: 20 }, 'zh')
   assert.equal(knowledgeAlias.total, 1)

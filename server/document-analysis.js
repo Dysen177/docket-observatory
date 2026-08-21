@@ -20,6 +20,8 @@ import { himalayaRestorationSearchAliases } from './himalaya-restoration.js'
 import { getDocumentSearchProcessingSnapshot, searchDocumentCatalog } from './document-search.js'
 import { allCaseRecords, localizeDiscoveredCase } from './discovered-case-records.js'
 import { normalizeLegalMetadataText } from './legal-metadata.js'
+import { interpretOfflineLegalDocument } from './offline-document-interpreter.js'
+import { documentLanguageQualityVersion, repairDocumentAnalysisLanguage } from './document-language-quality.js'
 
 const standaloneWithdrawalCasePattern = /^dconn-26-mc-\d{5}$/u
 const withdrawalPortfolioCaseId = 'dconn-26-withdrawal-reference'
@@ -103,6 +105,103 @@ function collectiveClaimExactNote(summary, summaryZh, priority = 'high') {
 }
 
 const exactDocumentNotes = {
+  'sha256:6d576f248cc3e90e9d195b9a82ccf564b673031f760c288dc74f8e15f5a8a138': {
+    category: 'Docket Filing',
+    priority: 'medium',
+    preferExact: true,
+    filedAt: '2026-08-05',
+    summary:
+      'Joshua L. Dratel of Dratel & Lewis filed the Second Circuit acknowledgment and appearance form as lead counsel for appellant Miles Guo. The form confirms counsel and docket-administration information; it is not a merits brief or a ruling on the appeal.',
+    summaryZh:
+      'Dratel & Lewis 的 Joshua L. Dratel 以 Miles Guo 上诉方首席律师身份提交第二巡回案卷确认及出庭表。该表用于确认律师和案卷管理信息，不是实体上诉书，也不是法院对上诉作出的裁定。',
+    whyItMatters: [
+      'It records who appeared for the appellant at that point and satisfies an appellate docket-management requirement.',
+      'It does not establish the appellate issues, change the judgment, or decide the later request to substitute counsel.',
+    ],
+    whyItMattersZh: [
+      '它记录当时代表上诉人的律师，并履行一项上诉案卷管理要求。',
+      '它不确定上诉争点，不改变原判，也不裁定后来提出的律师替换请求。',
+    ],
+    topics: ['direct-criminal-appeal'],
+  },
+  'sha256:d4f3d54b69c72ef8e1c9bcaad40a8ebe50a6bfe46d8589eebf50d772ce21b2a1': {
+    category: 'Motion',
+    priority: 'high',
+    preferExact: true,
+    filedAt: '2026-08-05',
+    summary:
+      'This motion information statement asks the Second Circuit to relieve Joshua L. Dratel as CJA appellate counsel and substitute the Federal Defenders. It describes requested relief, not a court order granting the change.',
+    summaryZh:
+      '这份动议信息表请求第二巡回解除 Joshua L. Dratel 的 CJA 上诉律师职务，并由 Federal Defenders 接替。它记载的是所请求的救济，不是法院已经批准换律师的命令。',
+    whyItMatters: [
+      'Counsel status affects who will review the record and prepare the merits briefs, but the requested substitution remains pending unless a later order grants it.',
+      'The form points to paragraph 5 of a separate declaration for the government\'s position; that declaration must be read before stating the government\'s response.',
+    ],
+    whyItMattersZh: [
+      '律师身份会影响由谁审阅案卷并准备实体上诉书，但在后续命令批准前，替换律师仍只是待裁请求。',
+      '表格把检方立场指向另一份声明第 5 段；在读到该声明前，不能自行概括检方回应。',
+    ],
+    topics: ['direct-criminal-appeal'],
+  },
+  'sha256:a976cceb019746a89c98d22f22152b690920ea4269eca9fe757438bade6850fb': {
+    category: 'Docket Filing',
+    priority: 'medium',
+    preferExact: true,
+    filedAt: '2026-08-06',
+    summary:
+      'The Second Circuit notified the parties that the case manager assigned to appeal 26-1853 had changed and supplied a telephone number for inquiries. This is an internal administrative-contact update.',
+    summaryZh:
+      '第二巡回通知各方：26-1853 号上诉案的案件管理员已经变更，并提供案件查询电话。这只是法院内部行政联系信息更新。',
+    whyItMatters: [
+      'It tells the parties where to direct administrative inquiries.',
+      'It does not change counsel, deadlines, appellate issues, the judgment, or the likely outcome.',
+    ],
+    whyItMattersZh: [
+      '它告知各方应向何处提出行政查询。',
+      '它不改变律师、期限、上诉争点、原判或案件可能结果。',
+    ],
+    topics: ['direct-criminal-appeal'],
+  },
+  'sdny-23-cr-118:264': {
+    category: 'Trial',
+    priority: 'high',
+    preferExact: true,
+    filedAt: '2024-04-09',
+    criticalFacts: {
+      dates: ['2024-04-09'],
+      amounts: [],
+      statutes: ['federal-rule-of-criminal-procedure-30'],
+    },
+    summary:
+      'The parties jointly submitted proposed jury instructions under Federal Rule of Criminal Procedure 30, suggesting how the court should explain the charges, evidence rules, and legal standards to the jury. This filing is not the final charge adopted or delivered by the court.',
+    summaryZh:
+      '控辩双方依据《联邦刑事诉讼规则》第 30 条共同提交拟议陪审团指示，建议法院如何向陪审团解释罪名、证据规则和法律标准；该文件不是法院已经采纳或宣读的最终指示。',
+    whyItMatters: [
+      'Proposed instructions show the parties\' requested legal framework and preserve objections, but the operative law given to the jury must be verified against the court\'s final charge and trial transcript.',
+    ],
+    whyItMattersZh: [
+      '拟议指示能显示双方希望采用的法律框架并可能保留异议，但陪审团实际收到的法律说明必须以法院最终指示和庭审记录核验。',
+    ],
+    topics: ['direct-criminal-appeal'],
+  },
+  'sdny-23-cr-118:869': {
+    category: 'Docket Filing',
+    priority: 'medium',
+    preferExact: true,
+    summary:
+      'Sharon Cohen Levin of Sullivan & Cromwell LLP filed an AO 458 appearance form stating that she appears as counsel for Pillsbury Winthrop Shaw Pittman LLP in the criminal docket.',
+    summaryZh:
+      'Sullivan & Cromwell LLP 的 Sharon Cohen Levin 提交 AO 458 律师出庭表，写明其在该刑事案卷中代表 Pillsbury Winthrop Shaw Pittman LLP 出庭。',
+    whyItMatters: [
+      'The filing updates counsel-of-record information for the stated represented firm. It does not decide any merits, appellate, sentencing, forfeiture, or custody issue.',
+      'The form does not explain why the appearance was filed; that reason must not be inferred without another docket filing or court order.',
+    ],
+    whyItMattersZh: [
+      '该文件更新了表内所列被代理律所的在册律师信息，不裁判实体争议、上诉、量刑、没收或羁押问题。',
+      '表格没有说明此次出庭登记的原因；没有其他案卷文件或法院命令时，不应自行推断。',
+    ],
+    topics: ['direct-criminal-appeal'],
+  },
   'sdny-23-cr-118:506': collectiveClaimExactNote(
     'Third-party counsel requests procedural relief for a stated group of Himalaya Exchange members; the motion and its proposed order do not themselves establish entitlement or a court ruling.',
     '第三方律师代表其所称的一组喜交所成员请求程序性救济；该动议及所附拟议命令本身不证明取得救济资格，也不等于法院裁定。',
@@ -159,6 +258,60 @@ const exactDocumentNotes = {
     ],
     topics: ['bankruptcy-assets'],
   },
+  'bkd-24-05249-aca:331': {
+    category: 'Bankruptcy',
+    priority: 'critical',
+    preferExact: true,
+    summary:
+      'The Chapter 11 trustee asks for summary judgment on Claims 17-21 and 26 and attaches a proposed judgment that would treat ACA Capital and five Himalaya entities, their ownership interests, and their assets as estate property. The proposed judgment is requested relief, not an entered court judgment.',
+    summaryZh:
+      '第 11 章受托人请求法院就第十七至二十一及第二十六项诉因作出简易判决，并附上拟议判决，要求把 ACA Capital 和五家 Himalaya 实体的所有权权益及资产认定为破产财产。拟议判决只是受托人请求的救济，不是法院已经录入的判决。',
+    whyItMatters: [
+      'If granted, the proposed relief would transfer broad ownership, control, asset, corporate-record, and foreign-enforcement authority to the trustee.',
+      'The motion must be read with the supporting memorandum, Rule 56 statement, declarations, defendants\' response, and the court\'s eventual ruling.',
+    ],
+    whyItMattersZh: [
+      '如果获准，拟议救济将把范围广泛的所有权、控制权、资产、公司记录更正权和境外执行权限交给受托人。',
+      '必须把该动议与支持性法律备忘录、Rule 56 事实陈述、各项声明、被告回应及法院最终裁定一起阅读。',
+    ],
+    topics: ['bankruptcy-assets', 'summary-judgment', 'entity-relationships'],
+  },
+  'bkd-24-05249-aca:331-1': {
+    category: 'Bankruptcy',
+    priority: 'critical',
+    preferExact: true,
+    summary:
+      'The trustee\'s redacted memorandum argues that criminal findings and judgment have evidentiary and issue-preclusive effect, that discovery sanctions favor the trustee, and that the record establishes the debtor\'s beneficial ownership and control of ACA Capital and five Himalaya entities. These remain the trustee\'s summary-judgment arguments unless adopted by the court.',
+    summaryZh:
+      '受托人的经删节法律备忘录主张：刑事案件判决和认定具有证据效力及争点排除效力，证据开示制裁支持受托人，并且现有记录证明债务人实益拥有并控制 ACA Capital 和五家 Himalaya 实体。在法院采纳前，这些仍是受托人的简易判决论证。',
+    whyItMatters: [
+      'It is the principal legal roadmap for converting criminal-case findings, discovery sanctions, witness testimony, communications, and transfer evidence into bankruptcy-estate ownership relief.',
+      'The most contestable legal steps include nonparty issue preclusion, the scope of sentencing findings, beneficial-ownership law, and whether a genuine dispute of material fact remains.',
+    ],
+    whyItMattersZh: [
+      '它是受托人把刑事案认定、证据开示制裁、证人证言、通信和转账证据转化为破产财产所有权救济的主要法律路线图。',
+      '最需要争辩和核验的法律环节包括对非当事方适用争点排除、量刑认定的范围、实益所有权规则，以及是否仍存在真实重大事实争议。',
+    ],
+    topics: ['bankruptcy-assets', 'summary-judgment', 'issue-preclusion', 'entity-relationships'],
+  },
+  'bkd-24-05249-aca:331-2': {
+    category: 'Bankruptcy',
+    priority: 'critical',
+    preferExact: true,
+    summary:
+      'The trustee\'s redacted Rule 56(a)(1) statement presents 93 numbered factual propositions and supporting citations concerning ACA Capital, the Himalaya entities, William Je, personnel, funding, transfers, and prior court proceedings. A Rule 56 statement is a party submission; each proposition may be admitted, disputed, deemed admitted, or rejected under the governing response and ruling.',
+    summaryZh:
+      '受托人的经删节 Rule 56(a)(1) 陈述列出 93 项编号事实命题及引证，涉及 ACA Capital、Himalaya 实体、William Je、人员、资金、转账和既往法院程序。Rule 56 事实陈述是当事方提交；每项命题仍可能在回应和裁定中被承认、争议、视为承认或不被采纳。',
+    whyItMatters: [
+      'It is a page-cited evidence index for the motion, but it is not a substitute for the cited exhibits or the defendants\' counterstatement.',
+      'Paragraph 2 states that the criminal judgment issued July 6, 2026, while criminal Doc. 860 records entry on July 2, 2026; the discrepancy must not be repeated as an established date.',
+    ],
+    whyItMattersZh: [
+      '它是该动议按页引证的证据索引，但不能替代被引用证物或被告方反事实陈述。',
+      '第 2 段称刑事判决于 2026 年 7 月 6 日作出，而刑事案 Doc. 860 记载判决于 2026 年 7 月 2 日录入；不得把这一冲突日期当成已确定事实沿用。',
+    ],
+    topics: ['bankruptcy-assets', 'summary-judgment', 'evidence-map', 'entity-relationships'],
+  },
   '858': {
     category: 'Forfeiture',
     priority: 'critical',
@@ -194,9 +347,14 @@ const exactDocumentNotes = {
     category: 'Order',
     priority: 'medium',
     summary: 'The order concerns sealing or redaction of sensitive personal information tied to appellate courtesy-copy material.',
+    summaryZh: '该命令涉及与上诉礼貌副本材料有关的敏感个人信息密封或删节处理。',
     whyItMatters: [
       'It affects public access, redaction timing, and which filings can be reviewed from public sources.',
       'Sealed material should not be inferred from public summaries.',
+    ],
+    whyItMattersZh: [
+      '它会影响公众查阅范围、删节期限，以及哪些文件可通过公开来源审阅。',
+      '不得根据公开摘要推测密封材料的具体内容。',
     ],
     topics: ['direct-criminal-appeal'],
   },
@@ -262,9 +420,14 @@ const exactDocumentNotes = {
     category: 'Mandamus',
     priority: 'high',
     summary: 'The filing appears to be a third-party mandamus request seeking action on § 853(n) forfeiture property claims.',
+    summaryZh: '该文件是一份第三方强制令申请，请求上诉法院推动地区法院处理其依据 § 853(n) 提出的没收财产权利主张。',
     whyItMatters: [
       'Mandamus activity can reveal procedural disputes about whether claimant petitions are docketed and considered.',
       'It should be separated from the direct criminal appeal and from court-adopted findings.',
+    ],
+    whyItMattersZh: [
+      '强制令活动可以反映申请人的文件是否已登记和处理等程序争议。',
+      '该申请必须与刑事直接上诉及法院已经采纳的认定分开。',
     ],
     topics: ['direct-criminal-appeal', 'forfeiture-ancillary'],
   },
@@ -282,9 +445,14 @@ const exactDocumentNotes = {
     category: 'Transcript',
     priority: 'medium',
     summary: 'The filing appears to be a transcript notice that affects redaction timing and public electronic availability.',
+    summaryZh: '该文件是庭审记录通知，涉及删节期限和庭审记录何时可通过公开电子系统取得。',
     whyItMatters: [
       'Transcript availability affects appeal preparation and public source review.',
       'Track redaction windows before assuming the final public transcript text is available.',
+    ],
+    whyItMattersZh: [
+      '庭审记录是否可取得会影响上诉准备和公开来源审阅。',
+      '在认定最终公开文本已经可用前，应先核对删节窗口。',
     ],
     topics: ['direct-criminal-appeal'],
   },
@@ -341,9 +509,9 @@ const priorityWeight = {
   low: 1,
 }
 
-const analysisCacheVersion = 'document-analysis-v36'
+const analysisCacheVersion = 'document-analysis-v39'
 const translationCacheVersion = 'translation-v7'
-const documentCatalogCacheVersion = 'document-catalog-v15'
+const documentCatalogCacheVersion = 'document-catalog-v19'
 const analysisBuilds = new Map()
 const analysisMemoryCache = new Map()
 const documentCatalogBuilds = new Map()
@@ -569,6 +737,7 @@ async function buildDocumentCatalogIndex(manifest, state, lang, cacheSignature) 
     const research = humanDocumentResearch(file, lang)
     return compactCatalogRecord(research ? applyHumanResearch(record, research, lang) : record, lang)
   })))
+  records.push(...docketEventCatalogRecords(state?.events, files, lang).map((record) => compactCatalogRecord(record, lang)))
   records.push(...sourceRecords.map((record) => compactCatalogRecord(sourceRecordAnalysis(record, lang), lang)))
   records.sort(compareAnalysisRecords)
   const payload = {
@@ -578,6 +747,160 @@ async function buildDocumentCatalogIndex(manifest, state, lang, cacheSignature) 
   }
   await atomicWriteJson(documentCatalogCachePath(lang), payload, { directoryMode: 0o700 })
   return payload
+}
+
+function docketEventCatalogRecords(events, files, lang) {
+  const localFilingKeys = new Set((files ?? [])
+    .filter((file) => file?.status !== 'error' && file?.path)
+    .flatMap((file) => catalogFilingKeys(file, file.docNumber)))
+  const records = new Map()
+
+  for (const event of events ?? []) {
+    if (!isDocketCatalogEvent(event)) continue
+    const keys = catalogFilingKeys(event, event.filingNumber)
+    if (keys.some((key) => localFilingKeys.has(key))) continue
+    const key = keys[0] ?? `source:${event.sourceUrl}`
+    const previous = records.get(key)
+    if (!previous || docketEventQuality(event) > docketEventQuality(previous)) records.set(key, event)
+  }
+
+  return [...records.values()].map((event) => docketEventAnalysis(event, lang))
+}
+
+function isDocketCatalogEvent(event) {
+  if (!String(event?.filingNumber ?? '').trim() || !/^https?:\/\//i.test(String(event?.sourceUrl ?? ''))) return false
+  return Boolean(
+    event.docketNumber
+    || event.courtListenerDocketId
+    || ['pacer', 'courtlistener-recap', 'supreme-court-docket'].includes(event.sourceId),
+  )
+}
+
+function docketEventQuality(event) {
+  const confidence = { highest: 4, high: 3, medium: 2, low: 1 }[event?.confidence] ?? 0
+  const summary = String(event?.summary ?? '').trim()
+  const placeholder = /\bdocket entry\s+\d+(?:-\d+)?$/i.test(summary)
+  return confidence * 10000 + Number(!placeholder) * 1000 + Math.min(summary.length, 999)
+}
+
+function catalogFilingKeys(record, filingNumber) {
+  const documentNumber = normalizeDocketNumber(filingNumber).toLowerCase()
+  if (!documentNumber) return []
+  const docket = normalizeCatalogDocketCoordinate(record?.docketNumber)
+  const caseId = String(record?.caseId ?? '').trim().toLowerCase()
+  return [
+    docket ? `docket:${docket}:${documentNumber}` : '',
+    caseId ? `case:${caseId}:${documentNumber}` : '',
+  ].filter(Boolean)
+}
+
+function normalizeCatalogDocketCoordinate(value) {
+  const docket = String(value ?? '').trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '')
+  if (!docket) return ''
+  const match = docket.match(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)(?:-[a-z]{1,6})+$/)
+  if (match) return `${match[1]}${match[2]}`
+  const canonical = docket.match(/^(\d+:\d{2,4}-(?:cr|cv|mc|mj|md|bk|ap)-)0*(\d+)$/)
+  return canonical ? `${canonical[1]}${canonical[2]}` : docket
+}
+
+function docketEventAnalysis(event, lang) {
+  const filingNumber = normalizeDocketNumber(event.filingNumber)
+  const localized = lang === 'en'
+    ? { title: event.title, summary: event.summary, impact: event.impact, category: event.category }
+    : translateEventFieldsToZh(event)
+  const title = String(localized.title ?? '').trim() || (lang === 'en' ? `Docket entry ${filingNumber}` : `文件 ${filingNumber}：案卷条目`)
+  const sourceLabel = lang === 'en'
+    ? englishSourceLabel(event)
+    : documentSourceLabelZh(event.sourceId, event.sourceLabel)
+  const boundary = lang === 'en'
+    ? `The public docket metadata confirms that entry ${filingNumber} exists${event.date ? ` and is dated ${event.date}` : ''}. No downloadable PDF or readable filing body is currently available in the local library, so this record cannot establish the filing's contents, the submitting party's position, a court ruling, or legal effect.`
+    : `公开案卷元数据可确认文件 ${filingNumber} 存在${event.date ? `，日期为 ${event.date}` : ''}。当前本地文件库没有可下载 PDF 或可读正文，因此不能据此判断文件内容、提交方立场、法院是否作出裁定或其法律效果。`
+  const summary = String(localized.summary ?? '').trim()
+  const sourceVerification = sourceVerificationForFile(event, lang)
+
+  return {
+    id: `docket-${createHash('sha256').update(`${event.caseId ?? ''}|${event.docketNumber ?? ''}|${filingNumber}|${event.sourceUrl}`).digest('hex').slice(0, 16)}`,
+    resourceKind: 'docket_entry',
+    publishedAt: event.date ?? null,
+    capturedAt: null,
+    docNumber: filingNumber,
+    title,
+    originalTitle: String(event.title ?? title),
+    variantKey: 'docket_metadata',
+    variantLabel: lang === 'en' ? 'Docket metadata only' : '仅案卷元数据',
+    caseId: event.caseId ?? '',
+    docketNumber: event.docketNumber ?? null,
+    sourceId: event.sourceId,
+    sourceLabel,
+    sourceUrl: event.sourceUrl,
+    localPath: '',
+    bytes: 0,
+    status: 'metadata_only',
+    category: String(localized.category ?? event.category ?? (lang === 'en' ? 'Docket filing' : '案卷文件')),
+    categoryKey: event.category ?? 'Docket Filing',
+    priority: event.severity ?? 'low',
+    confidence: event.confidence ?? 'medium',
+    sourcePosture: sourcePostureForFile(event, lang),
+    summary: [summary, boundary].filter(Boolean).join(lang === 'en' ? ' ' : ''),
+    plainEnglish: boundary,
+    legalReading: [boundary],
+    caseConnections: [],
+    whyItMatters: [String(localized.impact ?? '').trim()].filter(Boolean),
+    verificationTasks: [lang === 'en'
+      ? 'Open the source docket page and obtain the PDF or official docket text before drawing a substantive conclusion.'
+      : '在作出实质结论前，应打开来源案卷页并取得 PDF 或正式案卷文字。'],
+    riskFlags: [lang === 'en'
+      ? 'Metadata proves the entry and date only; it is not a substitute for the filing body.'
+      : '元数据只能证明条目及日期，不能替代文件正文。'],
+    offlineRead: null,
+    aiFindings: [],
+    relatedTopics: [],
+    relatedTopicIds: [],
+    translationStatus: {
+      metadata: lang === 'en' ? 'metadata localized' : '元数据已本地化',
+      body: lang === 'en' ? 'no filing body available' : '暂无文件正文',
+      note: boundary,
+    },
+    aiStatus: {
+      available: false,
+      provider: null,
+      availableProvider: 'local_rules',
+      generated: false,
+      mode: lang === 'en' ? 'metadata boundary only; no filing body to analyze' : '仅元数据边界；无文件正文可供解读',
+      batchDefault: lang === 'en' ? 'not applicable' : '不适用',
+    },
+    sourceVerification: {
+      ...sourceVerification,
+      label: lang === 'en' ? `${sourceVerification.label}; metadata only` : `${sourceVerification.label}；仅元数据`,
+      note: boundary,
+    },
+    sourceAlternatives: [],
+    searchAliases: [`Doc ${filingNumber}`, `Document ${filingNumber}`, `文件 ${filingNumber}`, event.docketNumber].filter(Boolean),
+    relationship: null,
+    relationshipStatus: 'metadata_only',
+    relationshipType: 'docket_metadata',
+    relationshipTypes: ['docket_metadata'],
+    relationshipConfidence: event.confidence ?? 'medium',
+    relationshipLabel: lang === 'en' ? 'Docket metadata only' : '仅案卷元数据',
+    relationshipEvidence: [],
+    relationshipControlWarning: boundary,
+    relationshipVerificationTasks: [],
+    analysisBasis: 'docket_metadata',
+    researchQuality: {
+      key: 'metadata_only',
+      label: lang === 'en' ? 'Docket metadata; no PDF/body' : '案卷元数据；无 PDF/正文',
+      detail: boundary,
+    },
+    textExtraction: {
+      ...emptyTextExtraction(lang),
+      status: 'unavailable',
+      label: lang === 'en' ? 'No PDF/body available' : '无 PDF/正文可提取',
+      warning: boundary,
+    },
+    citations: [],
+    translation: null,
+    pageText: '',
+  }
 }
 
 function prioritizeDocumentQueue(records, limit) {
@@ -642,22 +965,31 @@ export async function analyzeDocumentBySourceUrl(sourceUrl, manifest, state, lan
   return localAnalyzeDocumentWithExtraction(file, state, lang)
 }
 
-async function localAnalyzeDocumentWithExtraction(file, state, lang) {
+async function localAnalyzeDocumentWithExtraction(file, state, lang, options = {}) {
   const local = localDocumentAnalysis(file, state, lang)
   const extraction = await extractPdfSnippetForFile(file, {
       pageLimit: runtimeSetting('pdfPageLimit'),
       charLimit: runtimeSetting('pdfCharLimit'),
   })
-  await ensureOnDemandTranslation(file, extraction, lang)
+  if (options.ensureTranslation !== false) await ensureOnDemandTranslation(file, extraction, lang)
   const enriched = await enrichRecordWithExtraction(local, extraction, state, lang)
   if (enriched.aiStatus?.provider === 'human_research') return enriched
-  const result = {
+  const pendingResult = {
     ...localDocumentAiResult(enriched, extraction, lang),
     analysisLanguage: lang,
     sourceSha256: file.sha256 ?? null,
   }
+  const { record: result } = repairDocumentAnalysisLanguage(pendingResult, enriched, lang)
   await writeJsonFile(documentAiCachePath(file, extraction, lang, 'local_rules'), result)
   return result
+}
+
+export async function buildOfflineDocumentAnalysis(file, state, lang = 'zh') {
+  const normalizedLanguage = lang === 'en' ? 'en' : 'zh'
+  const research = humanDocumentResearch(file, normalizedLanguage)
+  return research
+    ? analyzeHumanDocument(file, research, state, normalizedLanguage, { ensureTranslation: false })
+    : localAnalyzeDocumentWithExtraction(file, state, normalizedLanguage, { ensureTranslation: false })
 }
 
 export function localDocumentAnalysis(file, state, lang = 'zh', context = null) {
@@ -680,11 +1012,13 @@ export function localDocumentAnalysis(file, state, lang = 'zh', context = null) 
   const sourcePosture = sourcePostureForFile(displayFile, lang)
   const riskFlags = riskFlagsForFile(displayFile, lang)
   const sourceAlternatives = sourceAlternativesForFile(displayFile, lang)
+  const offlineRead = interpretOfflineLegalDocument({ file: displayFile, category, lang })
+  const plainEnglish = composeOfflinePlainRead(summary, offlineRead.plainRead, exact || matchedEvent, lang)
 
   return {
     id: stableDocumentId(displayFile),
     resourceKind: 'pdf',
-    publishedAt: displayFile.filedAt ?? null,
+    publishedAt: displayFile.filedAt ?? exact?.filedAt ?? null,
     capturedAt: displayFile.archivedAt ?? null,
     docNumber: displayFile.docNumber ?? null,
     title,
@@ -707,17 +1041,20 @@ export function localDocumentAnalysis(file, state, lang = 'zh', context = null) 
     categoryKey: category,
     priority,
     confidence: confidenceForFile(displayFile),
+    criticalFacts: criticalFactsForFile(displayFile, exact),
     sourcePosture,
     summary,
-    plainEnglish: plainLanguageReading(displayFile, category, lang),
+    plainEnglish: isAdversaryAnswer(displayFile) ? plainLanguageReading(displayFile, category, lang) : plainEnglish,
     legalReading: mergeUnique([
+      ...offlineRead.professionalRead,
       ...legalReadingForFile(displayFile, category, exact, matchedEvent, lang),
       relationship.controlWarning,
     ]).slice(0, 6),
     caseConnections: caseConnectionsForFile(displayFile, topics, category, relationship, lang),
-    whyItMatters,
-    verificationTasks,
-    riskFlags,
+    whyItMatters: mergeUnique([...offlineRead.whyItMatters, ...whyItMatters]),
+    verificationTasks: mergeUnique([...offlineRead.verificationTasks, ...verificationTasks]),
+    riskFlags: mergeUnique([...riskFlags, ...offlineRead.riskFlags]),
+    offlineRead,
     aiFindings: [],
     relatedTopics: topics.map((topicId) => localizedTopicTitle(topicId, lang)),
     relatedTopicIds: topics,
@@ -837,6 +1174,59 @@ function cleanDisplayTitle(value) {
 }
 
 function localizedDisplayTitle(file, lang) {
+  if (file?.caseId === 'ca2-26-1853') {
+    const titles = {
+      '14': {
+        sha256: '6d576f248cc3e90e9d195b9a82ccf564b673031f760c288dc74f8e15f5a8a138',
+        en: 'Document 14: Acknowledgment and Notice of Appearance for Appellant',
+        zh: '文件 14：上诉律师出庭确认及案卷信息确认表',
+      },
+      '15': {
+        sha256: '2a247490751890832fa5cd7285540772d84327b48f4e5a273d4219d69efeef7f',
+        en: 'Document 15: Criminal Appeal Transcript Information (Form B)',
+        zh: '文件 15：刑事上诉庭审记录信息表（Form B）',
+      },
+      '16-1': {
+        sha256: 'd4f3d54b69c72ef8e1c9bcaad40a8ebe50a6bfe46d8589eebf50d772ce21b2a1',
+        en: 'Document 16-1: Motion Information Statement to Substitute Appellate Counsel',
+        zh: '文件 16-1：解除并替换上诉律师动议信息表',
+      },
+      '17': {
+        sha256: 'a976cceb019746a89c98d22f22152b690920ea4269eca9fe757438bade6850fb',
+        en: 'Document 17: Notice of Case Manager Change',
+        zh: '文件 17：案件管理员变更通知',
+      },
+    }
+    const title = titles[String(file?.docNumber ?? '')]
+    if (title?.sha256 === file?.sha256) return title[lang === 'en' ? 'en' : 'zh']
+  }
+  if (file?.caseId === 'sdny-23-cr-118' && String(file?.docNumber) === '869') {
+    return lang === 'en'
+      ? 'Doc 869: Appearance of Counsel for Pillsbury Winthrop Shaw Pittman LLP'
+      : '文件 869：Pillsbury Winthrop Shaw Pittman LLP 律师出庭登记'
+  }
+  if (file?.caseId === 'scotus-26-194') {
+    const titles = {
+      petition: {
+        en: 'Petition for a Writ of Certiorari',
+        zh: '调卷令申请书',
+      },
+      'certificate-of-word-count': {
+        en: 'Certificate of Compliance with Word-Count Limit',
+        zh: '字数限制合规证明',
+      },
+      'proof-of-service': {
+        en: 'Proof of Service',
+        zh: '送达证明',
+      },
+      'respondent-waiver': {
+        en: 'Respondent Waiver of Right to Respond',
+        zh: '被申请人放弃当前回应权文件',
+      },
+    }
+    const title = titles[String(file?.docNumber ?? '')]
+    if (title) return title[lang === 'en' ? 'en' : 'zh']
+  }
   if (file?.caseId === 'sdny-23-cr-118' && String(file?.docNumber) === '765') {
     return lang === 'en'
       ? 'Document 765: source metadata conflicts with PDF body; official docket verification required'
@@ -890,6 +1280,7 @@ function englishSourceLabel(file) {
     'epiq-kwok-trustee': 'Epiq bankruptcy docket source',
     'himalaya-restoration': 'Himalaya Restoration public project site',
     'himalaya-restoration-archive': 'Himalaya Restoration historical public archive',
+    'supreme-court-docket': 'Official Supreme Court docket No. 26-194',
   }
   const fallback = String(file?.sourceLabel ?? '')
   return labels[file?.sourceId] ?? (hasCjk(fallback) ? 'Public source' : fallback)
@@ -907,6 +1298,12 @@ async function enrichRecordWithExtraction(record, extraction, state, lang) {
   const translation = await readCachedTranslation(record.rawFile, effectiveExtraction, lang)
   const normalizedExtraction = localizedTextExtraction(effectiveExtraction, lang, translation)
   const citations = localizedCitations(record, effectiveExtraction, translation, lang)
+  const offlineRead = interpretOfflineLegalDocument({
+    file: record.rawFile,
+    category: record.categoryKey,
+    extraction: effectiveExtraction,
+    lang,
+  })
   const enriched = {
     ...publicRecord,
     researchQuality: researchQualityFor(record.rawFile, effectiveExtraction, lang),
@@ -917,10 +1314,15 @@ async function enrichRecordWithExtraction(record, extraction, state, lang) {
       ? translatedStatus(translation, lang)
       : publicRecord.translationStatus,
     legalReading: mergeUnique([
+      ...offlineRead.professionalRead,
       ...publicRecord.legalReading,
       ...snippetLegalReading(effectiveExtraction, record.rawFile, state, lang),
-    ]).slice(0, 5),
-    plainEnglish: snippetPlainLanguage(publicRecord.plainEnglish, effectiveExtraction, lang),
+    ]).slice(0, 6),
+    plainEnglish: composeOfflinePlainRead(publicRecord.summary, offlineRead.plainRead, ['curated', 'linked_event'].includes(publicRecord.analysisBasis), lang),
+    whyItMatters: mergeUnique([...offlineRead.whyItMatters, ...publicRecord.whyItMatters]),
+    verificationTasks: mergeUnique([...offlineRead.verificationTasks, ...publicRecord.verificationTasks]),
+    riskFlags: mergeUnique([...publicRecord.riskFlags, ...offlineRead.riskFlags]),
+    offlineRead,
   }
   return research ? applyHumanResearch(enriched, research, lang, effectiveExtraction) : enriched
 }
@@ -929,7 +1331,7 @@ function maximumHumanCitationPage(research) {
   return Math.max(0, ...(research?.content?.findings ?? []).flatMap((item) => item.pages ?? []).map(Number).filter(Number.isFinite))
 }
 
-async function analyzeHumanDocument(file, research, state, lang) {
+async function analyzeHumanDocument(file, research, state, lang, options = {}) {
   const local = localDocumentAnalysis(file, state, lang)
   const extraction = await extractPdfSnippetForFile(file, {
     pageLimit: 300,
@@ -949,11 +1351,11 @@ async function analyzeHumanDocument(file, research, state, lang) {
       },
     }
   }
-  await ensureOnDemandTranslation(file, extraction, lang)
+  if (options.ensureTranslation !== false) await ensureOnDemandTranslation(file, extraction, lang)
   const enriched = await enrichRecordWithExtraction(local, extraction, state, lang)
   const applied = applyHumanResearch(enriched, research, lang, extraction)
   const cachePath = documentAiCachePath(file, extraction, lang, 'human_research')
-  const result = {
+  const pendingResult = {
     ...applied,
     analysisLanguage: lang,
     generatedAt: research.reviewedAt ?? new Date().toISOString(),
@@ -961,6 +1363,7 @@ async function analyzeHumanDocument(file, research, state, lang) {
     sourceUrl: file.url,
     sourceSha256: file.sha256 ?? null,
   }
+  const { record: result } = repairDocumentAnalysisLanguage(pendingResult, enriched, lang)
   await writeJsonFile(cachePath, result)
   return result
 }
@@ -1056,9 +1459,11 @@ function compactCatalogRecord(record, lang = 'zh') {
     categoryKey: record.categoryKey,
     priority: record.priority,
     confidence: record.confidence,
+    criticalFacts: record.criticalFacts ?? { dates: [], amounts: [], statutes: [] },
     sourcePosture: record.sourcePosture,
     summary: record.summary,
     plainEnglish: record.plainEnglish,
+    offlineRead: record.offlineRead ?? null,
     legalReading: [],
     caseConnections: [],
     whyItMatters: [],
@@ -1108,14 +1513,19 @@ function catalogResponseRecord(record) {
   return {
     id: record.id,
     resourceKind: record.resourceKind,
+    publishedAt: record.publishedAt ?? null,
     docNumber: record.docNumber,
     title: record.title,
+    caseId: record.caseId,
+    docketNumber: record.docketNumber ?? null,
     variantLabel: record.variantLabel,
     sourceLabel: record.sourceLabel,
     sourceUrl: record.sourceUrl,
     status: record.status,
     category: record.category,
     priority: record.priority,
+    confidence: record.confidence,
+    criticalFacts: record.criticalFacts ?? { dates: [], amounts: [], statutes: [] },
     summary: record.summary,
     plainEnglish: record.plainEnglish,
     researchQuality: record.researchQuality,
@@ -1237,7 +1647,7 @@ function localizedCitations(record, extraction, translation, lang) {
     return {
       id: `${record.id}-p${page.pageNumber ?? index + 1}`,
       pageNumber: page.pageNumber ?? index + 1,
-      originalText: lang === 'en' && sourceIsChinese ? usableEnglishText : sourceText,
+      originalText: sourceText,
       translatedText: lang === 'en' ? usableEnglishText : translatedText,
       charStart: page.charStart ?? 0,
       charEnd: page.charEnd ?? 0,
@@ -1696,6 +2106,34 @@ function classifyDocument(file) {
   return 'Docket Filing'
 }
 
+function criticalFactsForFile(file, exact = null) {
+  const text = `${file.title ?? ''} ${file.originalTitle ?? ''}`
+  const dates = []
+  if (/^20\d{2}-\d{2}-\d{2}$/u.test(String(file.filedAt ?? ''))) dates.push(file.filedAt)
+  const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+  for (const match of text.matchAll(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(20\d{2})\b/giu)) {
+    dates.push(`${match[3]}-${String(months.indexOf(match[1].toLowerCase()) + 1).padStart(2, '0')}-${String(match[2]).padStart(2, '0')}`)
+  }
+  for (const match of text.matchAll(/\b(\d{1,2})\/(\d{1,2})\/(20\d{2})\b/gu)) {
+    dates.push(`${match[3]}-${String(match[1]).padStart(2, '0')}-${String(match[2]).padStart(2, '0')}`)
+  }
+  const amounts = []
+  for (const match of text.matchAll(/(?:US\$|USD\s*|\$)\s*([0-9][0-9,]*(?:\.[0-9]+)?)\s*(billion|million)?/giu)) {
+    const factor = match[2]?.toLowerCase() === 'billion' ? 1e9 : match[2]?.toLowerCase() === 'million' ? 1e6 : 1
+    amounts.push(String(Math.round(Number(match[1].replaceAll(',', '')) * factor)))
+  }
+  const statutes = [
+    ...(text.match(/\bRule\s+\d+(?:\([a-z0-9]+\))*/giu) ?? []),
+    ...(text.match(/§\s*\d+(?:\([a-z0-9]+\))*/giu) ?? []),
+    ...(text.match(/\b\d+\s+U\.S\.C\.\s*(?:§\s*)?\d+(?:\([a-z0-9]+\))*/giu) ?? []),
+  ].map((value) => value.toLowerCase().replace(/\s+/gu, ''))
+  return {
+    dates: [...new Set([...(exact?.criticalFacts?.dates ?? []), ...dates])],
+    amounts: [...new Set([...(exact?.criticalFacts?.amounts ?? []), ...amounts])],
+    statutes: [...new Set([...(exact?.criticalFacts?.statutes ?? []), ...statutes])],
+  }
+}
+
 function priorityForCategory(category) {
   if (['Judgment', 'Sentencing', 'Appeal'].includes(category)) return 'critical'
   if (['Forfeiture', 'Mandamus', 'Bankruptcy'].includes(category)) return 'high'
@@ -1735,6 +2173,15 @@ function localizedSummary(file, event, exact, lang) {
   if (event) return translateEventFieldsToZh(event).summary
   if (exact) return exact.summaryZh ?? translateLegalTextToZh(exact.summary)
   return `该文件当前按案卷标题和来源元数据分类：${translateDocumentTitleToZh(file)}。`
+}
+
+function composeOfflinePlainRead(summary, offlinePlainRead, includeKnownSummary, lang) {
+  const read = String(offlinePlainRead ?? '').trim()
+  const knownSummary = String(summary ?? '').trim()
+  const genericSummary = /classified from (?:its )?docket title|按案卷标题和来源元数据分类/iu.test(knownSummary)
+  if (!includeKnownSummary || !knownSummary || genericSummary) return read
+  const separator = lang === 'en' ? ' ' : ''
+  return `${knownSummary}${separator}${read}`.slice(0, 1800)
 }
 
 function plainLanguageReading(file, category, lang) {
@@ -1942,7 +2389,19 @@ function genericWhyItMatters(category, lang) {
     Transcript: ['Transcript materials should be read directly because wording, objections, and rulings matter.'],
   }
   const value = english[category] ?? ['Read the source document before using this item for a material conclusion.']
-  return lang === 'en' ? value : value.map((item) => translateLegalTextToZh(item))
+  if (lang === 'en') return value
+  const chinese = {
+    Appeal: ['上诉相关文件可能设定期限、争点、律师程序姿态或书状义务。'],
+    Forfeiture: ['没收文件可能改变资产追回、第三方权利主张以及返还、减免或抵扣分析。'],
+    Sentencing: ['量刑材料是分析上诉争点、损失认定和刑罚理由的核心来源。'],
+    Judgment: ['判决材料决定可上诉的程序姿态以及判决后的执行问题。'],
+    Bankruptcy: ['破产文件会影响破产财产、所有权争议、债权人主张和资产追回。'],
+    'Civil Enforcement': ['民事执法材料应与刑事没收和 Fair Fund 追回情况交叉核对。'],
+    Discovery: ['证据开示材料可能影响审判公平、争点保留和上诉问题。'],
+    Trial: ['审判材料可能影响证据充分性、证据争议和上诉分析。'],
+    Transcript: ['庭审记录的具体措辞、异议和裁定都很重要，应直接阅读。'],
+  }
+  return chinese[category] ?? ['在把该文件用于重要结论前，应直接阅读来源文件。']
 }
 
 function isAdversaryAnswer(file) {
@@ -2011,7 +2470,18 @@ function sourcePostureForFile(file, lang) {
   if (sourceId === 'courtlistener-recap') posture = 'RECAP court-record mirror'
   if (sourceId === 'himalaya-restoration') posture = 'Party/counsel project site; descriptions and counts are advocacy-side statements, not court findings'
   if (sourceId === 'himalaya-restoration-archive') posture = 'Historical public web archive; proves what the project site published at capture time, not official docket acceptance or disposition'
-  return lang === 'en' ? posture : translateLegalTextToZh(posture)
+  if (lang === 'en') return posture
+  const chinese = {
+    'Public source metadata': '公开来源元数据',
+    'Public mirror; not the docket of record': '公开镜像；不是正式案卷记录',
+    'Official agency source; allegations and announcements still need court-record separation': '官方机构来源；仍须把机构指控和公告与法院记录分开',
+    'Claims administrator source; reconcile with court and SEC records': '索赔管理机构来源；须与法院及 SEC 记录核对',
+    'Official court source': '法院官方来源',
+    'RECAP court-record mirror': 'RECAP 法院记录镜像',
+    'Party/counsel project site; descriptions and counts are advocacy-side statements, not court findings': '当事方或律师项目网站；其描述和人数是主张方陈述，不是法院认定',
+    'Historical public web archive; proves what the project site published at capture time, not official docket acceptance or disposition': '历史公开网页存档；只能证明项目网站在存档时发布了什么，不能证明法院正式接收或作出处理',
+  }
+  return chinese[posture] ?? translateLegalTextToZh(posture)
 }
 
 function riskFlagsForFile(file, lang) {
@@ -2126,17 +2596,18 @@ function neutralLabel(lang) {
 
 function sourceVerificationForFile(file, lang) {
   const tier = verificationTierForSource(file.sourceId)
+  const primarySourceIds = new Set(['pacer', 'courtlistener-recap', 'supreme-court-docket'])
   if (lang === 'en') {
     return {
       tier,
-      primary: file.sourceId === 'pacer' || file.sourceId === 'courtlistener-recap',
+      primary: primarySourceIds.has(file.sourceId),
       label: sourceVerificationLabel(tier, 'en'),
       note: sourceVerificationNote(file.sourceId, 'en'),
     }
   }
   return {
     tier,
-    primary: file.sourceId === 'pacer' || file.sourceId === 'courtlistener-recap',
+    primary: primarySourceIds.has(file.sourceId),
     label: sourceVerificationLabel(tier, 'zh'),
     note: sourceVerificationNote(file.sourceId, 'zh'),
   }
@@ -2244,7 +2715,7 @@ function sourceAlternativeNote(kind, equivalenceStatus, lang) {
 }
 
 function verificationTierForSource(sourceId) {
-  if (sourceId === 'pacer') return 'official_record'
+  if (['pacer', 'supreme-court-docket'].includes(sourceId)) return 'official_record'
   if (sourceId === 'courtlistener-recap') return 'recap_court_record'
   if (['doj-victim-page', 'sec-press-2023-50'].includes(sourceId)) return 'official_agency'
   if (['gtv-fair-fund', 'epiq-kwok-trustee'].includes(sourceId)) return 'claims_administrator'
@@ -2285,6 +2756,7 @@ function sourceVerificationNote(sourceId, lang) {
     if (sourceId === 'nfsc-criminal-mirror') return 'Use for fast access only. Prefer PACER docket text, RECAP PDF metadata, or official court/agency records before relying on the file.'
     if (sourceId === 'courtlistener-recap') return 'Best no-fee public substitute for PACER when the relevant docket/PDF has been mirrored by PACER users.'
     if (sourceId === 'pacer') return 'Docket of record. Use fee controls and manual confirmation for chargeable retrieval.'
+    if (sourceId === 'supreme-court-docket') return 'Official Supreme Court docket and Court-hosted filing. The docket posture controls; filing or conference distribution does not establish a grant of certiorari or a merits ruling.'
     if (sourceId === 'himalaya-restoration') return 'Useful for proving what the project publicly stated or linked. Verify filing identity, acceptance, and disposition against PACER/RECAP.'
     if (sourceId === 'himalaya-restoration-archive') return 'Useful for reconstructing previously public pages and file links. Archive capture does not establish filing acceptance or a court ruling.'
     return 'Useful source, but keep source posture visible and reconcile against court records for material conclusions.'
@@ -2292,6 +2764,7 @@ function sourceVerificationNote(sourceId, lang) {
   if (sourceId === 'nfsc-criminal-mirror') return '仅作快速访问备用。重要结论优先用 PACER 案卷文字、RECAP PDF 元数据或法院/官方机构记录核验。'
   if (sourceId === 'courtlistener-recap') return '在相关案卷/PDF 已由 PACER 用户同步时，这是最好的低成本公开替代来源。'
   if (sourceId === 'pacer') return '正式案卷记录。抓取时必须加入费用控制，并对收费操作人工确认。'
+  if (sourceId === 'supreme-court-docket') return '美国最高法院官方案卷及法院托管文件。应以案卷程序状态为准；提交申请或分发至法官会议不等于准予调卷令，也不等于实体裁判。'
   if (sourceId === 'himalaya-restoration') return '可证明项目网站公开陈述或链接过什么；文件身份、法院是否接收及处理结果仍需 PACER/RECAP 核验。'
   if (sourceId === 'himalaya-restoration-archive') return '可重建旧站曾公开的页面与文件链接；存档快照不等于法院接收文件或作出裁定。'
   return '可用来源，但重要结论应保留来源姿态，并与法院记录交叉核验。'
@@ -2411,20 +2884,26 @@ function localizedTextExtraction(extraction, lang, translation = null) {
     textHash: value.textHash ?? null,
     warning: translationPending
       ? 'The source-language text remains local and is omitted from the English response until a cached English translation exists.'
-      : value.warning ? (lang === 'en' ? value.warning : translateLegalTextToZh(value.warning)) : null,
+      : localizedExtractionWarning(value.warning, lang),
   }
+}
+
+function localizedExtractionWarning(value, lang) {
+  if (!value) return null
+  if (lang === 'en') return value
+  const warnings = {
+    'The PDF text layer was empty or materially sparse; body text was recovered with bundled local OCR.': 'PDF 文本层为空或内容明显稀少；已使用内置本地 OCR 恢复正文。',
+    'The PDF had no text layer; body text was recovered with bundled local OCR.': 'PDF 没有文本层；已使用内置本地 OCR 恢复正文。',
+    'The PDF text layer appears materially sparse, but local OCR did not recover a stronger body-text result.': 'PDF 文本层内容明显稀少，但本地 OCR 未能恢复出更完整的正文。',
+    'PDF parser and local OCR returned no body text; the file may be blank, sealed, corrupt, or extraction-restricted.': 'PDF 解析器和本地 OCR 均未提取到正文；文件可能为空白、密封、损坏或受提取限制。',
+  }
+  return warnings[value] ?? translateLegalTextToZh(value)
 }
 
 function extractionCoverageLabel(coverage, lang) {
   if (coverage === 'complete') return lang === 'en' ? 'Body fully extracted locally' : '已完整提取正文'
   if (coverage === 'partial') return lang === 'en' ? 'Body partially extracted locally' : '已部分提取正文'
   return lang === 'en' ? 'Body extracted; coverage unverified' : '已提取正文（覆盖范围未确认）'
-}
-
-function snippetPlainLanguage(base, extraction, lang) {
-  if (!extraction || extraction.status !== 'extracted' || !extraction.snippet) return base
-  const signal = snippetSignal(extraction.snippet, lang)
-  return signal ? `${base} ${signal}` : base
 }
 
 function snippetLegalReading(extraction, file, state, lang) {
@@ -2451,14 +2930,6 @@ function snippetLegalReading(extraction, file, state, lang) {
     readings.push(lang === 'en' ? `Compare the snippet against the linked timeline event for filing ${matchingEvent.filingNumber}.` : `将片段与时间线中关联的文件 ${matchingEvent.filingNumber} 对照。`)
   }
   return readings
-}
-
-function snippetSignal(snippet, lang) {
-  const lower = snippet.toLowerCase()
-  if (lower.includes('ordered')) return lang === 'en' ? 'The extracted text appears to include operative court language.' : '提取文本中可能包含法院操作性命令语言。'
-  if (lower.includes('motion')) return lang === 'en' ? 'The extracted text appears to be a motion or request, so treat it as a party position unless granted.' : '提取文本可能是动议或请求；除非法院准许，否则按当事人立场处理。'
-  if (lower.includes('transcript')) return lang === 'en' ? 'The extracted text appears linked to transcript review, where exact wording matters.' : '提取文本可能与庭审记录有关，精确措辞很重要。'
-  return ''
 }
 
 function sourceStrategy(lang) {
@@ -3125,7 +3596,7 @@ function legalRelationshipLabel(entity, caseId, lang) {
   if (role.includes('defendant') || role.includes('co-defendant')) key = 'defendant / co-defendant'
   else if (caseId === 'sec-admin-3-20537' || role.includes('fair fund')) key = 'SEC / Fair Fund entity'
   else if (caseId === 'dconn-22-50073' || role.includes('bankruptcy estate')) key = 'bankruptcy estate / ownership'
-  else if (caseId === 'ca2-24-2504' || role.includes('alter ego')) key = 'appellate asset relation'
+  else if (['ca2-24-2504', 'scotus-26-194'].includes(caseId) || role.includes('alter ego')) key = 'appellate asset relation'
   else if (role.includes('forfeiture')) key = 'forfeiture / claimant relation'
   else if (role.includes('offering') || role.includes('investor')) key = 'offering / investor relation'
   if (lang === 'en') return key
@@ -3295,10 +3766,14 @@ async function cloudAnalyzeDocumentMetadata(file, state, lang, provider) {
   const cachePath = documentAiCachePath(file, extraction, lang)
   const cached = await readJsonFile(cachePath)
   if (cached) {
+    const { record: localized, correctedFields } = repairDocumentAnalysisLanguage(cached, local, lang)
+    if (correctedFields.length || cached?.languageQuality?.version !== documentLanguageQualityVersion) {
+      await writeJsonFile(cachePath, localized)
+    }
     return {
-      ...cached,
+      ...localized,
       aiStatus: {
-        ...cached.aiStatus,
+        ...localized.aiStatus,
         cached: true,
       },
     }
@@ -3389,7 +3864,7 @@ async function cloudAnalyzeDocumentMetadata(file, state, lang, provider) {
 
   const ai = validateDocumentAiAnalysis(parseStructuredModelOutput(outputText, `${cloudProviderLabel(provider)} document analysis response`), extraction, includeSnippet)
 
-  const result = {
+  const pendingResult = {
     ...local,
     analysisLanguage: lang,
     sourceUrl: file.url,
@@ -3416,6 +3891,7 @@ async function cloudAnalyzeDocumentMetadata(file, state, lang, provider) {
       generated: true,
     },
   }
+  const { record: result } = repairDocumentAnalysisLanguage(pendingResult, local, lang)
   await writeJsonFile(cachePath, result)
   return result
 }
@@ -3430,16 +3906,20 @@ async function ollamaAnalyzeDocumentMetadata(file, state, lang) {
   const cachePath = documentAiCachePath(file, extraction, lang, 'ollama')
   const cached = await readJsonFile(cachePath)
   if (cached) {
+    const { record: localized, correctedFields } = repairDocumentAnalysisLanguage(cached, local, lang)
+    if (correctedFields.length || cached?.languageQuality?.version !== documentLanguageQualityVersion) {
+      await writeJsonFile(cachePath, localized)
+    }
     return {
-      ...cached,
+      ...localized,
       aiStatus: {
-        ...cached.aiStatus,
+        ...localized.aiStatus,
         cached: true,
       },
     }
   }
   const event = findMatchingEvent(file, state)
-  const result = {
+  const pendingResult = {
     ...(await ollamaDocumentAnalysis({
       file,
       local,
@@ -3462,6 +3942,7 @@ async function ollamaAnalyzeDocumentMetadata(file, state, lang) {
     sourceUrl: file.url,
     sourceSha256: file.sha256 ?? null,
   }
+  const { record: result } = repairDocumentAnalysisLanguage(pendingResult, local, lang)
   await writeJsonFile(cachePath, result)
   return result
 }
@@ -3586,6 +4067,8 @@ function documentCatalogCacheSignature(manifest, state, lang) {
       status: file.status,
       title: file.title,
       filename: file.filename,
+      path: file.path ?? null,
+      filedAt: file.filedAt ?? null,
       docNumber: file.docNumber,
       sourceId: file.sourceId,
       sourceLabel: file.sourceLabel,
@@ -3606,10 +4089,18 @@ function documentCatalogCacheSignature(manifest, state, lang) {
       events: (state?.events ?? []).map((event) => ({
         id: event.id,
         caseId: event.caseId,
+        docketNumber: event.docketNumber,
         filingNumber: event.filingNumber,
         date: event.date,
         title: event.title,
         summary: event.summary,
+        impact: event.impact,
+        category: event.category,
+        severity: event.severity,
+        confidence: event.confidence,
+        sourceId: event.sourceId,
+        sourceLabel: event.sourceLabel,
+        sourceUrl: event.sourceUrl,
       })),
     },
     language: lang === 'en' ? 'en' : 'zh',
@@ -3658,7 +4149,7 @@ function documentAiCachePath(file, extraction, lang, provider = runtimeSetting('
   const cacheKey = createHash('sha1')
     .update(
       JSON.stringify({
-        version: 'document-ai-v9',
+        version: 'document-ai-v12',
         lang,
         provider,
         model,

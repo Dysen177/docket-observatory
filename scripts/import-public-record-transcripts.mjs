@@ -62,6 +62,26 @@ const legacyArchivePath = path.join(workDir, 'legacy-transcript-source.tar.gz')
 const legacySourceDir = path.join(workDir, 'legacy-transcript-source')
 const publicPostOverlayPath = path.join(workDir, 'public-post-overlay.json')
 const publicPostSourceDir = path.join(workDir, 'public-post-source')
+const verifiedTranscriptCorrections = [
+  {
+    id: '2022-01-17-2',
+    durationSec: 123.922,
+    minimumImprovementRatio: 2,
+    segments: [
+      { start: 67.3, end: 73.225, text: '兄弟姐妹们 要想征服敌人你不征服自己能行吗' },
+      { start: 76.2, end: 80.575, text: '兄弟姐妹们 任何情况下别忘了健身' },
+      { start: 82.4, end: 85.457, text: '今天大直播有很多战友流泪' },
+      { start: 86.289, end: 89.361, text: '流泪没比中国人流的再多的了' },
+      { start: 91.089, end: 94.225, text: '你只流泪你的敌人要你流血' },
+      { start: 95.185, end: 98.321, text: '你跪下来他要打断你的脊椎' },
+      { start: 99.281, end: 102.609, text: '只有铲除敌人 消灭敌人' },
+      { start: 103.185, end: 107.345, text: '征服敌人你才能不流泪' },
+      { start: 107.857, end: 109.457, text: '让你家人不流血' },
+      { start: 110.161, end: 111.697, text: '那就先征服自己' },
+      { start: 112.273, end: 116.561, text: '兄弟姐妹们 一切都已经开始' },
+    ],
+  },
+]
 const highConfidenceTranscriptCorrections = [
   [/洗联储/gu, '喜联储'],
   [/洗聯儲/gu, '喜聯儲'],
@@ -150,7 +170,9 @@ if (refreshPublicPosts) {
   imported.push(...(overlay?.syntheticRecords ?? []))
 }
 
-imported = imported.map(normalizeCachedRecord)
+applyVerifiedTranscriptCorrections(imported)
+
+imported = imported.map((record) => stripVerificationSourceMetadata(normalizeCachedRecord(record)))
 imported.sort((left, right) => left.date.localeCompare(right.date) || left.id.localeCompare(right.id))
 const linkedEquivalentTranscripts = linkEquivalentTranscripts(imported)
 const upgradedSparseTranscripts = linkSparseEquivalentTranscripts(imported)
@@ -522,6 +544,48 @@ function parseSrtTimestamp(value) {
   const match = String(value).match(/^(\d{1,2}):(\d{2}):(\d{2})[,.](\d{1,3})$/u)
   if (!match) return null
   return Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) + Number(match[4].padEnd(3, '0')) / 1000
+}
+
+function applyVerifiedTranscriptCorrections(records) {
+  for (const correction of verifiedTranscriptCorrections) {
+    const existing = records.find((record) => record.id === correction.id)
+    if (!existing) continue
+    const metrics = transcriptMetrics(correction.segments, correction.durationSec)
+    const currentCharacters = existing.segments?.reduce((sum, segment) => sum + String(segment.text ?? '').length, 0) ?? 0
+    if (!transcriptBoundaryFitsDuration(metrics, correction.durationSec)) continue
+    if (metrics.charCount < currentCharacters * correction.minimumImprovementRatio) continue
+    Object.assign(existing, {
+      segments: correction.segments,
+      transcriptStatus: 'available',
+      upstreamTranscriptStatus: 'verified_correction',
+      completeness: 'verified_transcript',
+      transcriptSourceType: 'verified_transcript',
+      transcriptBoundaryVerified: true,
+      publicSubtitleAudit: null,
+      importError: null,
+    })
+  }
+}
+
+function stripVerificationSourceMetadata(record) {
+  const output = { ...record }
+  output.originalLinks = (output.originalLinks ?? []).filter((link) => !isVerificationSiteUrl(link?.url))
+  output.transcriptSourceLinks = (output.transcriptSourceLinks ?? []).filter((link) => !isVerificationSiteUrl(link?.url))
+  if (isVerificationSiteUrl(output.publicSubtitleAudit?.pageUrl) || isVerificationSiteUrl(output.publicSubtitleAudit?.subtitleUrl)) {
+    output.publicSubtitleAudit = null
+  }
+  delete output.gettrSearchTranscriptAudit
+  if (output.upstreamTranscriptStatus === 'public_gettrsearch_available') output.upstreamTranscriptStatus = 'public_subtitle_available'
+  return output
+}
+
+function isVerificationSiteUrl(value) {
+  try {
+    const host = new URL(String(value ?? '')).hostname.replace(/^www\./u, '').toLowerCase()
+    return host === 'gettrsearch.com' || host === 'gettrsearchassets.s3.amazonaws.com'
+  } catch {
+    return false
+  }
 }
 
 function transcriptMetrics(segments, durationSec) {

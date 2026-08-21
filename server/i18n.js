@@ -25,6 +25,7 @@ const categoryZh = {
   'Docket Filing': '案卷文件',
   Bankruptcy: '破产',
   'Bankruptcy Appeal': '破产上诉',
+  'Supreme Court': '最高法院程序',
   'Civil Enforcement': '民事执法',
   'Fair Fund': '公平基金',
   Indictment: '起诉',
@@ -99,7 +100,21 @@ function localizedPublicRecapStatus(value) {
   return `CourtListener 公开 RECAP Feed 已扫描 ${match[1]}/${match[2]} 个固定监控案卷，返回 ${match[3]} 条近期案卷记录。Token 属于可选增强，可增加结构化 API 分页、文件说明和 PDF 发现。`
 }
 
+function localizedOfficialStatus(value) {
+  const supremeCourt = String(value ?? '').match(/^Official Supreme Court docket 26-194 returned (\d+) proceeding\(s\) and (\d+) court-hosted PDF\(s\)\.$/)
+  if (supremeCourt) return `美国最高法院第 26-194 号官方案卷返回 ${supremeCourt[1]} 项程序记录和 ${supremeCourt[2]} 份法院托管 PDF。`
+  const bop = String(value ?? '').match(/^BOP currently lists Miles Guo \(49134-510\) at (.+)\. The locator does not provide an exact transfer date\.$/)
+  if (bop) return `BOP 当前将 Miles Guo（49134-510）的指定机构列为 ${bop[1]}。该查询不提供具体转监日期。`
+  return null
+}
+
 const sourceTranslations = {
+  'ghot-text-archive': {
+    shortName: 'GHOT 文字档案',
+    name: 'GHOT 公开文字档案',
+    coverage: '中英双语名词解释、宣言、报告，以及郭文贵相关公开法院文件的外部摘要。',
+    limitations: '这是二级研究档案，不是法院正式案卷或独立事实证明。争议性主张必须保留归因，法律结论必须回到 PDF 原件和官方案卷核验。',
+  },
   'nfsc-criminal-mirror': {
     shortName: 'NFSC 文件镜像',
     name: 'NFSC 刑事案法院文件镜像',
@@ -160,6 +175,18 @@ const sourceTranslations = {
     coverage: '由 PACER 用户同步的 RECAP 案卷和 PDF 元数据。',
     limitations: '无需 Token 可读取 26 宗固定案卷的公开 Feed、有限结构化搜索和当前公开 PDF；Token 可增强完整案卷条目分页。PACER 仍是正式案卷。',
   },
+  'supreme-court-docket': {
+    shortName: '美国最高法院',
+    name: '美国最高法院第 26-194 号官方案卷',
+    coverage: 'Mei Guo 等诉第 11 章受托人 Luc A. Despins，第 26-194 号案的官方程序记录和法院托管 PDF。',
+    limitations: '提交调卷令申请、放弃当前回应权或分发至法官会议，都不等于最高法院已受理案件或作出实体裁判。',
+  },
+  'bop-inmate-locator': {
+    shortName: 'BOP 在押人员查询',
+    name: '美国联邦监狱管理局在押人员查询',
+    coverage: '登记编号 49134-510 的 Miles Guo 当前公开羁押机构和预计释放日期字段。',
+    limitations: '查询结果只显示当前状态，不是转监历史，不能据此确定具体转监日期；预计释放日期也可能变化。',
+  },
   pacer: {
     shortName: 'PACER',
     name: 'PACER 官方案卷',
@@ -175,6 +202,7 @@ const sourceTranslations = {
 }
 
 const sourceEnglishOverrides = {
+  'ghot-text-archive': { shortName: 'GHOT Archive' },
   'nfsc-criminal-mirror': { shortName: 'NFSC Mirror' },
   'doj-victim-page': { shortName: 'DOJ Victim Page' },
   'doj-sentencing-release': { shortName: 'DOJ Sentencing' },
@@ -185,6 +213,8 @@ const sourceEnglishOverrides = {
   'himalaya-restoration-archive': { shortName: 'Himalaya Archive' },
   'epiq-kwok-trustee': { shortName: 'Epiq Bankruptcy' },
   'courtlistener-recap': { shortName: 'RECAP' },
+  'supreme-court-docket': { shortName: 'Supreme Court' },
+  'bop-inmate-locator': { shortName: 'BOP Locator' },
   pacer: { shortName: 'PACER' },
   'federal-register-policy': { shortName: 'Policy Radar' },
 }
@@ -263,13 +293,27 @@ const caseTranslations = {
     title: 'In re Kwok：HK International Funds Investments / Lady May 资产线',
     shortTitle: '第二巡回资产案',
     kind: '上诉 / 破产',
-    status: '2026 年公开发表的上诉裁判，报道号 172 F.4th 145',
-    lastKnownFiling: '2026-04-06 报道裁判意见',
-    stage: '人格混同和破产财产裁判影响资产图谱。',
+    status: '第二巡回已发表裁判；最高法院第 26-194 号调卷令申请待处理',
+    lastKnownFiling: '最高法院于 2026-08-19 将申请分发至法官会议',
+    stage: '第二巡回的人格混同裁判目前仍然有效；申请人已在最高法院第 26-194 号案请求审查。',
     focus: '名义上由 HK International 或相关实体持有的资产是否属于破产财产。',
     watchQuestions: [
-      '是否有复议申请、上诉法院正式命令、最高法院申请或后续破产执行文件。',
+      '最高法院在 2026 年 9 月 28 日会议后是否要求回应、再次列会、准许或驳回调卷令，或发布其他命令。',
       '生效案卷记录中点名了哪些家族、信托或投资载体。',
+    ],
+  },
+  'scotus-26-194': {
+    title: 'Mei Guo、HK International Funds Investments (IUSA) Limited LLC 诉第 11 章受托人 Luc A. Despins',
+    shortTitle: '最高法院调卷令申请',
+    kind: '最高法院 / 破产',
+    status: '调卷令申请待处理',
+    lastKnownFiling: '2026-08-19 分发至法官会议',
+    stage: '申请已分发至最高法院 2026 年 9 月 28 日法官会议；最高法院尚未准许调卷令。',
+    focus: '《美国法典》第 11 编 § 544(a) 是否授权破产受托人提起本来属于全体债权人的州法人格混同请求。',
+    watchQuestions: [
+      '尽管受托人已放弃当前回应权，最高法院是否仍要求回应、再次列会、准许或驳回调卷令，或要求联邦政府提交意见。',
+      '后续文件是否改变申请人所主张的各巡回法院对 § 544(a) 受托人诉讼资格的分歧。',
+      '最高法院的处理如何影响第二巡回裁判、Lady May / 3,700 万美元托管款及后续破产管理。',
     ],
   },
   'bkd-22-05032': {
@@ -382,9 +426,30 @@ const caseEnglishOverrides = {
   'bkd-25-05094-ny-blinds': { shortTitle: 'NY Blinds trustee case', kind: 'Bankruptcy Adversary' },
   'az-voice-of-guo': { shortTitle: 'Voice of Guo Arizona case', kind: 'Civil / Entity-Related' },
   'related-people-companies': { shortTitle: 'Related Entities', kind: 'Entity Intelligence' },
+  'scotus-26-194': { shortTitle: 'Supreme Court Certiorari Petition', kind: 'Supreme Court / Bankruptcy' },
 }
 
 const eventTranslations = {
+  'recap-feed-sdny-23-cr-118-67012324-869': {
+    title: '文件 869：Sharon Cohen Levin 为 Pillsbury Winthrop Shaw Pittman LLP 提交律师出庭登记',
+    summary: 'RECAP 公开 Feed 和该一页 PDF 显示，Sullivan & Cromwell LLP 的 Sharon Cohen Levin 于 2026 年 8 月 18 日提交 AO 458 出庭表，表内所列代理对象为 Pillsbury Winthrop Shaw Pittman LLP。',
+    impact: '这是代理登记类程序文件，不裁判定罪、量刑、上诉、没收或羁押问题；表格本身也没有说明提交原因。',
+  },
+  'scotus-26-194-conference-distribution-2026-08-19': {
+    title: '最高法院将第 26-194 号调卷令申请分发至 2026 年 9 月 28 日法官会议',
+    summary: '官方案卷记载，第 26-194 号调卷令申请已分发，供最高法院在 2026 年 9 月 28 日法官会议上审议。',
+    impact: '“分发至会议”只是把申请提交法官内部审议，不等于最高法院已准许调卷令，也不是对实体争议作出裁判。',
+  },
+  'scotus-26-194-response-waiver-2026-08-17': {
+    title: '第 11 章受托人放弃当前提交调卷令申请回应的权利',
+    summary: '官方案卷记载，被申请人受托人放弃当前回应权；如果最高法院以后要求回应，仍可再提交。',
+    impact: '放弃回应不等于同意申请、承认对方实体主张或任何一方胜诉，最高法院仍可要求回应。',
+  },
+  'scotus-26-194-cert-petition-2026-08-11': {
+    title: '最高法院第 26-194 号案提交调卷令申请',
+    summary: 'Mei Guo 和 HK International Funds Investments (IUSA) Limited LLC 请求最高法院审查第二巡回第 24-2504 号案的裁判。',
+    impact: '申请提出的问题是 § 544(a) 是否允许破产受托人接管并提起属于一般债权人的州法人格混同请求。提交申请不等于最高法院同意受理。',
+  },
   'sdny-23-cr-118-doc-868': {
     title: '文件 868：第二巡回发布正式命令，驳回并行自行诉讼强制令申请',
     summary:
@@ -534,7 +599,17 @@ const entityTranslations = {
     type: '人物',
     role: '被告、债务人、核心主体',
     riskAreas: ['刑事上诉', '没收', '破产财产', 'SEC 民事执法'],
-    notes: '刑事案中 9 项罪名成立；公开镜像材料显示判决于 2026 年 7 月 2 日录入。',
+    notes: '刑事案中 9 项罪名成立；公开镜像材料显示判决于 2026 年 7 月 2 日录入。2026 年 8 月 20 日通过 BOP 官方查询核验，登记编号 49134-510 当前指定机构为 FCI Danbury；查询结果不提供具体转监日期。',
+    custody: {
+      registerNumber: '49134-510',
+      currentFacility: 'FCI Danbury',
+      facilityCode: 'DAN',
+      projectedReleaseDate: '2048-10-06',
+      verifiedAt: '2026-08-20',
+      sourceId: 'bop-inmate-locator',
+      sourceUrl: 'https://www.bop.gov/PublicInfo/execute/inmateloc?todo=query&output=json&inmateNum=49134-510&inmateNumType=IRN',
+      limitation: '仅代表 BOP 当前公开指定机构；官方查询不提供具体转监日期。预计释放日期可能变化，不构成实际释放日期保证。',
+    },
   },
   'kin-ming-je': {
     name: 'Kin Ming Je / William Je',
@@ -885,6 +960,30 @@ export function translateLegalTextToZh(value) {
 }
 
 export function translateDocumentTitleToZh(file) {
+  if (file.caseId === 'sdny-23-cr-118' && String(file.docNumber) === '264') {
+    return '文件 264：控辩双方共同提交的拟议陪审团指示'
+  }
+  if (file.caseId === 'sdny-23-cr-118' && String(file.docNumber) === '869') {
+    return '文件 869：Pillsbury Winthrop Shaw Pittman LLP 律师出庭登记'
+  }
+  if (file.caseId === 'scotus-26-194') {
+    const supremeCourtTitles = {
+      'respondent-waiver': '被申请人放弃答复权利书',
+      'proof-of-service': '送达证明',
+      petition: '调卷令申请书',
+      'certificate-of-word-count': '字数合规证明',
+    }
+    if (supremeCourtTitles[file.docNumber]) return supremeCourtTitles[file.docNumber]
+  }
+  if (file.caseId === 'bkd-24-05249-aca' && String(file.docNumber) === '331') {
+    return '文件 331：第 11 章受托人就第十七至二十一及第二十六项诉因提出简易判决动议'
+  }
+  if (file.caseId === 'bkd-24-05249-aca' && String(file.docNumber) === '331-1') {
+    return '文件 331-1：支持受托人简易判决动议的经删节法律备忘录'
+  }
+  if (file.caseId === 'bkd-24-05249-aca' && String(file.docNumber) === '331-2') {
+    return '文件 331-2：经删节的地方规则 56(a)(1) 无争议重大事实陈述'
+  }
   if (file.caseId === 'bkd-24-05249-aca' && String(file.docNumber) === '192') {
     return '文件 192：被告对受托人修订起诉状的答辩、积极抗辩及陪审团审判请求'
   }
@@ -921,11 +1020,11 @@ export function translateEventFieldsToZh(event) {
   const publicFeedPlaceholder = event.assertionType === 'Public RECAP feed metadata'
     && /\bdocket entry\s+\d+(?:-\d+)?$/i.test(String(event.summary ?? ''))
   return {
-    title: shouldUseGenericZh(title) ? genericEventTitleZh(event) : title,
+    title: exact.title || !shouldUseGenericZh(title) ? title : genericEventTitleZh(event),
     summary: publicFeedPlaceholder
       ? `CourtListener 公开 Feed 仅确认该案卷存在文件 ${event.filingNumber ?? '未编号'} 及其提交日期；Feed 未提供文件说明，必须打开原始来源或取得 PDF 后再判断内容和法律效果。`
-      : shouldUseGenericZh(summary) ? genericEventSummaryZh(event) : summary,
-    impact: shouldUseGenericZh(impact) ? genericEventImpactZh(event) : impact,
+      : exact.summary || !shouldUseGenericZh(summary) ? summary : genericEventSummaryZh(event),
+    impact: exact.impact || !shouldUseGenericZh(impact) ? impact : genericEventImpactZh(event),
     category: categoryZh[event.category] ?? translateLegalTextToZh(event.category),
   }
 }
@@ -938,11 +1037,12 @@ function shouldUseGenericZh(value) {
     'Wang', 'William', 'Kin', 'Ming', 'Saraca', 'Media', 'Group', 'Voice', 'Post', 'Oak', 'Ltd', 'LLC', 'USA',
   ])
   const syntaxWords = new Set([
-    'the', 'and', 'that', 'this', 'with', 'from', 'into', 'asks', 'asked', 'seeks', 'seeking', 'argues', 'filed',
+    'the', 'and', 'that', 'this', 'with', 'from', 'into', 'by', 'to', 'as', 'of', 'asks', 'asked', 'seeks', 'seeking', 'argues', 'filed',
     'submits', 'submitted', 'court', 'motion', 'order', 'petition', 'claim', 'claims', 'his', 'her', 'their', 'was',
     'were', 'but', 'for', 'not', 'formally', 'address', 'force', 'ignored', 'multiple', 'investor', 'petitioner',
     'response', 'notice', 'decision', 'defense', 'government', 'counsel', 'hearing', 'record', 'file', 'filing',
     'letter', 'memo', 'endorsement', 'request', 'charge', 'superseding', 'information', 'email', 'conversation',
+    'sentencing', 'submission',
     'bank', 'records', 'document', 'declaration', 'deposition', 'subpoena', 'appearance', 'reply', 'opposition',
   ])
   const unexpected = latinWords.filter((word) => !legalAllowed.has(word))
@@ -1010,8 +1110,10 @@ function assertionTypeZh(value) {
     'Government filing': '检方文件',
     'Party filing': '当事人文件',
     'Docket entry': '案卷条目',
+    'RECAP docket entry': 'RECAP 案卷条目',
     'Public RECAP feed metadata': '公开 RECAP Feed 元数据',
     'Secondary news report': '新闻媒体辅助报道',
+    'Official court docket entry': '法院官方案卷条目',
   }
   return exact[value] ?? translateLegalTextToZh(value)
 }
@@ -1158,7 +1260,7 @@ function localizeStatus(status, lang) {
   if (lang === 'en') return status
   return {
     ...status,
-    message: statusMessageZh[status.message] ?? localizedMirrorTimelineStatus(status.message) ?? localizedPublicRecapStatus(status.message) ?? translateLegalTextToZh(status.message),
+    message: statusMessageZh[status.message] ?? localizedMirrorTimelineStatus(status.message) ?? localizedPublicRecapStatus(status.message) ?? localizedOfficialStatus(status.message) ?? translateLegalTextToZh(status.message),
     facts: (status.facts ?? []).map((fact) => ({
       ...fact,
       label: statusFactZh(fact.label),
@@ -1170,6 +1272,7 @@ function localizeStatus(status, lang) {
       message: statusMessageZh[status.lastAttempt.message]
         ?? localizedMirrorTimelineStatus(status.lastAttempt.message)
         ?? localizedPublicRecapStatus(status.lastAttempt.message)
+        ?? localizedOfficialStatus(status.lastAttempt.message)
         ?? translateLegalTextToZh(status.lastAttempt.message),
       facts: (status.lastAttempt.facts ?? []).map((fact) => ({
         ...fact,
@@ -1210,6 +1313,16 @@ function statusFactZh(value) {
     'Second Circuit asset appeal': '第二巡回资产上诉',
     'E.D.N.Y. Section 1782 related proceeding': '纽约东区 § 1782 关联程序',
     'feed error': 'Feed 错误',
+    Case: '案件',
+    'No. 26-194': '第 26-194 号',
+    'Latest official docket action': '最新官方案卷动作',
+    'Court-hosted PDFs': '法院托管 PDF',
+    'Files are collected directly from the official Supreme Court docket.': '文件直接采集自美国最高法院官方案卷。',
+    'Register number': '登记编号',
+    'Current facility': '当前指定机构',
+    'Projected release field': '预计释放日期字段',
+    'A projected date can change and is not a guarantee of actual release.': '预计日期可能变化，不构成实际释放日期保证。',
+    'Facility code DAN. This is the current public designation, not a transfer-history record.': '机构代码 DAN。这是当前公开指定机构，不是转监历史记录。',
   }
   return exact[text] ?? translateLegalTextToZh(text)
 }
@@ -1271,6 +1384,8 @@ export function localizeDocumentManifest(manifest, lang) {
         ...page,
         label: englishManifestText(page.label, 'Public source page'),
         error: englishManifestText(page.error, ''),
+        limitation: englishManifestText(page.limitation, ''),
+        court: englishManifestText(page.court, 'Court'),
       })),
       credentialRequired: (manifest.credentialRequired ?? []).map((item) => ({
         ...item,
@@ -1286,25 +1401,27 @@ export function localizeDocumentManifest(manifest, lang) {
     sourcePages: (manifest.sourcePages ?? []).map((page) => ({
       ...page,
       label: manifestSourcePageLabelZh(page),
-      error: translateLegalTextToZh(page.error),
+      error: manifestErrorToZh(page.error),
+      limitation: manifestTextToZh(page.limitation),
+      court: manifestCourtToZh(page.court),
     })),
     credentialRequired: (manifest.credentialRequired ?? []).map((item) => ({
       ...item,
-      reason: translateLegalTextToZh(item.reason),
+      reason: manifestReasonToZh(item.reason),
     })),
     sampleFiles: (manifest.sampleFiles ?? []).map((file) => ({
       ...file,
-      title: translateDocumentTitleToZh(file),
+      title: manifestFileTitleZh(file),
       variantLabel: documentVariantLabel(file, 'zh'),
       sourceLabel: documentSourceLabelZh(file.sourceId, file.sourceLabel),
-      error: translateLegalTextToZh(file.error),
+      error: manifestErrorToZh(file.error),
     })),
     errorFiles: (manifest.errorFiles ?? []).map((file) => ({
       ...file,
-      title: translateDocumentTitleToZh(file),
+      title: manifestFileTitleZh(file),
       variantLabel: documentVariantLabel(file, 'zh'),
       sourceLabel: documentSourceLabelZh(file.sourceId, file.sourceLabel),
-      error: translateLegalTextToZh(file.error),
+      error: manifestErrorToZh(file.error),
     })),
   }
 }
@@ -1318,8 +1435,57 @@ function manifestSourcePageLabelZh(page) {
     'sec-press-2023-50': 'SEC 官方民事执法来源',
     'gtv-fair-fund': 'GTV Fair Fund 案件管理来源',
     'epiq-kwok-trustee': 'Epiq 破产案卷来源',
+    'himalaya-restoration': 'Himalaya Restoration 当前公开项目网站',
+    'himalaya-restoration-archive': 'Himalaya Restoration 历史公开存档',
+    'supreme-court-docket': '美国最高法院第 26-194 号正式案卷',
   }
   return labels[page?.sourceId] ?? translateLegalTextToZh(page?.label)
+}
+
+function manifestFileTitleZh(file) {
+  const translated = translateDocumentTitleToZh(file)
+  if (hasCjkText(translated)) return translated
+  const number = String(file?.docNumber ?? '').trim()
+  if (number && /^(?:ecf-)?[\w.-]+(?:\.pdf)?$/iu.test(String(file?.title ?? '').trim())) {
+    return `文件 ${number}：来源 PDF 文件`
+  }
+  return number ? `文件 ${number}：案卷文件` : '案卷文件'
+}
+
+function manifestErrorToZh(value) {
+  const text = String(value ?? '').trim()
+  if (!text) return text
+  const exact = {
+    'The archived project page linked this PDF, but Internet Archive currently has no application/pdf snapshot for the linked URL.': '历史项目页面曾链接该 PDF，但 Internet Archive 当前没有对应链接的 PDF 存档快照。',
+    'Internet Archive returned a truncated PDF capture; the incomplete payload was rejected.': 'Internet Archive 返回的 PDF 存档不完整，程序已拒绝保存截断文件。',
+    'Document source URL is outside the application network policy.': '文件来源网址不符合程序网络访问策略。',
+  }
+  const http = text.match(/^HTTP\s+(\d{3})$/iu)
+  if (http) return `下载失败：来源服务器返回 HTTP ${http[1]}。`
+  const paused = text.match(/^CourtListener public search is paused until (.+) after HTTP 429\.$/u)
+  if (paused) return `CourtListener 公开搜索因 HTTP 429 限流暂停至 ${paused[1]}。`
+  return exact[text] ?? translateLegalTextToZh(text)
+}
+
+function manifestReasonToZh(value) {
+  const text = String(value ?? '').trim()
+  const exact = {
+    'Full district, bankruptcy, and appellate dockets require PACER credentials and fee-aware retrieval.': '完整的地区法院、破产法院和上诉法院正式记录需要 PACER 凭证，并应采用费用感知抓取。',
+    'The Epiq docket shell is public, but full document extraction requires mapping its JSON document endpoint.': 'Epiq 案卷页面公开可访问，但完整文件提取仍需完成其 JSON 文件端点映射。',
+  }
+  return exact[text] ?? translateLegalTextToZh(text)
+}
+
+function manifestTextToZh(value) {
+  const text = String(value ?? '').trim()
+  const exact = {
+    'Docket coordinates establish the public RECAP counterpart. Chinese project translations remain distinct variants unless hashes independently match.': '案卷坐标可确认对应的公开 RECAP 文件；除非哈希值独立匹配，否则项目中文翻译仍按不同版本处理。',
+  }
+  return exact[text] ?? translateLegalTextToZh(text)
+}
+
+function manifestCourtToZh(value) {
+  return String(value ?? '') === 'Supreme Court of the United States' ? '美国最高法院' : translateLegalTextToZh(value)
 }
 
 const auditStatusZh = {
@@ -1559,6 +1725,7 @@ function englishManifestSourceLabel(sourceId, fallback) {
     'epiq-kwok-trustee': 'Epiq bankruptcy docket source',
     'himalaya-restoration': 'Himalaya Restoration public project site',
     'himalaya-restoration-archive': 'Himalaya Restoration historical public archive',
+    'supreme-court-docket': 'Official Supreme Court docket No. 26-194',
   }
   return labels[sourceId] ?? englishManifestText(fallback, 'Public source')
 }
@@ -1574,6 +1741,7 @@ export function documentSourceLabelZh(sourceId, fallback) {
     'epiq-kwok-trustee': 'Epiq 破产案卷链接文件',
     'himalaya-restoration': 'Himalaya Restoration 公开项目网站文件',
     'himalaya-restoration-archive': 'Himalaya Restoration 历史网页存档文件',
+    'supreme-court-docket': '美国最高法院第 26-194 号正式案卷',
   }
   return labels[sourceId] ?? translateLegalTextToZh(fallback)
 }

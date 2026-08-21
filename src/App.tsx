@@ -469,7 +469,7 @@ type MonitoringProfile = {
 
 type DocumentAnalysisRecord = {
   id: string
-  resourceKind?: 'pdf' | 'web_page'
+  resourceKind?: 'pdf' | 'web_page' | 'docket_entry'
   publishedAt?: string | null
   capturedAt?: string | null
   docNumber: string | null
@@ -1049,6 +1049,21 @@ const severityText: Record<Language, Record<Severity, string>> = {
   },
 }
 
+const processingPriorityText: Record<Language, Record<Severity, string>> = {
+  zh: {
+    critical: '处理优先级：关键',
+    high: '处理优先级：高',
+    medium: '处理优先级：中',
+    low: '处理优先级：低',
+  },
+  en: {
+    critical: 'Processing priority: Critical',
+    high: 'Processing priority: High',
+    medium: 'Processing priority: Medium',
+    low: 'Processing priority: Low',
+  },
+}
+
 const confidenceText: Record<Language, Record<string, string>> = {
   zh: {
     highest: '最高',
@@ -1098,7 +1113,7 @@ const ui = {
     navPositions: '诉讼方动态',
     navEntities: '实体关系',
     navPublicRecords: '公开言论',
-    navAiChat: 'AI Chat',
+    navAiChat: '全库研究',
     navPolicy: '政策雷达',
     navDocuments: '证据文件库',
     navSettings: '设置',
@@ -1155,7 +1170,7 @@ const ui = {
     localAiModel: '本机模型名称',
     localAiTimeout: '本机 AI 超时（毫秒）',
     localAiContext: '本机 AI 最大上下文字符',
-    researchChatContext: 'AI Chat 对话上下文字符预算',
+    researchChatContext: '全库研究上下文字符预算',
     researchChatContextDetail: '完整聊天记录始终保存在本机；每次生成只在此字符预算内选取最近对话。模型自身的上下文上限仍是硬限制，证据材料和回答也会占用模型窗口。',
     localAiDetail: 'Ollama 仅连接本机 loopback；不可用时回退到本地规则。',
     openai: 'OpenAI（可选）',
@@ -1307,8 +1322,8 @@ const ui = {
     entitiesWorkspaceCopy: '人物、公司、基金与资产的跨案关联；关联不等于责任认定。',
     publicRecordsWorkspaceTitle: '历史直播与公开言论',
     publicRecordsWorkspaceCopy: '独立索引 2017 年 1 月 26 日至 2023 年 3 月 14 日的历史直播和公开视频；转载副本与法院认定严格分开。',
-    aiChatWorkspaceTitle: 'AI 全库研究对话',
-    aiChatWorkspaceCopy: '跨法院案卷、直播文字、案件时间线、人物公司、实体关系和政策资料进行检索与模型对话；必须先配置云端 API 或 Ollama，不会在无模型时伪造 AI 答案。',
+    aiChatWorkspaceTitle: '全库研究',
+    aiChatWorkspaceCopy: '未接入模型时，在案件、文件、直播文字、人物、公司和政策资料中执行本地检索；接入 Ollama 或云端模型后，增加整合、比较、推理、联想和普通对话。',
     policyWorkspaceTitle: '美国政策与制度环境',
     policyWorkspaceCopy: '独立跟踪与案件相关的法律政策、执法制度和公开机构来源，避免把政策背景混同为个案事实。',
     notRefreshed: '尚未执行在线刷新',
@@ -1340,7 +1355,7 @@ const ui = {
     filingNo: '文件号',
     source: '来源',
     type: '类型',
-    confidence: '可信度',
+    confidence: '来源可信度',
     aiAnalysis: '法律分析',
     activeCase: '所属案件',
     casePortfolio: '案件组合',
@@ -1684,7 +1699,7 @@ const ui = {
     navPositions: 'Party activity',
     navEntities: 'Entity map',
     navPublicRecords: 'Historical statements',
-    navAiChat: 'AI Chat',
+    navAiChat: 'Library Research',
     navPolicy: 'Policy radar',
     navDocuments: 'Evidence library',
     navSettings: 'Settings',
@@ -1741,7 +1756,7 @@ const ui = {
     localAiModel: 'Local model name',
     localAiTimeout: 'Local AI timeout (ms)',
     localAiContext: 'Local AI context characters',
-    researchChatContext: 'AI Chat conversation context budget',
+    researchChatContext: 'Library Research context budget',
     researchChatContextDetail: 'Complete chat history remains on this computer. Each generation sends only the most recent conversation within this character budget. The model context limit remains a hard ceiling, and retrieved evidence plus the answer share that window.',
     localAiDetail: 'Ollama is restricted to local loopback; the app falls back to local rules when unavailable.',
     openai: 'OpenAI (optional)',
@@ -1893,8 +1908,8 @@ const ui = {
     entitiesWorkspaceCopy: 'Cross-case links among people, companies, funds, and assets; association is not liability.',
     publicRecordsWorkspaceTitle: 'Historical livestreams and public statements',
     publicRecordsWorkspaceCopy: 'A separate index of historical livestreams and public videos from January 26, 2017 through March 14, 2023; repost copies remain distinct from judicial findings.',
-    aiChatWorkspaceTitle: 'Whole-library AI research chat',
-    aiChatWorkspaceCopy: 'Retrieve across court records, transcript text, case timelines, people and companies, entity relationships, and policy material before asking the configured model to answer; no model means no AI answer.',
+    aiChatWorkspaceTitle: 'Library Research',
+    aiChatWorkspaceCopy: 'Without a model, search cases, filings, transcripts, people, companies, and policy records locally. Connecting Ollama or a cloud model adds synthesis, comparison, reasoning, association, and natural conversation.',
     policyWorkspaceTitle: 'U.S. policy and institutional context',
     policyWorkspaceCopy: 'Track relevant legal policy, enforcement institutions, and public-agency sources separately from adjudicated facts in individual proceedings.',
     notRefreshed: 'No online refresh yet',
@@ -1926,7 +1941,7 @@ const ui = {
     filingNo: 'Filing no.',
     source: 'Source',
     type: 'Type',
-    confidence: 'Confidence',
+    confidence: 'Source confidence',
     aiAnalysis: 'Legal analysis',
     activeCase: 'Case track',
     casePortfolio: 'Case portfolio',
@@ -3148,7 +3163,6 @@ function App() {
     return Number.isFinite(eventTime) && latestEventTime - eventTime <= 7 * 24 * 60 * 60 * 1000
   }).length
   const uniquePdfContentCount = documentAnalysis?.counts.uniquePdfContents ?? documents?.counts.uniquePdfContents ?? null
-  const localDocumentCount = uniquePdfContentCount ?? physicalDocumentCount
   const professionalReviewCount = documentAnalysis?.counts.professionalReviewDocuments ?? documents?.counts.professionalReviewDocuments ?? null
   const aiBacklogCount = documentAnalysis?.counts.pendingProfessionalReviewDocuments ?? documents?.counts.pendingProfessionalReviewDocuments ?? null
   const aiBacklogDetail = aiBacklogCount !== null && uniquePdfContentCount !== null && professionalReviewCount !== null
@@ -3174,7 +3188,7 @@ function App() {
   const activeWorkspace = workspaceMeta[workspaceView]
   const navItems = [
     { href: '#timeline', label: text.navLatest, icon: <FileText size={17} />, metric: formatNumber(dashboard.metrics.totalEvents, language) },
-    { href: '#documents', label: text.navDocuments, icon: <FolderOpen size={17} />, metric: formatOptionalNumber(localDocumentCount, language) },
+    { href: '#documents', label: text.navDocuments, icon: <FolderOpen size={17} />, metric: formatOptionalNumber(physicalDocumentCount, language) },
     { href: '#cases', label: text.navCases, icon: <BriefcaseBusiness size={17} />, metric: formatNumber(displayCases.length, language) },
     { href: '#positions', label: text.navPositions, icon: <UserRoundCheck size={17} />, metric: formatOptionalNumber(litigationPositions?.counts.total, language) },
     { href: '#entities', label: text.navEntities, icon: <GitBranch size={17} />, metric: formatNumber(dashboard.metrics.monitoredEntities, language) },
@@ -3301,7 +3315,7 @@ function App() {
           {actionSourceCount > 0 && <a className="rail-source-details" href="#settings-diagnostics"><span>{text.sourceDiagnosticsLink}</span><ArrowUpRight size={13} /></a>}
           <div className="rail-evidence-coverage">
             <span><ShieldAlert size={13} />{text.officialFileCoverage}</span>
-            <strong>{formatOptionalNumber(officialOrRecapFileCount, language)} / {formatOptionalNumber(localDocumentCount, language)}</strong>
+            <strong>{formatOptionalNumber(officialOrRecapFileCount, language)} / {formatOptionalNumber(physicalDocumentCount, language)}</strong>
           </div>
           <div className="rail-source-footnote">
             <span>{text.sourceOfficialShort} {formatOptionalNumber(officialOrRecapFileCount, language)}</span>
@@ -3546,13 +3560,25 @@ function App() {
               />
             </div>
 
-            <div className="event-list">
+            <div
+              className="event-list"
+              tabIndex={0}
+              aria-label={language === 'zh' ? '最新案卷列表' : 'Latest docket list'}
+              onScroll={(event) => {
+                if (timelineLimit >= filteredEvents.length) return
+                const list = event.currentTarget
+                const remaining = list.scrollHeight - list.scrollTop - list.clientHeight
+                if (remaining <= 160) {
+                  setTimelineLimit((current) => Math.min(current + 40, filteredEvents.length))
+                }
+              }}
+            >
               {filteredEvents.slice(0, timelineLimit).map((event) => (
                 <EventRow event={event} language={language} selected={event.id === selectedEvent?.id} onSelect={() => setSelectedEventId(event.id)} key={event.id} />
               ))}
             </div>
             {timelineLimit < filteredEvents.length && (
-              <button className="catalog-load-button timeline-load-button" type="button" onClick={() => setTimelineLimit((current) => current + 40)}>
+              <button className="catalog-load-button timeline-load-button" type="button" onClick={() => setTimelineLimit((current) => Math.min(current + 40, filteredEvents.length))}>
                 {text.loadMore}
               </button>
             )}
@@ -3564,7 +3590,7 @@ function App() {
                 <div className="detail-head">
                   <div>
                     <div className="detail-kicker">
-                      <span className={`severity-pill severity-${selectedEvent.severity}`}>{severityText[language][selectedEvent.severity]}</span>
+                      <span className={`severity-pill severity-${selectedEvent.severity}`}>{processingPriorityText[language][selectedEvent.severity]}</span>
                       <span>{selectedEvent.category}</span>
                       <span>{formatEventDateWithBasis(selectedEvent, language)}</span>
                     </div>
@@ -4136,7 +4162,7 @@ function EventRow({ event, selected, onSelect, language }: { event: EventRecord;
       <div className="event-row-main">
         <div className="event-row-top">
           <div className="event-row-kicker">
-            <span className={`severity-pill severity-${event.severity}`}>{severityText[language][event.severity]}</span>
+            <span className={`severity-pill severity-${event.severity}`}>{processingPriorityText[language][event.severity]}</span>
             <span>{event.category}</span>
             <span>{event.sourceType}</span>
           </div>
@@ -4266,7 +4292,7 @@ function MonitoringProfileView({
           {profile.watchTopics.slice(0, 4).map((topic) => (
             <article className="watch-topic-card" key={topic.id}>
               <div>
-                <span className={`priority-chip priority-${topic.priority}`}>{severityText[language][topic.priority as Severity] ?? topic.priority}</span>
+                <span className={`priority-chip priority-${topic.priority}`}>{processingPriorityText[language][topic.priority as Severity] ?? topic.priority}</span>
                 <h4>{topic.title}</h4>
                 <p>{topic.scope}</p>
                 <div className="event-tags">
@@ -6725,7 +6751,7 @@ function DocumentAnalysisRow({
     <article className={`analysis-document-row ${emphasis ? 'emphasis' : ''}`}>
       <div className="analysis-document-main">
         <div className="event-row-kicker">
-          <span className={`severity-pill severity-${record.priority}`}>{severityText[language][record.priority]}</span>
+          <span className={`severity-pill severity-${record.priority}`}>{processingPriorityText[language][record.priority]}</span>
           <span>{record.variantLabel}</span>
           <span>{record.category}</span>
           <span>{record.sourceLabel}</span>
@@ -6830,7 +6856,7 @@ function DocumentAnalysisRow({
             )}
           </details>
         )}
-        {onAnalyzeDocument && (
+        {onAnalyzeDocument && record.resourceKind === 'pdf' && (
           <button className="document-analyze-button" type="button" onClick={() => onAnalyzeDocument(record.sourceUrl)} disabled={isAnalyzing}>
             {isAnalyzing ? <Loader2 className="spin" size={13} /> : <Bot size={13} />}
             {isAnalyzing ? text.analyzingDocument : text.analyzeDocument}
@@ -6864,7 +6890,7 @@ function DocumentQueueRow({
     <article className="document-queue-row">
       <div className="document-queue-main">
         <div className="event-row-kicker">
-          <span className={`severity-pill severity-${record.priority}`}>{severityText[language][record.priority]}</span>
+          <span className={`severity-pill severity-${record.priority}`}>{processingPriorityText[language][record.priority]}</span>
           <span>{record.variantLabel}</span>
           <span>{record.category}</span>
           <span>{record.sourceVerification.label}</span>
@@ -6881,13 +6907,13 @@ function DocumentQueueRow({
         <p>{record.plainEnglish || record.summary}</p>
       </div>
       <div className="document-queue-actions">
-        {record.resourceKind !== 'web_page' && (
+        {record.resourceKind === 'pdf' && (
           <button type="button" onClick={() => onAnalyzeDocument(record.sourceUrl)} disabled={isAnalyzing} title={text.analyzeDocument}>
             {isAnalyzing ? <Loader2 className="spin" size={14} /> : <Bot size={14} />}
             <span>{isAnalyzing ? text.analyzingDocument : text.analyzeDocument}</span>
           </button>
         )}
-        {record.resourceKind !== 'web_page' && record.status !== 'error' && (
+        {record.resourceKind === 'pdf' && record.status !== 'error' && (
           <button
             type="button"
             onClick={() => onOpenDocument({ sourceUrl: record.sourceUrl, title: record.title, docNumber: record.docNumber, sourceLabel: record.sourceLabel, variantLabel: record.variantLabel })}
@@ -6925,7 +6951,7 @@ function DocumentCatalogRow({
     <article className="catalog-row">
       <div>
         <div className="event-row-kicker">
-          <span className={`severity-pill severity-${record.priority}`}>{severityText[language][record.priority]}</span>
+          <span className={`severity-pill severity-${record.priority}`}>{processingPriorityText[language][record.priority]}</span>
           <span>{record.variantLabel}</span>
           <span>{record.category}</span>
           <span>{record.sourceVerification.label}</span>
@@ -6946,13 +6972,13 @@ function DocumentCatalogRow({
         <DocumentSourceAlternatives record={record} language={language} text={text} onOpenDocument={onOpenDocument} />
       </div>
       <div className="catalog-actions">
-        {record.resourceKind !== 'web_page' && (
+        {record.resourceKind === 'pdf' && (
           <button type="button" onClick={() => onAnalyzeDocument(record.sourceUrl)} disabled={isAnalyzing}>
             {isAnalyzing ? <Loader2 className="spin" size={13} /> : <Bot size={13} />}
             {isAnalyzing ? text.analyzingDocument : text.analyzeDocument}
           </button>
         )}
-        {record.resourceKind !== 'web_page' && record.status !== 'error' && (
+        {record.resourceKind === 'pdf' && record.status !== 'error' && (
           <button
             type="button"
             onClick={() => onOpenDocument({ sourceUrl: record.sourceUrl, title: record.title, docNumber: record.docNumber, sourceLabel: record.sourceLabel, variantLabel: record.variantLabel })}
@@ -6989,7 +7015,7 @@ function DocumentSearchHit({
     legal_analysis: text.searchMatchAnalysis,
     web_page: text.searchMatchWeb,
   }[match.kind] ?? text.searchMatchTitle
-  const canOpenPage = record.resourceKind !== 'web_page' && record.status !== 'error' && Number(match.pageNumber) > 0
+  const canOpenPage = record.resourceKind === 'pdf' && record.status !== 'error' && Number(match.pageNumber) > 0
   const coverageLabel = match.contentIntegrity === 'assistive_glossary'
     ? text.searchMatchAssistive
     : match.coverage === 'complete'
@@ -7134,7 +7160,7 @@ function DocumentAnalysisDialog({
       {!loading && record && (
         <>
           <div className="modal-document-actions">
-            {record.resourceKind !== 'web_page' && (
+            {record.resourceKind === 'pdf' && (
               <button
                 type="button"
                 onClick={() => onOpenDocument({

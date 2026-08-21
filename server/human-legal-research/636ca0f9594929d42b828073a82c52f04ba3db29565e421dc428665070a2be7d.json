@@ -1,0 +1,34 @@
+{
+  "sha256": "636ca0f9594929d42b828073a82c52f04ba3db29565e421dc428665070a2be7d",
+  "caseId": "scotus-26-194",
+  "docNumber": "respondent-waiver",
+  "posture": "respondent_response_waiver",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-20T20:45:00+08:00",
+  "en": {
+    "summary": "This one-page form, filed for respondent Luc A. Despins as Chapter 11 Trustee, states: 'I do not intend to file a response to the petition unless one is requested by the Court.' It is a procedural waiver of the present response, not consent to certiorari and not a concession on the facts or law.",
+    "plainEnglish": "The Trustee told the Court he will not submit an opposition now unless the justices ask for one. That is like declining an optional first reply; it is not saying the petition is correct, and it does not mean the Court will hear the case.",
+    "legalReading": ["The form is filed on behalf of all respondents and identifies counsel for the Trustee.", "The waiver is expressly conditional because a response will be filed if the Court requests one.", "The form lists the Rule 15.9 corporate disclosure and unidentified-party fields as not applicable."],
+    "caseConnections": ["The official docket entered the waiver on August 17, 2026 and then distributed the petition for the September 28 conference."],
+    "whyItMatters": ["It explains why no respondent merits brief is presently available and why the petition may proceed to initial conference consideration without one."],
+    "verificationTasks": ["Monitor whether the Court later calls for a response; if it does, the later response supersedes any inference drawn from the waiver."],
+    "riskFlags": ["Do not describe the waiver as agreement, default, victory, non-opposition on the merits, or evidence that certiorari will be granted."],
+    "findings": [
+      { "section": "summary", "text": "The Trustee does not intend to respond unless the Court requests a response.", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The waiver does not concede the petition or predict the Court's action.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份代表第 11 章受托人 Luc A. Despins 提交的一页表格写明：“除非法院要求，本人无意提交对调卷令申请的回应。”这只是放弃当前回应的程序文件，不等于同意最高法院受理，也不构成对事实或法律的承认。",
+    "plainEnglish": "受托人告诉最高法院：目前不主动提交反对书，除非法官以后要求。可以把它理解成暂时不提交可选的首轮回复，不是承认申请正确，也不表示最高法院一定会审理。",
+    "legalReading": ["表格表示代表全部被申请人提交，并列明受托人的律师。", "放弃具有明确条件：如果最高法院要求，仍会提交回应。", "表格把规则 15.9 公司披露及申请未列当事方项目填写为不适用。"],
+    "caseConnections": ["最高法院官方案卷于 2026 年 8 月 17 日登记该放弃书，随后把申请分发至 9 月 28 日会议。"],
+    "whyItMatters": ["它解释了为什么目前没有被申请人的实体回应书，以及申请为何可能在没有回应的情况下进入初次会议审议。"],
+    "verificationTasks": ["继续监控最高法院以后是否要求回应；一旦要求，应以之后提交的回应书为准。"],
+    "riskFlags": ["不得把放弃回应写成同意、缺席败诉、实体上不反对、申请方胜诉，或最高法院将准许调卷令的证据。"],
+    "findings": [
+      { "section": "summary", "text": "受托人表示除非最高法院要求，否则目前不提交回应。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "放弃书不承认申请主张，也不能预测最高法院处理结果。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "sha256": "a6e4c583140f77c221863b28109fad50b32c28030db99f0a63c9a2aa7affc21d",
+  "caseId": "sdny-23-cr-118",
+  "docNumber": "869",
+  "posture": "appearance_of_counsel",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-20T21:15:00+08:00",
+  "en": {
+    "summary": "This one-page AO 458 form states that Sharon Cohen Levin of Sullivan & Cromwell LLP appears in the criminal docket as counsel for Pillsbury Winthrop Shaw Pittman LLP. The docket header records filing on August 18, 2026.",
+    "plainEnglish": "This is an attorney check-in form. It tells the clerk who entered an appearance and whom the form says she represents. It does not decide an appeal, change the sentence, transfer custody, or explain why the appearance was filed.",
+    "legalReading": [
+      "The caption identifies United States v. Miles Guo, S3 23 Cr. 118 (AT).",
+      "The represented-client line names Pillsbury Winthrop Shaw Pittman LLP, while the attorney is Sharon Cohen Levin of Sullivan & Cromwell LLP.",
+      "An AO 458 appearance places counsel information on the docket; it is not a motion, evidentiary submission, judicial finding, or order."
+    ],
+    "caseConnections": [
+      "The filing belongs to the post-judgment criminal docket and may matter for identifying counsel involved in later proceedings, but the form itself does not identify an appellate issue or connect the appearance to a particular pending motion."
+    ],
+    "whyItMatters": [
+      "It updates the counsel-of-record map after judgment and before further district-court or appellate activity."
+    ],
+    "verificationTasks": [
+      "Read any later filing that identifies why Pillsbury required separate counsel before assigning a substantive role to this appearance.",
+      "PACER remains the docket of record; the local PDF is a public RECAP copy whose caption, date, and single-page body were checked."
+    ],
+    "riskFlags": [
+      "Do not report this form as a change of Miles Guo's defense counsel: the represented-client line names Pillsbury Winthrop Shaw Pittman LLP.",
+      "Do not infer a dispute, conflict, subpoena issue, appeal position, or custody consequence from the appearance form alone."
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "Sharon Cohen Levin entered an appearance as counsel for Pillsbury Winthrop Shaw Pittman LLP on the form filed August 18, 2026.",
+        "confidence": "high",
+        "pages": [1]
+      },
+      {
+        "section": "riskFlags",
+        "text": "The form states a counsel relationship only and does not explain the reason for the appearance or decide a substantive issue.",
+        "confidence": "high",
+        "pages": [1]
+      }
+    ]
+  },
+  "zh": {
+    "summary": "这份一页 AO 458 表格写明，Sullivan & Cromwell LLP 的 Sharon Cohen Levin 在刑事案卷中作为 Pillsbury Winthrop Shaw Pittman LLP 的律师出庭。案卷页眉记载提交日期为 2026 年 8 月 18 日。",
+    "plainEnglish": "可以把它理解成律师向法院书记官提交的“出庭登记表”：告诉法院是哪位律师登记、表格写明其代表谁。它不裁判上诉，不改变刑期，不涉及转监，也没有解释为什么提交这份登记。",
+    "legalReading": [
+      "案名栏为 United States v. Miles Guo，案号 S3 23 Cr. 118 (AT)。",
+      "被代理对象一栏写的是 Pillsbury Winthrop Shaw Pittman LLP；登记律师是 Sullivan & Cromwell LLP 的 Sharon Cohen Levin。",
+      "AO 458 出庭表的作用是把律师信息登记进案卷；它不是动议、证据材料、法院认定或命令。"
+    ],
+    "caseConnections": [
+      "该文件属于判决后的刑事案卷，可用于识别后续程序中出现的律师；但表格本身没有提出上诉争点，也没有把此次出庭与某项待决动议联系起来。"
+    ],
+    "whyItMatters": [
+      "它更新了判决后、后续地区法院或上诉活动期间的在册律师关系图。"
+    ],
+    "verificationTasks": [
+      "在给此次出庭赋予实体意义前，应查找以后是否有文件说明 Pillsbury 为什么需要单独律师。",
+      "PACER 仍是正式案卷；本地文件是公开 RECAP 副本，已经核对案名、提交日期和一页正文。"
+    ],
+    "riskFlags": [
+      "不得把该表格写成 Miles Guo 更换辩护律师；表内所列被代理对象是 Pillsbury Winthrop Shaw Pittman LLP。",
+      "不得仅凭这份出庭表推断存在争议、利益冲突、传票问题、上诉立场或羁押后果。"
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "Sharon Cohen Levin 在 2026 年 8 月 18 日提交的表格中登记为 Pillsbury Winthrop Shaw Pittman LLP 的律师。",
+        "confidence": "high",
+        "pages": [1]
+      },
+      {
+        "section": "riskFlags",
+        "text": "该表格只记录律师关系，没有说明提交原因，也没有裁判实体问题。",
+        "confidence": "high",
+        "pages": [1]
+      }
+    ]
+  }
+}

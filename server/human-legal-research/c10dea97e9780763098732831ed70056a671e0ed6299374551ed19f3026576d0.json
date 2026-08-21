@@ -1,0 +1,34 @@
+{
+  "sha256": "c10dea97e9780763098732831ed70056a671e0ed6299374551ed19f3026576d0",
+  "caseId": "scotus-26-194",
+  "docNumber": "certificate-of-word-count",
+  "posture": "procedural_compliance_certificate",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-20T20:45:00+08:00",
+  "en": {
+    "summary": "This one-page certificate states under Supreme Court Rule 33.1(h) that the petition contains 5,512 words, excluding exempt portions. It is a filing-compliance document, not evidence about the merits.",
+    "plainEnglish": "This is the petition's word-count receipt. It tells the Clerk that the filing fits the Court's length rules; it does not support or weaken the legal argument.",
+    "legalReading": ["The declarant certifies 5,512 counted words and invokes the exclusions in Supreme Court Rule 33.1(d).", "The certificate is executed under penalty of perjury and notarized."],
+    "caseConnections": ["It accompanies the August 11, 2026 certiorari petition in No. 26-194 and addresses formal filing compliance only."],
+    "whyItMatters": ["It helps establish that the petition package included the required word-count certification."],
+    "verificationTasks": ["Use the official docket to confirm whether the Clerk later identifies any filing defect or requests a corrected submission."],
+    "riskFlags": ["The certificate contains no judicial finding, response position, or merits analysis."],
+    "findings": [
+      { "section": "summary", "text": "The certificate reports 5,512 words under Supreme Court Rule 33.1(h).", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "The document addresses filing compliance rather than the merits.", "confidence": "high", "pages": [1] }
+    ]
+  },
+  "zh": {
+    "summary": "这份一页证明依据《最高法院规则》33.1(h)，声明调卷令申请共有 5,512 个计入字数的单词，不包括规则允许排除的部分。它属于提交合规文件，不是案件实体证据。",
+    "plainEnglish": "这相当于申请书的“字数收据”：它告诉书记官文件符合篇幅规则，不会证明法律论点更强或更弱。",
+    "legalReading": ["声明人证明计入字数为 5,512，并适用《最高法院规则》33.1(d) 的排除部分。", "证明以伪证罪责任声明并经公证。"],
+    "caseConnections": ["它随第 26-194 号案 2026 年 8 月 11 日调卷令申请提交，只处理形式合规。"],
+    "whyItMatters": ["它证明申请文件包包含最高法院要求的字数合规证明。"],
+    "verificationTasks": ["继续查看官方案卷，确认书记官以后是否指出提交缺陷或要求更正。"],
+    "riskFlags": ["本证明没有法院认定、被申请人立场或实体法律分析。"],
+    "findings": [
+      { "section": "summary", "text": "证明依据《最高法院规则》33.1(h) 申报 5,512 个单词。", "confidence": "high", "pages": [1] },
+      { "section": "riskFlags", "text": "文件处理的是提交合规，而不是案件实体。", "confidence": "high", "pages": [1] }
+    ]
+  }
+}

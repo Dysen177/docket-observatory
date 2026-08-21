@@ -7,7 +7,7 @@ import { Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { pathToFileURL } from 'node:url'
 import { atomicWriteJson } from './atomic-write.js'
-import { scanPublicRecapFeeds, scanPublicRecapPortfolio, scanPublicRecapRelatedPortfolio, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
+import { discoverPublicRecapDocuments, normalizeRecapDocumentMetadata, scanPublicRecapFeeds, scanPublicRecapPortfolio, scanPublicRecapRelatedPortfolio, scanPublicRecapSearch, scanRecapArchive } from './recap-client.js'
 import { safeFetch } from './safe-fetch.js'
 import { readTextWithLimit } from './safe-fetch.js'
 import { sourceRegistry } from './seed.js'
@@ -15,6 +15,7 @@ import { initializeSettingsStore, resolvedSecret, runtimeSetting } from './setti
 import networkPolicy from './network-policy.cjs'
 import { compareDocketNumbers, normalizeDocketNumber } from './docket-number.js'
 import { scanHimalayaRestorationArchive } from './himalaya-restoration.js'
+import { parseSupremeCourtDocket } from './supreme-court-docket.js'
 
 const { isAllowedOutboundUrl } = networkPolicy
 
@@ -26,6 +27,17 @@ const bundledRoot = process.env.GUO_INTEL_BUNDLED_DOWNLOAD_DIR
   : null
 const bundledManifestPath = bundledRoot ? path.join(bundledRoot, 'manifest.json') : null
 const pages = [
+  {
+    sourceId: 'supreme-court-docket',
+    caseId: 'scotus-26-194',
+    courtId: 'scotus',
+    court: 'Supreme Court of the United States',
+    docketNumber: '26-194',
+    label: 'Official Supreme Court docket No. 26-194',
+    url: 'https://www.supremecourt.gov/docket/docketfiles/html/public/26-194.html',
+    subdir: 'scotus-26-194-official',
+    parser: 'supreme_court_docket',
+  },
   {
     sourceId: 'nfsc-criminal-mirror',
     caseId: 'sdny-23-cr-118',
@@ -57,6 +69,74 @@ const pages = [
 ]
 
 const verifiedPublicDocuments = [
+  {
+    sourceId: 'courtlistener-recap',
+    caseId: 'bkd-24-05249-aca',
+    courtId: 'ctb',
+    court: 'D. Conn. Bankruptcy Court',
+    docketNumber: '24-05249',
+    courtListenerDocketId: 68254946,
+    sourcePage: 'https://www.courtlistener.com/docket/68254946/331/despins-luc-a-chapter-11-trustee-v-aca-capital-group-ltd/',
+    sourceLabel: 'Despins v. ACA Capital Group Ltd. public RECAP document',
+    title: 'Doc 331: Chapter 11 Trustee Motion for Summary Judgment on Claims 17-21 and 26',
+    docNumber: '331',
+    filedAt: '2026-08-07',
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.ctb.312844/gov.uscourts.ctb.312844.331.0.pdf',
+    subdir: 'bkd-24-05249-aca-recap',
+    pageCount: 14,
+    discoveryMethod: 'courtlistener_public_feed_verified_storage',
+  },
+  {
+    sourceId: 'courtlistener-recap',
+    caseId: 'bkd-24-05249-aca',
+    courtId: 'ctb',
+    court: 'D. Conn. Bankruptcy Court',
+    docketNumber: '24-05249',
+    courtListenerDocketId: 68254946,
+    sourcePage: 'https://www.courtlistener.com/docket/68254946/331/1/despins-luc-a-chapter-11-trustee-v-aca-capital-group-ltd/',
+    sourceLabel: 'Despins v. ACA Capital Group Ltd. public RECAP document',
+    title: 'Doc 331-1: Redacted Memorandum Supporting Trustee Summary-Judgment Motion',
+    docNumber: '331-1',
+    filedAt: '2026-08-07',
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.ctb.312844/gov.uscourts.ctb.312844.331.1.pdf',
+    subdir: 'bkd-24-05249-aca-recap',
+    pageCount: 63,
+    discoveryMethod: 'courtlistener_public_feed_verified_storage',
+  },
+  {
+    sourceId: 'courtlistener-recap',
+    caseId: 'bkd-24-05249-aca',
+    courtId: 'ctb',
+    court: 'D. Conn. Bankruptcy Court',
+    docketNumber: '24-05249',
+    courtListenerDocketId: 68254946,
+    sourcePage: 'https://www.courtlistener.com/docket/68254946/331/2/despins-luc-a-chapter-11-trustee-v-aca-capital-group-ltd/',
+    sourceLabel: 'Despins v. ACA Capital Group Ltd. public RECAP document',
+    title: 'Doc 331-2: Redacted Local Rule 56(a)(1) Statement of Undisputed Material Facts',
+    docNumber: '331-2',
+    filedAt: '2026-08-07',
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.ctb.312844/gov.uscourts.ctb.312844.331.2.pdf',
+    subdir: 'bkd-24-05249-aca-recap',
+    pageCount: 41,
+    discoveryMethod: 'courtlistener_public_feed_verified_storage',
+  },
+  {
+    sourceId: 'courtlistener-recap',
+    caseId: 'sdny-23-cr-118',
+    courtId: 'nysd',
+    court: 'S.D.N.Y.',
+    docketNumber: '1:23-cr-00118',
+    courtListenerDocketId: 67012324,
+    sourcePage: 'https://www.courtlistener.com/docket/67012324/869/united-states-v-guo/',
+    sourceLabel: 'S.D.N.Y. criminal case public RECAP document',
+    title: 'Doc 869: Appearance of Counsel for Pillsbury Winthrop Shaw Pittman LLP',
+    docNumber: '869',
+    filedAt: '2026-08-18',
+    url: 'https://storage.courtlistener.com/recap/gov.uscourts.nysd.595325/gov.uscourts.nysd.595325.869.0.pdf',
+    subdir: 'sdny-23-cr-118-recap',
+    pageCount: 1,
+    discoveryMethod: 'courtlistener_public_feed_verified_storage',
+  },
   {
     sourceId: 'courtlistener-recap',
     caseId: 'sdny-23-cr-118',
@@ -191,6 +271,7 @@ async function fetchText(url) {
 
 async function collectPdfLinks(page) {
   const html = await fetchText(page.url)
+  if (page.parser === 'supreme_court_docket') return collectSupremeCourtPdfLinks(page, html)
   const $ = cheerio.load(html)
   const links = new Map()
 
@@ -226,6 +307,32 @@ async function collectPdfLinks(page) {
   })
 
   return [...links.values()]
+}
+
+function collectSupremeCourtPdfLinks(page, html) {
+  const docket = parseSupremeCourtDocket(html, page.url)
+  if (docket.docketNumber !== page.docketNumber) {
+    throw new Error(`Official Supreme Court parser expected docket ${page.docketNumber}, received ${docket.docketNumber || 'none'}.`)
+  }
+  return docket.proceedings.flatMap((proceeding) => proceeding.documents.flatMap((document) => {
+    if (!isAllowedOutboundUrl(document.url, { includeOpenAI: false })) return []
+    return [{
+      sourceId: page.sourceId,
+      caseId: page.caseId,
+      courtId: page.courtId,
+      court: page.court,
+      docketNumber: page.docketNumber,
+      sourcePage: page.url,
+      sourceLabel: page.label,
+      title: document.title,
+      docNumber: document.docNumber,
+      filedAt: document.date,
+      url: document.url,
+      subdir: page.subdir,
+      relationStatus: 'tracked',
+      discoveryMethod: 'official_supreme_court_docket',
+    }]
+  }))
 }
 
 function docketNumberFromMirrorFilename(sourceId, absoluteUrl) {
@@ -752,7 +859,18 @@ export async function runDocumentDownload(options = {}) {
         ...document,
         relationStatus: document.relationStatus ?? (String(document.caseId).startsWith('discovered-') ? 'pending_review' : 'tracked'),
       }))
-      collected.push(...searchArchive.documents, ...discoveredDocuments, ...relatedDocuments)
+      const publicStorageDocuments = await discoverPublicRecapDocuments({
+        events: archive.events,
+        knownDocuments: [
+          ...(priorManifest?.files ?? []),
+          ...collected,
+          ...searchArchive.documents,
+          ...discoveredDocuments,
+          ...relatedDocuments,
+        ],
+        concurrency: runtimeSetting('downloadConcurrency'),
+      })
+      collected.push(...searchArchive.documents, ...discoveredDocuments, ...relatedDocuments, ...publicStorageDocuments)
       pageResults.push({
         sourceId: 'courtlistener-recap',
         caseId: 'tracked-case-portfolio',
@@ -760,7 +878,8 @@ export async function runDocumentDownload(options = {}) {
         url: 'https://www.courtlistener.com/feed/search/',
         subdir: 'recap',
         status: searchArchive.targets.some((target) => !target.error) ? 'limited' : 'error',
-        count: [...new Set([...searchArchive.documents, ...portfolioArchive.documents].map((document) => document.url))].length,
+        count: [...new Set([...searchArchive.documents, ...portfolioArchive.documents, ...publicStorageDocuments].map((document) => document.url))].length,
+        publicStorageProbeCount: publicStorageDocuments.length,
         eventCount: archive.events.length,
         structuredEventCount: searchArchive.events.length,
         discoveredDocketCount: portfolioArchive.targets.length,
@@ -771,7 +890,7 @@ export async function runDocumentDownload(options = {}) {
         relatedSearchFailures: relatedArchive.failures,
         limitation: 'No-token public search exposes a limited result window and available RECAP PDFs. A token adds full docket-entry pagination.',
       })
-      log(`courtlistener-recap: public feeds observed ${archive.events.length} recent record(s); fixed, portfolio, and related-name searches collected ${searchArchive.documents.length + portfolioArchive.documents.length + relatedArchive.documents.length} public PDF link(s) before de-duplication across ${relatedArchive.acceptedDocketCount} accepted related docket(s)`)
+      log(`courtlistener-recap: public feeds observed ${archive.events.length} recent record(s); fixed, portfolio, related-name, and verified storage probes collected ${searchArchive.documents.length + portfolioArchive.documents.length + relatedArchive.documents.length + publicStorageDocuments.length} public PDF link(s) before de-duplication across ${relatedArchive.acceptedDocketCount} accepted related docket(s)`)
     } catch (error) {
       pageResults.push({
         sourceId: 'courtlistener-recap',
@@ -794,7 +913,8 @@ export async function runDocumentDownload(options = {}) {
     ...(priorManifest?.files ?? []),
     ...(priorManifest?.deferredDiscoveries ?? []),
   ].filter((file) => file?.url)
-  const uniqueLinks = [...new Map([...archivedLinks, ...collected].map((link) => [downloadIdentity(link), link])).values()]
+  const normalizedLinks = [...archivedLinks, ...collected].map(normalizeRecapDocumentMetadata)
+  const uniqueLinks = [...new Map(normalizedLinks.map((link) => [downloadIdentity(link), link])).values()]
   uniqueLinks.sort(compareDownloadPriority)
   log(`total unique downloadable link(s): ${uniqueLinks.length}`)
 
@@ -869,7 +989,7 @@ function compareDownloadPriority(left, right) {
 }
 
 function downloadAuthority(sourceId) {
-  if (sourceId === 'pacer') return 0
+  if (['pacer', 'supreme-court-docket'].includes(sourceId)) return 0
   if (sourceId === 'courtlistener-recap') return 1
   if (['doj-victim-page', 'sec-press-2023-50'].includes(sourceId)) return 2
   if (['gtv-fair-fund', 'epiq-kwok-trustee'].includes(sourceId)) return 3

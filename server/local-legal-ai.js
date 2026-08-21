@@ -232,11 +232,13 @@ export function localAssistiveContentIntegrity() {
 
 export function localDocumentAiResult(local, extraction, lang = 'zh') {
   const extracted = extraction?.status === 'extracted' && extraction.snippet
-  const citation = extracted ? [{ kind: 'extracted_page', pageNumber: firstExtractedPage(extraction) }] : [{ kind: 'source_metadata', pageNumber: null }]
+  const citation = Array.isArray(local?.offlineRead?.citations) && local.offlineRead.citations.length
+    ? local.offlineRead.citations
+    : extracted ? [{ kind: 'extracted_page', pageNumber: firstExtractedPage(extraction) }] : [{ kind: 'source_metadata', pageNumber: null }]
   const confidence = extracted ? 'medium' : 'low'
   const mode = lang === 'en'
-    ? 'Local deterministic legal read; no generative AI provider configured'
-    : '本地确定性律师式解读；未配置生成式 AI'
+    ? 'Local deterministic plain-language and professional read; no generative AI required'
+    : '本地确定性通俗解读 + 专业解读；无需生成式 AI'
   const analysisNote = lang === 'en'
     ? extracted
       ? 'Local rules used the source metadata and extracted body snippet. Verify operative language in the linked PDF.'
@@ -246,6 +248,7 @@ export function localDocumentAiResult(local, extraction, lang = 'zh') {
       : '由于没有可用正文，本地规则仅使用元数据。'
   const result = {
     ...local,
+    generatedAt: new Date().toISOString(),
     aiFindings: citedFindings({
       summary: local.summary,
       plainEnglish: local.plainEnglish,

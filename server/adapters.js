@@ -5,6 +5,8 @@ import { resolvedSecret } from './settings-store.js'
 import networkPolicy from './network-policy.cjs'
 import { normalizeDocketNumber } from './docket-number.js'
 import { scanCurrentHimalayaRestoration, scanHistoricalHimalayaRestoration } from './himalaya-restoration.js'
+import { parseSupremeCourtDocket } from './supreme-court-docket.js'
+import { syncGhotTextArchive } from './ghot-text-archive.js'
 
 const { isAllowedOutboundUrl } = networkPolicy
 
@@ -91,6 +93,37 @@ export function parseDocketFilingDate(text) {
   const day = match[1] ? match[2] : match[5]
   const year = match[1] ? match[3] : match[6]
   return `${year}-${month}-${String(day).padStart(2, '0')}`
+}
+
+export async function ghotTextArchive(source) {
+  const start = Date.now()
+  const archive = await syncGhotTextArchive({
+    refreshRecentCourtCount: 12,
+    concurrency: 4,
+    requestDelayMs: 80,
+    languages: ['zh', 'en'],
+  })
+  const failures = archive.sync?.failures?.length ?? 0
+  return {
+    events: [],
+    status: sourceStatus(
+      source,
+      start,
+      failures ? 'limited' : 'ok',
+      failures
+        ? `Synced ${archive.counts.total} GHOT text-archive records with ${failures} detail request failure(s); previous cached details were retained where available.`
+        : `Synced ${archive.counts.total} GHOT text-archive records, including ${archive.counts.byKind?.concept ?? 0} glossary entries and ${archive.counts.byKind?.court_filing ?? 0} secondary court-file summaries.`,
+      {
+        itemCount: archive.counts.total,
+        retryable: failures > 0,
+        facts: [
+          { label: 'Glossary entries', value: String(archive.counts.byKind?.concept ?? 0), detail: 'Secondary explanations used with attribution and primary-source verification.' },
+          { label: 'Court-file summaries', value: String(archive.counts.byKind?.court_filing ?? 0), detail: 'Comparison layer only; PDF originals and official dockets remain controlling.' },
+          { label: 'Details fetched this run', value: String(archive.sync?.fetchedDetails ?? 0), detail: `${archive.sync?.retainedDetails ?? 0} cached language detail(s) retained.` },
+        ],
+      },
+    ),
+  }
 }
 
 function eventCategory(text) {
@@ -607,7 +640,126 @@ export async function federalRegisterPolicy(source) {
   }
 }
 
+export async function supremeCourtDocket(source) {
+  const start = Date.now()
+  const { response, text } = await fetchText(source.url)
+  if (!response.ok) {
+    return { events: [], status: sourceStatus(source, start, 'error', `Supreme Court docket returned HTTP ${response.status}.`) }
+  }
+
+  const docket = parseSupremeCourtDocket(text, source.url)
+  if (docket.docketNumber !== '26-194' || !docket.proceedings.length) {
+    return {
+      events: [],
+      status: sourceStatus(source, start, 'limited', 'The official Supreme Court page is reachable, but docket 26-194 proceedings were not parsed.', {
+        retryable: true,
+        facts: [{ label: 'Parsed docket', value: docket.docketNumber || 'none', detail: 'Expected No. 26-194.' }],
+      }),
+    }
+  }
+
+  const events = docket.proceedings.map((proceeding) => supremeCourtEvent(proceeding, source))
+  const latest = [...docket.proceedings].sort((a, b) => b.date.localeCompare(a.date))[0]
+  const documentCount = docket.proceedings.reduce((total, item) => total + item.documents.length, 0)
+  return {
+    events,
+    status: sourceStatus(source, start, 'ok', `Official Supreme Court docket 26-194 returned ${events.length} proceeding(s) and ${documentCount} court-hosted PDF(s).`, {
+      itemCount: events.length,
+      facts: [
+        { label: 'Case', value: 'No. 26-194', detail: docket.title },
+        { label: 'Latest official docket action', value: latest.date, detail: latest.description },
+        { label: 'Court-hosted PDFs', value: String(documentCount), detail: 'Files are collected directly from the official Supreme Court docket.' },
+      ],
+    }),
+  }
+}
+
+function supremeCourtEvent(proceeding, source) {
+  const lower = proceeding.description.toLowerCase()
+  const petition = lower.includes('petition for a writ of certiorari filed')
+  const waiver = lower.includes('waiver of right')
+  const distributed = lower.includes('distributed for conference')
+  const suffix = petition ? 'cert-petition' : waiver ? 'response-waiver' : distributed ? 'conference-distribution' : `docket-${proceeding.date}`
+  const title = petition
+    ? 'Petition for a writ of certiorari filed in Supreme Court No. 26-194'
+    : waiver
+      ? 'Chapter 11 trustee waives current right to respond to certiorari petition'
+      : distributed
+        ? 'Supreme Court petition distributed for the September 28, 2026 conference'
+        : `Supreme Court No. 26-194 docket action: ${proceeding.description}`
+  const impact = petition
+    ? 'Requests Supreme Court review of whether 11 U.S.C. § 544(a) authorizes a trustee to prosecute a generalized creditor-owned alter ego claim; filing a petition does not mean review has been granted.'
+    : waiver
+      ? 'The respondent declined to file a response unless later requested. A waiver is not consent to the petition, a merits concession, or a grant of review.'
+      : distributed
+        ? 'The petition is scheduled for consideration at conference. Distribution does not mean the Court has granted certiorari or ruled on the merits.'
+        : 'The legal effect depends on the exact official docket text and any later Supreme Court order.'
+  return {
+    id: `scotus-26-194-${suffix}-${proceeding.date}`,
+    date: proceeding.date,
+    dateBasis: petition || waiver ? 'court_filed' : 'court_entered',
+    dateConfidence: 'high',
+    title,
+    summary: proceeding.description,
+    impact,
+    caseId: 'scotus-26-194',
+    relatedCaseIds: ['scotus-26-194', 'ca2-24-2504', 'dconn-22-50073', 'bkd-hk-int-despins'],
+    court: 'Supreme Court of the United States',
+    docketNumber: '26-194',
+    filingNumber: petition ? 'Petition' : waiver ? 'Waiver' : distributed ? 'Conference distribution' : null,
+    category: 'Supreme Court',
+    severity: petition || distributed ? 'high' : 'medium',
+    sourceId: source.id,
+    sourceLabel: source.shortName,
+    sourceType: source.type,
+    sourceUrl: source.url,
+    confidence: source.confidence,
+    assertionType: 'Official court docket entry',
+    entities: ['ho-wan-kwok', 'hk-international'],
+    tags: ['Supreme Court', 'certiorari', 'bankruptcy', '11 U.S.C. § 544(a)', 'alter ego', 'Lady May'],
+  }
+}
+
+export async function bopInmateLocator(source) {
+  const start = Date.now()
+  const { response, text } = await fetchText(source.url)
+  if (!response.ok) {
+    return { events: [], status: sourceStatus(source, start, 'error', `BOP inmate locator returned HTTP ${response.status}.`) }
+  }
+
+  let payload
+  try {
+    payload = JSON.parse(text)
+  } catch {
+    return { events: [], status: sourceStatus(source, start, 'error', 'BOP inmate locator returned invalid JSON.', { retryable: true }) }
+  }
+  const inmate = (payload.InmateLocator ?? []).find((item) => item.inmateNum === '49134-510')
+  if (!inmate) {
+    return {
+      events: [],
+      status: sourceStatus(source, start, 'limited', 'BOP inmate locator did not return the verified register number 49134-510.', {
+        retryable: true,
+        facts: [{ label: 'Register number', value: '49134-510', detail: 'No matching public locator row was returned.' }],
+      }),
+    }
+  }
+
+  const facility = [inmate.faclType, inmate.faclName].filter(Boolean).join(' ')
+  return {
+    events: [],
+    status: sourceStatus(source, start, 'ok', `BOP currently lists Miles Guo (49134-510) at ${facility}. The locator does not provide an exact transfer date.`, {
+      itemCount: 1,
+      facts: [
+        { label: 'Register number', value: inmate.inmateNum, detail: `${inmate.nameFirst} ${inmate.nameLast}` },
+        { label: 'Current facility', value: facility, detail: `Facility code ${inmate.faclCode || 'not reported'}. This is the current public designation, not a transfer-history record.` },
+        { label: 'Projected release field', value: inmate.projRelDate || 'not reported', detail: 'A projected date can change and is not a guarantee of actual release.' },
+      ],
+    }),
+  }
+}
+
 const adapterMap = {
+  ghotTextArchive,
   nfscCriminalMirror,
   dojVictimPage,
   dojSentencingRelease,
@@ -617,6 +769,8 @@ const adapterMap = {
   himalayaRestorationArchive,
   epiqKwokDocket,
   courtlistenerRecap,
+  supremeCourtDocket,
+  bopInmateLocator,
   pacerPlaceholder,
   federalRegisterPolicy,
 }

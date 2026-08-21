@@ -1,6 +1,6 @@
 # Corpus Publication Review
 
-Generated: 2026-08-14T23:19:55.117Z
+Generated: 2026-08-21T06:19:31.861Z
 Reviewer / publisher: Dysen177
 
 ## Decision
@@ -11,22 +11,25 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 
 ## Summary
 
-- Reviewed documents: 240
-- High-severity heuristic findings: 221
+- Reviewed documents: 245
+- High-severity heuristic findings: 226
 - Medium-severity heuristic findings: 19
-- Source distribution: courtlistener-recap 69, himalaya-restoration-archive 7, nfsc-criminal-mirror 164
-- Risk categories: account-or-routing-number 78, bulk-hid-identifiers 4, date-of-birth 1, explicit-seal-banner 130, minor-or-medical-record 1, passport-or-license-number 27, protective-order-material 21, social-security-number 1
+- Source distribution: courtlistener-recap 74, himalaya-restoration-archive 7, nfsc-criminal-mirror 164
+- Risk categories: account-or-routing-number 79, bulk-hid-identifiers 4, date-of-birth 1, explicit-seal-banner 134, minor-or-medical-record 1, passport-or-license-number 28, protective-order-material 21, social-security-number 1
 
 ## Per-Document Record
 
 | SHA-256 | Source | Case | Doc | Severity | Screening categories | Decision |
 | --- | --- | --- | ---: | --- | --- | --- |
+| 2dd363cc66a2990c1bb5a6a38cb109f15449a425093eb63c32417a6dcbd1d6b9 | courtlistener-recap | bkd-22-05032 | 205 | high | explicit-seal-banner (1) | approved_public |
+| c6c9fe797ee57f8b2885a92e61f2a5e56221240131d3bacb61509916025136e2 | courtlistener-recap | bkd-22-05032 | 206 | high | explicit-seal-banner (1) | approved_public |
 | ca5628593ac24b2f008bc97d3b67af86e8da42da8efbc81d7cf7e0de5d74a77b | courtlistener-recap | bkd-24-05006-aws | 42 | high | explicit-seal-banner (5) | approved_public |
 | 4c0b26f11922e0c735ab82de8f85074d483962c31a68b508665ae7a9b870b408 | courtlistener-recap | bkd-24-05006-aws | 51 | high | explicit-seal-banner (2) | approved_public |
 | ae0d04cea94cb70e2b63184bb925dd9406de850bd61aa719c5e5a5c017508fc6 | courtlistener-recap | bkd-24-05057-amazon | 22 | high | explicit-seal-banner (9), protective-order-material (9) | approved_public |
 | 81c8c72f75977b39a279932a581d7524d70b9d0c8ed17b9629d3caae54adc4b1 | courtlistener-recap | bkd-24-05057-amazon | 65 | high | explicit-seal-banner (5) | approved_public |
 | 7a14da070efbf96677a4dba811cecbd21dbaabb7e9e932d0a5052c0cc6b29a97 | courtlistener-recap | bkd-24-05246-wa-hf | 52 | high | explicit-seal-banner (1) | approved_public |
 | a2800906f7cd7ae60c9d6a8a74ad7be3921ad58a6d1de50396d52efd38e0a395 | courtlistener-recap | bkd-24-05275-lamp | 1 | high | explicit-seal-banner (1) | approved_public |
+| eeceff9240a716ea1f4ee18a31776e71de71395404f34734535cafc1fc1bf208 | courtlistener-recap | ca2-26-563-dx | 50 | high | explicit-seal-banner (1) | approved_public |
 | 0ea1e4c9b11e6a42f186efa71c4e417fb7c106ed5db31357892e7a1812a7106d | courtlistener-recap | dconn-22-50073 | 2924 | high | explicit-seal-banner (2) | approved_public |
 | 92d216e1806f8af86e9a00ad1b7302ee75cc64fd97516251dd9fa2cd4975e7a9 | courtlistener-recap | discovered-cacd-7231208 | 1 | high | passport-or-license-number (2) | approved_public |
 | 555d9b36cb8835d0fdf2389d09e03dc0b7aa0780f2d1a9880804eee38b5a2b3b | courtlistener-recap | discovered-ctb-67397837 | 176 | high | explicit-seal-banner (8), protective-order-material (4) | approved_public |
@@ -241,7 +244,9 @@ This review verifies PDF structure, file size, SHA-256, managed storage path, so
 | 4ef3492d97a33e161520c5a9d27adefd4c36e185790974adca979823e0e18630 | nfsc-criminal-mirror | sdny-23-cr-118 | 844 | high | account-or-routing-number (11) | approved_public |
 | 1179434e1838c9f697fda0075d2f7063ae3e927ba92b4d73bd64315b829ab46d | nfsc-criminal-mirror | sdny-23-cr-118 | 857 | high | social-security-number (1) | approved_public |
 | a10fae7c54a7dcc543219d5e09d9bb19590df142af98b591d66afda5168d8642 | nfsc-criminal-mirror | sdny-23-cr-118 | 859 | high | account-or-routing-number (2) | approved_public |
+| dc8da24f8576fda54ca78c2e2687466298c63e42eb1fb5f78077c9e93c120130 | courtlistener-recap | sdny-23-cr-118 | 859 | high | account-or-routing-number (2) | approved_public |
 | 81df1f2d4b568d5eb43bbfb31a596ff2e160f4f6734318e02b33d48e612e7b17 | himalaya-restoration-archive | sdny-23-cr-118 |  | high | explicit-seal-banner (1) | approved_public |
+| 152813a5a51eded34f0b52ca0cbf85a5cb2f6ab60c7801f051a689f7fffea53b | courtlistener-recap | sdny-23-cv-2200 | 68 | high | explicit-seal-banner (38), passport-or-license-number (1) | approved_public |
 | 4dc0dcb91be89dfa65d36bd60fddb47949500a19bbcdc63498896c69f32421aa | courtlistener-recap | bkd-24-05006-aws | 6 | medium | protective-order-material (3) | approved_public |
 | 4986b2e2503504c10224ae56bd7b99df0f37949c7cfa276960acfc1239ca1f57 | courtlistener-recap | dconn-22-50073 | 2778-4 | medium | date-of-birth (1) | approved_public |
 | 450814542254d3f40de73820a3427870629515634a5b293591be9ac8f332e1d1 | courtlistener-recap | discovered-ctb-67500817 | 86 | medium | protective-order-material (1) | approved_public |

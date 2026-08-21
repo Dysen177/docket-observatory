@@ -19,6 +19,7 @@ Conflicting sources remain separate. A lower-tier source cannot silently overrid
 
 | Host | Purpose | Data |
 | --- | --- | --- |
+| `ghot.ai` | Public bilingual text-archive catalog used as a secondary research reference. | Public glossary entries, declarations, reports, and secondary court-file summaries; court summaries do not replace PDF originals or official dockets. |
 | `nfsc.press` | Public mirror for docket-linked PDFs. | Public mirror metadata and PDFs. |
 | `www.justice.gov` | DOJ victim information and press releases. | Public agency pages. |
 | `www.sec.gov` | SEC enforcement releases and linked files. | Public agency pages and PDFs. |
@@ -30,6 +31,8 @@ Conflicting sources remain separate. A lower-tier source cannot silently overrid
 | `dm.epiq11.com` | Epiq bankruptcy docket shell and future extraction endpoint mapping. | Public claims-agent docket metadata. |
 | `www.courtlistener.com` | Public fixed-docket Atom feeds, anonymous structured search, optional token API, and source pages. | Feed and limited structured-search metadata need no token; a token enables full docket-entry pagination. |
 | `storage.courtlistener.com` | Public PDFs already present in the RECAP archive. | Public court PDFs downloaded from validated search/API results or an exact docket/document/attachment coordinate independently reconciled to a public CourtListener record. |
+| `www.supremecourt.gov` | Official Supreme Court docket pages and court-hosted filings for tracked matters. | Public docket metadata and PDFs; currently includes No. 26-194. |
+| `www.bop.gov` | Official Bureau of Prisons inmate locator for the verified register number. | Current public facility designation and projected-release field. The locator is not a transfer-history service and does not establish an exact transfer date. |
 | `www.federalregister.gov` | Federal Register policy search API. | Public policy metadata. |
 | `pacer.uscourts.gov` | PACER credential entry point and future fee-aware adapter. | Credential-gated official court metadata. |
 | `api.openai.com` | Optional structured AI analysis and full-text translation. | Public metadata; extracted text only when explicitly enabled; `store: false`. |

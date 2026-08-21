@@ -1,0 +1,104 @@
+{
+  "sha256": "003dd12592237252f576c6f77551868fa9dedf99cdb5cd55b58c63881140155b",
+  "caseId": "bkd-24-05249-aca",
+  "docNumber": "331",
+  "posture": "trustee_summary_judgment_motion",
+  "researchQuality": "body_verified_complete",
+  "reviewedAt": "2026-08-20T21:45:00+08:00",
+  "en": {
+    "summary": "This 14-page filing asks the bankruptcy court to grant the Chapter 11 trustee summary judgment on Claims 17-21 and 26. The attached proposed judgment would declare that the ownership interests and assets of ACA Capital Group Ltd. and five Himalaya entities belong to the debtor or estate, require immediate turnover of ownership, control, and assets, authorize correction of corporate records, and support foreign enforcement. No judge signed the proposed judgment in this filing.",
+    "plainEnglish": "The trustee is asking the court to decide six ownership claims without a trial. Think of the attached judgment as the order the trustee wants the judge to sign, not an order the judge has already signed. Until the court rules, the requested ownership transfer and turnover have not been granted by this document.",
+    "legalReading": [
+      "Pages 1-3 invoke Civil Rule 56 and Bankruptcy Rules 7001 and 7056 and identify the six claims for which the trustee seeks summary judgment.",
+      "Page 3 also invokes Rule 54(b), seeking an immediately final judgment on these claims before the rest of the adversary proceeding is resolved.",
+      "Pages 7-12 are expressly labeled a proposed judgment and contain blank fields for the date and docket number of any future summary-judgment order.",
+      "Pages 8-11 would treat the ownership interests and assets of HIFG, HIR, HIC, HIP, HCCP, and ACA Capital as estate property and require turnover and corporate-record correction.",
+      "Page 12 requests immediate effectiveness without a Rule 7062 stay and authority for the trustee to seek implementation in foreign countries. These provisions have no operative effect unless adopted by the court."
+    ],
+    "caseConnections": [
+      "Read the motion with Doc. 331-1, the trustee's legal memorandum; Doc. 331-2, the Rule 56 fact statement; the supporting declarations and exhibits; the defendants' Doc. 192 answer and later opposition; and the eventual court ruling.",
+      "The requested relief intersects with the main bankruptcy estate, criminal forfeiture, foreign corporate records, the pending Supreme Court petition in No. 26-194, and other alter-ego adversary proceedings, but each forum applies a distinct claim and procedural standard."
+    ],
+    "whyItMatters": [
+      "If granted substantially as proposed, the ruling would be a major estate-ownership decision affecting six entities, their assets, corporate control, and cross-border enforcement.",
+      "The Rule 54(b) request could create an appealable judgment before the entire adversary proceeding ends."
+    ],
+    "verificationTasks": [
+      "Collect the defendants' opposition, counterstatement of facts, reply, hearing record, and the court's signed order before reporting an outcome.",
+      "Check whether the court grants Rule 54(b) finality, immediate enforcement, foreign-representative authority, and every entity-specific remedy requested."
+    ],
+    "riskFlags": [
+      "Do not describe the attached proposed judgment as an entered judgment or an ownership finding.",
+      "Do not treat a request for summary judgment as proof that no genuine dispute of material fact exists.",
+      "Do not merge bankruptcy-estate ownership, criminal forfeiture, and shareholder title into one legal concept."
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "The trustee seeks summary judgment on six claims concerning ACA Capital and five Himalaya entities.",
+        "confidence": "high",
+        "pages": [1, 2, 3]
+      },
+      {
+        "section": "legalReading",
+        "text": "The requested judgment would direct turnover of entity ownership, control, and assets and authorize corporate-record correction.",
+        "confidence": "high",
+        "pages": [8, 9, 10, 11]
+      },
+      {
+        "section": "riskFlags",
+        "text": "The attached judgment is expressly proposed and contains blank future-order fields; it is not an entered court ruling.",
+        "confidence": "high",
+        "pages": [7, 12]
+      }
+    ]
+  },
+  "zh": {
+    "summary": "这份 14 页文件请求破产法院就第十七至二十一及第二十六项诉因向第 11 章受托人作出简易判决。附件拟议判决要求宣告 ACA Capital Group Ltd. 和五家 Himalaya 实体的所有权权益及资产属于债务人或破产财产，并要求立即移交所有权、控制权和资产，授权更正公司记录及境外执行。本文件中的拟议判决没有法官签名。",
+    "plainEnglish": "受托人希望法院不用正式审判，就直接决定六项所有权争议。可以把附件理解为受托人递给法官的“希望签署的判决草案”，不是法官已经签过的命令。法院正式裁定前，单靠这份文件并没有完成所有权转移或资产交付。",
+    "legalReading": [
+      "第 1-3 页援引《联邦民事诉讼规则》第 56 条、《破产程序规则》第 7001 和 7056 条，并列明受托人请求简易判决的六项诉因。",
+      "第 3 页同时援引 Rule 54(b)，要求在整个对抗程序尚未结束前，就这些诉因录入可立即作为终局处理的判决。",
+      "第 7-12 页明确标注为“拟议判决”，未来简易判决命令的日期和案卷号仍是空白。",
+      "第 8-11 页拟把 HIFG、HIR、HIC、HIP、HCCP 和 ACA Capital 的所有权权益及资产视为破产财产，并要求移交及更正公司记录。",
+      "第 12 页还请求判决立即生效、不适用 Rule 7062 中止，并授权受托人在外国寻求执行。这些条款只有被法院采纳后才可能产生操作性效力。"
+    ],
+    "caseConnections": [
+      "必须把本动议与 Doc. 331-1 受托人法律备忘录、Doc. 331-2 Rule 56 事实陈述、支持性声明和证物、被告 Doc. 192 答辩及后续反对文件、法院最终裁定一起阅读。",
+      "请求救济与破产主案、刑事没收、境外公司记录、最高法院 26-194 号 certiorari 申请及其他人格混同对抗程序存在事实交叉，但各程序适用不同诉因和程序标准。"
+    ],
+    "whyItMatters": [
+      "如果法院基本按草案准许，该裁定将成为影响六家实体、其资产、公司控制和跨境执行的重要破产财产所有权决定。",
+      "Rule 54(b) 请求可能让这些诉因在整个对抗程序结束前形成可上诉判决。"
+    ],
+    "verificationTasks": [
+      "取得被告反对书、反事实陈述、受托人回复、听证记录和法院签署命令后，才能报告结果。",
+      "分别核对法院是否准许 Rule 54(b) 终局性、立即执行、外国代表权限及每项针对具体实体的救济。"
+    ],
+    "riskFlags": [
+      "不得把附件拟议判决写成已录入判决或法院已作出的所有权认定。",
+      "不得因为受托人提出简易判决，就认为已经证明不存在真实重大事实争议。",
+      "不得把破产财产所有权、刑事没收和公司股权登记混成同一个法律概念。"
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "受托人就涉及 ACA Capital 和五家 Himalaya 实体的六项诉因请求简易判决。",
+        "confidence": "high",
+        "pages": [1, 2, 3]
+      },
+      {
+        "section": "legalReading",
+        "text": "请求的判决将命令移交实体所有权、控制权和资产，并授权更正公司记录。",
+        "confidence": "high",
+        "pages": [8, 9, 10, 11]
+      },
+      {
+        "section": "riskFlags",
+        "text": "附件明确是拟议判决，未来命令信息仍为空白，不是法院已经录入的裁定。",
+        "confidence": "high",
+        "pages": [7, 12]
+      }
+    ]
+  }
+}

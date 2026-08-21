@@ -1,0 +1,120 @@
+{
+  "sha256": "4637daee88b350adf2aeed5fea1d70e8c5359a0b49c05a1fae47a9dc79610846",
+  "caseId": "bkd-24-05249-aca",
+  "docNumber": "331-2",
+  "posture": "trustee_rule_56_statement",
+  "researchQuality": "body_verified_complete",
+  "reviewedAt": "2026-08-20T21:45:00+08:00",
+  "en": {
+    "summary": "This 41-page redacted Local Rule 56(a)(1) statement presents 93 numbered propositions that the trustee asks the court to treat as undisputed for summary judgment. It covers nominal ownership, William Je's alleged agency role, witnesses and communications, ACA personnel and transfers, the Himalaya entities' formation and operations, public statements, funding flows, spending, prior proceedings, and Fifth Amendment invocations. It is the trustee's asserted fact map, not the court's adopted findings.",
+    "plainEnglish": "This document is the trustee's evidence checklist. Each numbered paragraph says, in effect, 'here is a fact we say the evidence proves.' The defendants can admit it, dispute it with evidence, or face procedural consequences for failing to answer properly. The list becomes a court finding only to the extent the judge later accepts or deems particular facts admitted.",
+    "legalReading": [
+      "Pages 1-2 identify the filing as a Rule 56(a)(1) statement supporting the trustee's summary-judgment motion; it is not itself evidence or a ruling.",
+      "Pages 2-4 summarize criminal-case material and prior findings that the trustee uses to support control and privity theories.",
+      "Pages 4-24 address Je's relationship with the debtor and ACA through testimony, communications, company personnel, addresses, prior rulings, and transfer summaries.",
+      "Pages 24-40 address the Himalaya entities through organization records, control and personnel allegations, recorded statements, platform operations, funding, transfers, and claimed expenditures.",
+      "Because the statement is redacted and frequently cites trustee exhibits, reliable evaluation requires the exhibits, declarations, defendants' counterstatement, and the court's ruling."
+    ],
+    "caseConnections": [
+      "The filing links the ACA/Himalaya ownership dispute to criminal Docs. 307, 395, 826, 860, and 864, prior bankruptcy decisions, bank-transfer summaries, and public broadcasts. Those sources must be kept separate by procedural posture.",
+      "Paragraphs 78-87 use historical G Coin, G Dollar, H Coin, H Dollar, and Himalaya Reserve material as part of the trustee's control narrative, making this filing relevant to cross-search between court documents and the transcript archive."
+    ],
+    "whyItMatters": [
+      "A properly supported and unanswered Rule 56 statement can cause facts to be deemed admitted, which may decide whether a trial is needed.",
+      "The numbered format provides a useful evidence map for checking each ownership and transfer claim against its cited source."
+    ],
+    "verificationTasks": [
+      "Collect the defendants' Rule 56(a)(2) response and opposition and build a paragraph-by-paragraph admitted, disputed, unsupported, or redacted table.",
+      "Resolve the judgment-date discrepancy against criminal Doc. 860 and the official criminal docket.",
+      "Retrieve the cited declarations and exhibits where publicly available; do not treat an exhibit citation as proof without reviewing the exhibit."
+    ],
+    "riskFlags": [
+      "Paragraph 2 says the criminal judgment issued on July 6, 2026, but criminal Doc. 860 records the judgment as entered on July 2, 2026. July 6 should not be repeated as the established judgment date.",
+      "The label 'undisputed material facts' is the filing's procedural title, not proof that the defendants or court accept every proposition.",
+      "Transfer totals and descriptions are attributed to trustee summaries and cited records; they are not automatically final tracing or ownership findings.",
+      "Redactions are visible in the public PDF and must not be filled by inference."
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "The trustee presents 93 numbered propositions in support of summary judgment concerning ACA Capital and the Himalaya entities.",
+        "confidence": "high",
+        "pages": [1, 40, 41]
+      },
+      {
+        "section": "riskFlags",
+        "text": "Paragraph 2 states July 6, 2026 for the criminal judgment, conflicting with the July 2, 2026 entry shown by criminal Doc. 860.",
+        "confidence": "high",
+        "pages": [2]
+      },
+      {
+        "section": "legalReading",
+        "text": "The statement uses funding and transfer propositions to connect ACA Capital and the Himalaya entities to the debtor and related companies.",
+        "confidence": "high",
+        "pages": [22, 23, 24, 38, 39, 40]
+      },
+      {
+        "section": "riskFlags",
+        "text": "The filing is a party's Rule 56 statement and does not itself establish that every listed fact is undisputed or true.",
+        "confidence": "high",
+        "pages": [1]
+      }
+    ]
+  },
+  "zh": {
+    "summary": "这份 41 页经删节的地方规则 56(a)(1) 事实陈述列出 93 项编号命题，受托人请求法院在简易判决中把它们视为无争议事实。内容涉及名义所有权、William Je 被指称的代理角色、证人和通信、ACA 人员及转账、Himalaya 实体的设立和运营、公开言论、资金流、支出、既往程序及第五修正案援引。它是受托人提出的事实地图，不是法院已经采纳的认定。",
+    "plainEnglish": "这相当于受托人的“证据核对清单”。每个编号段落都在说：“我们认为证据证明了这件事。”被告可以承认、用证据争议，或因没有按规则回应而承担程序后果。只有法官以后接受某项命题或依法把它视为承认，该命题才会相应成为裁判基础。",
+    "legalReading": [
+      "第 1-2 页表明这是支持受托人简易判决动议的 Rule 56(a)(1) 陈述；它本身不是证据，也不是裁定。",
+      "第 2-4 页概述受托人用于支持控制和 privity 理论的刑事案材料及既往认定。",
+      "第 4-24 页通过证言、通信、公司人员、地址、既往裁定和转账汇总讨论 Je 与债务人及 ACA 的关系。",
+      "第 24-40 页通过设立记录、控制和人员主张、录音言论、平台运营、资金、转账和被指称支出讨论 Himalaya 实体。",
+      "文件经过删节并大量引用受托人证物；可靠评价需要同时阅读证物、声明、被告反事实陈述和法院裁定。"
+    ],
+    "caseConnections": [
+      "文件把 ACA/Himalaya 所有权争议连接到刑事案 Docs. 307、395、826、860、864、既往破产裁定、银行转账汇总及公开直播。必须按各自程序姿态区分这些来源。",
+      "第 78-87 段把 G Coin、G Dollar、H Coin、H Dollar 和 Himalaya Reserve 的历史材料用于受托人的控制叙事，因此该文件适合与程序内直播文字库进行交叉检索。"
+    ],
+    "whyItMatters": [
+      "有证据支持且未被妥善回应的 Rule 56 事实可能被法院视为承认，进而决定是否还需要审判。",
+      "编号格式为逐项核对所有权和转账主张及其引用来源提供了实用证据地图。"
+    ],
+    "verificationTasks": [
+      "取得被告 Rule 56(a)(2) 回应和反对书，建立逐段的承认、争议、缺乏支持或被删节对照表。",
+      "以刑事 Doc. 860 和刑事官方案卷解决判决日期冲突。",
+      "在合法公开范围内取得被引用声明和证物；没有阅读证物前，不能把证物编号当成事实证明。"
+    ],
+    "riskFlags": [
+      "第 2 段称刑事判决于 2026 年 7 月 6 日作出，但刑事 Doc. 860 记载判决于 2026 年 7 月 2 日录入。不得把 7 月 6 日沿用为已确定判决日期。",
+      "“无争议重大事实”是该文件的程序标题，不能证明被告或法院接受每项命题。",
+      "转账总额和描述来源于受托人汇总及被引用记录，不自动构成最终资金追踪或所有权认定。",
+      "公开 PDF 中存在删节，不得通过推断补全。"
+    ],
+    "findings": [
+      {
+        "section": "summary",
+        "text": "受托人围绕 ACA Capital 和 Himalaya 实体提出 93 项编号命题支持简易判决。",
+        "confidence": "high",
+        "pages": [1, 40, 41]
+      },
+      {
+        "section": "riskFlags",
+        "text": "第 2 段写明刑事判决日期为 2026 年 7 月 6 日，与刑事 Doc. 860 显示的 2026 年 7 月 2 日录入日期冲突。",
+        "confidence": "high",
+        "pages": [2]
+      },
+      {
+        "section": "legalReading",
+        "text": "该陈述用资金和转账命题连接 ACA Capital、Himalaya 实体、债务人及相关公司。",
+        "confidence": "high",
+        "pages": [22, 23, 24, 38, 39, 40]
+      },
+      {
+        "section": "riskFlags",
+        "text": "这是当事方提交的 Rule 56 事实陈述，本身不能证明每项事实均无争议或属实。",
+        "confidence": "high",
+        "pages": [1]
+      }
+    ]
+  }
+}

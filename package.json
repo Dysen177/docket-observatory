@@ -69,6 +69,9 @@
     "test:search:fixture": "node scripts/document-search-fixture-check.mjs",
     "test:search:corpus": "node scripts/document-search-check.mjs",
     "test:search": "node scripts/document-search-fixture-check.mjs && node scripts/document-search-check.mjs",
+    "test:offline-document-read": "node scripts/document-language-quality-check.mjs && node scripts/offline-document-interpreter-check.mjs",
+    "rebuild:offline-document-reads": "node scripts/rebuild-offline-document-reads.mjs",
+    "repair:document-language": "node scripts/repair-document-analysis-language.mjs",
     "test:relationships": "node scripts/relationship-graph-check.mjs",
     "test:public-records": "node scripts/public-record-check.mjs",
     "import:public-record-transcripts": "node scripts/import-public-record-transcripts.mjs",
@@ -94,8 +97,10 @@
     "translate:public-record-transcripts:en:start": "node scripts/start-local-transcript-translation.mjs",
     "translate:public-record-transcripts:en:status": "node scripts/transcript-translation-status.mjs",
     "audit:all-transcripts": "node scripts/import-public-record-transcripts.mjs --refresh-community-transcripts --force-community-transcripts --refresh-legacy-transcripts --refresh-public-posts --concurrency=6 --delay-ms=80",
+    "import:ghot-text-archive": "node scripts/import-ghot-text-archive.mjs",
+    "test:ghot-text-archive": "node scripts/ghot-text-archive-check.mjs",
     "test:public-record-transcripts": "node scripts/public-record-transcript-check.mjs && node scripts/public-record-transcript-corpus-check.mjs",
-    "test:research-chat": "node scripts/research-chat-history-check.mjs && node scripts/research-chat-check.mjs",
+    "test:research-chat": "node scripts/research-chat-history-check.mjs && node scripts/ghot-text-archive-check.mjs && node scripts/research-chat-check.mjs",
     "test:automation-selection": "node scripts/automation-selection-check.mjs",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
@@ -126,8 +131,7 @@
       "!server/**/*.log",
       "electron/**/*",
       "package.json",
-      "build/icon.icns",
-      "build/icon.png"
+      "build/icon.icns"
     ],
     "extraResources": [
       {

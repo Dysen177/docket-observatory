@@ -222,8 +222,8 @@ function isTrackedCriminalCase(caseId, docketNumber) {
 }
 
 function isTrackedEstateCase(caseId, docketNumber) {
-  return /^(?:dconn-22-50073|bkd-|ca2-24-2504|bkd-hk-int-despins|bkd-24-)/i.test(caseId)
-    || /(?:22-50073|22-05003|24-05\d{3})/i.test(docketNumber)
+  return /^(?:dconn-22-50073|bkd-|ca2-24-2504|scotus-26-194|bkd-hk-int-despins|bkd-24-)/i.test(caseId)
+    || /(?:22-50073|22-05003|24-05\d{3}|26-194)/i.test(docketNumber)
 }
 
 export function relationshipForFile(file = {}) {
@@ -475,50 +475,60 @@ function summarizeFiles(files, processingIndex) {
 }
 
 async function readProcessingIndex(cacheDir, manifest) {
-  const [extractions, translations, aiAnalyses] = await Promise.all([
-    readJsonDirectory(path.join(cacheDir, 'pdf-text')),
-    readJsonDirectory(path.join(cacheDir, 'translations')),
-    readJsonDirectory(path.join(cacheDir, 'document-ai')),
-  ])
   const filesByHash = new Map((manifest?.files ?? []).filter((file) => file.sha256).map((file) => [file.sha256, file.url]))
   const urlsByTextHash = new Map()
   const extractedUrls = new Set()
-  for (const extraction of extractions.filter((value) => value?.status === 'extracted')) {
+  const translatedUrls = new Set()
+  const aiUrls = new Set()
+
+  await visitJsonDirectory(path.join(cacheDir, 'pdf-text'), (extraction) => {
+    if (extraction?.status !== 'extracted') return
     const sourceUrl = filesByHash.get(extraction.signature?.manifestSha256 || extraction.signature?.contentSha256)
-    if (!sourceUrl) continue
+    if (!sourceUrl) return
     extractedUrls.add(sourceUrl)
     if (extraction.textHash) urlsByTextHash.set(extraction.textHash, sourceUrl)
-  }
+  })
+  await visitJsonDirectory(path.join(cacheDir, 'translations'), (translation) => {
+    if (!['translated', 'no_translation_needed'].includes(translation?.status)) return
+    const sourceUrl = translation.sourceUrl || urlsByTextHash.get(translation.textHash)
+    if (sourceUrl) translatedUrls.add(sourceUrl)
+  })
+  await visitJsonDirectory(path.join(cacheDir, 'document-ai'), (analysis) => {
+    if (!analysis?.aiStatus?.generated || !['openai', 'anthropic', 'gemini', 'openai_compatible', 'ollama'].includes(analysis.aiStatus.provider)) return
+    const sourceUrl = analysis.sourceUrl || analysis.analysis?.sourceUrl
+    if (sourceUrl) aiUrls.add(sourceUrl)
+  })
+
   return {
     extractedUrls,
-    translatedUrls: new Set(translations
-      .filter((value) => ['translated', 'no_translation_needed'].includes(value?.status))
-      .map((value) => value.sourceUrl || urlsByTextHash.get(value.textHash))
-      .filter(Boolean)),
-    aiUrls: new Set(aiAnalyses
-      .filter((value) => value?.aiStatus?.generated && ['openai', 'anthropic', 'gemini', 'openai_compatible', 'ollama'].includes(value?.aiStatus?.provider))
-      .map((value) => value.sourceUrl || value.analysis?.sourceUrl)
-      .filter(Boolean)),
+    translatedUrls,
+    aiUrls,
   }
 }
 
-async function readJsonDirectory(directory) {
+async function visitJsonDirectory(directory, visitor, concurrency = 2) {
   let entries
   try {
     entries = await readdir(directory, { withFileTypes: true })
   } catch (error) {
-    if (error?.code === 'ENOENT') return []
+    if (error?.code === 'ENOENT') return
     throw error
   }
-  return Promise.all(entries
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-    .map(async (entry) => {
+  const filenames = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json')).map((entry) => entry.name)
+  let cursor = 0
+  const workers = Array.from({ length: Math.min(concurrency, Math.max(1, filenames.length)) }, async () => {
+    while (cursor < filenames.length) {
+      const filename = filenames[cursor]
+      cursor += 1
       try {
-        return JSON.parse(await readFile(path.join(directory, entry.name), 'utf8'))
+        visitor(JSON.parse(await readFile(path.join(directory, filename), 'utf8')))
       } catch {
-        return null
+        // A corrupt cache entry is ignored and remains visible through the
+        // processing gap counts instead of aborting the full audit.
       }
-    }))
+    }
+  })
+  await Promise.all(workers)
 }
 
 function emptyProcessingIndex() {

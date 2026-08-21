@@ -3,6 +3,7 @@ import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promi
 import path from 'node:path'
 import { createSeedState } from '../server/seed.js'
 import { allCaseRecords } from '../server/discovered-case-records.js'
+import { humanCaseResearch } from '../server/human-legal-research.js'
 
 const projectRoot = process.cwd()
 const sourceCorpusRoot = path.join(projectRoot, 'downloads', 'court-files-complete')
@@ -128,7 +129,9 @@ function assertCompleteResearchBaseline(index, seedFiles, corpusManifest, caseRe
   for (const caseRecord of caseRecords ?? []) {
     for (const language of ['zh', 'en']) {
       const prefix = `case-ai/${caseRecord.id}-${language}-`
-      if (![...caseDossierPaths].some((filePath) => filePath.startsWith(prefix))) {
+      const hasCaseAiCache = [...caseDossierPaths].some((filePath) => filePath.startsWith(prefix))
+      const hasHumanBaseline = Boolean(humanCaseResearch(caseRecord.id, corpusManifest, language))
+      if (!hasCaseAiCache && !hasHumanBaseline) {
         throw new Error(`Release baseline lacks the ${language} case dossier for ${caseRecord.id}.`)
       }
     }

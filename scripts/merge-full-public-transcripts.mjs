@@ -16,6 +16,8 @@ const internetArchiveItemUrl = 'https://archive.org/details/2004-Mar152023_Video
 const ourHimalayasDir = path.resolve(process.env.OURHIMALAYAS_TRANSCRIPT_DIR ?? path.join(root, 'output', 'ourhimalayas-txt'))
 const bearRecordsPath = path.resolve(process.env.BEARBLOG_RECORDS_PATH ?? path.join(root, 'output', 'bearblog-transcript-records.json.gz'))
 const notebookRecordsPath = path.resolve(process.env.NOTEBOOK_TRANSCRIPT_RECORDS_PATH ?? path.join(root, 'output', 'notebook-transcript-records.json.gz'))
+const englishTranscriptManifestPath = path.resolve(process.env.ENGLISH_TRANSCRIPT_MANIFEST_PATH ?? path.join(transcriptRoot, 'en', 'manifest.json'))
+const preservedTranscriptRecordsPath = path.join(root, 'scripts', 'data', 'public-record-transcript-preservation.json.gz')
 const coverageStart = '2017-01-26'
 const coverageEnd = '2023-03-14'
 const writeOutput = !process.argv.includes('--dry-run')
@@ -92,7 +94,9 @@ const recordSpecificTranscriptCorrections = {
 await mkdir(path.dirname(auditPath), { recursive: true })
 
 const { manifest, records } = await loadCurrentCorpus()
-const baseRecords = records.map(sanitizeRecordForOutput)
+const preservedRecords = await loadPreservedTranscriptRecords()
+const stableTranscriptIds = await loadStableTranscriptIds()
+const baseRecords = mergePreservedTranscriptRecords(records, preservedRecords).map(sanitizeRecordForOutput)
 const candidateGroups = [
   await loadInternetArchiveCandidates(),
   await loadOurHimalayasCandidates(),
@@ -101,7 +105,7 @@ const candidateGroups = [
 ]
 const rawCandidates = candidateGroups.flatMap((group) => group.candidates)
 const candidates = dedupeCandidates(rawCandidates).filter((candidate) => candidate.charCount >= 40)
-const merge = mergeCandidates(baseRecords, candidates)
+const merge = mergeCandidates(baseRecords, candidates, stableTranscriptIds)
 const finalRecords = clearDanglingTranscriptLinks(dedupeOutputRecords(merge.records.map(recomputeRecord)))
 finalRecords.sort((left, right) => left.date.localeCompare(right.date) || left.id.localeCompare(right.id))
 
@@ -214,6 +218,45 @@ async function loadCurrentCorpus() {
     if (!availableById.has(metadata.id)) records.push({ ...metadata, segments: [] })
   }
   return { manifest, records }
+}
+
+async function loadStableTranscriptIds() {
+  try {
+    const manifest = JSON.parse(await readFile(englishTranscriptManifestPath, 'utf8'))
+    const entries = (manifest.records ?? [])
+      .filter((record) => String(record.id ?? '').startsWith('archival-') && record.sourceContentSha256)
+      .map((record) => [record.sourceContentSha256, record.id])
+    return new Map(entries)
+  } catch (error) {
+    if (error?.code === 'ENOENT') return new Map()
+    throw error
+  }
+}
+
+async function loadPreservedTranscriptRecords() {
+  const payload = JSON.parse((await gunzipAsync(await readFile(preservedTranscriptRecordsPath))).toString('utf8'))
+  return Array.isArray(payload.records) ? payload.records : []
+}
+
+function mergePreservedTranscriptRecords(records, preservedRecords) {
+  const output = [...records]
+  const byId = new Map(output.map((record) => [record.id, record]))
+  const byHash = new Map(output.filter((record) => record.contentSha256).map((record) => [record.contentSha256, record]))
+  for (const preserved of preservedRecords) {
+    const existing = byId.get(preserved.id)
+    if (existing) {
+      const preferPreserved = preserved.transcriptStatus === 'available'
+        && Number(preserved.charCount ?? 0) > Number(existing.charCount ?? 0)
+      if (preferPreserved) Object.assign(existing, preserved)
+      continue
+    }
+    const identical = preserved.contentSha256 ? byHash.get(preserved.contentSha256) : null
+    if (identical) continue
+    output.push(preserved)
+    byId.set(preserved.id, preserved)
+    if (preserved.contentSha256) byHash.set(preserved.contentSha256, preserved)
+  }
+  return output
 }
 
 async function loadInternetArchiveCandidates() {
@@ -498,7 +541,7 @@ function articleHeading(markdown) {
   return headings[0] ?? { title: '', bodyStart: 0 }
 }
 
-function mergeCandidates(records, candidates) {
+function mergeCandidates(records, candidates, stableTranscriptIds = new Map()) {
   const recordsById = new Map(records.map((record) => [record.id, record]))
   const byDate = Map.groupBy(records, (record) => record.date)
   const byHash = new Map(records.filter((record) => record.transcriptStatus === 'available').map((record) => [hashRecordText(record), record]))
@@ -514,6 +557,20 @@ function mergeCandidates(records, candidates) {
     if (exactDuplicate) {
       mergeCandidateSources(exactDuplicate, candidate, false)
       rejectedDuplicates.push({ candidate, record: exactDuplicate, method: 'exact_text' })
+      continue
+    }
+
+    const candidateTranscriptHash = transcriptHash(untimedSegments(candidate.paragraphs, null))
+    const stableId = stableTranscriptIds.get(candidateTranscriptHash)
+    if (stableId && !recordsById.has(stableId)) {
+      const record = syntheticRecordFromCandidate(candidate, recordsById, stableId)
+      records.push(record)
+      recordsById.set(record.id, record)
+      if (!byDate.has(record.date)) byDate.set(record.date, [])
+      byDate.get(record.date).push(record)
+      indexRecordMedia(record, byMedia)
+      byHash.set(hashRecordText(record), record)
+      added.push({ candidate, record, sourceType: candidate.sourceType, method: 'stable_archival_identity' })
       continue
     }
 
@@ -642,8 +699,8 @@ function mergeCandidateSources(record, candidate, selected) {
   }
 }
 
-function syntheticRecordFromCandidate(candidate, recordsById) {
-  let id = `archival-${candidate.contentHash.slice(0, 16)}`
+function syntheticRecordFromCandidate(candidate, recordsById, preferredId = null) {
+  let id = preferredId || `archival-${candidate.contentHash.slice(0, 16)}`
   let suffix = 1
   while (recordsById.has(id)) {
     suffix += 1
@@ -890,6 +947,7 @@ function recomputeRecord(record) {
 function sanitizeRecordForOutput(record) {
   const output = { ...record }
   delete output.sourceAudit
+  delete output.gettrSearchTranscriptAudit
   if (typeof output.title === 'string') output.title = normalizeTranscriptTitle(output.title)
   output.originalLinks = normalizeLinks(output.originalLinks ?? [])
   output.transcriptSourceLinks = normalizeLinks(output.transcriptSourceLinks ?? [])
@@ -903,12 +961,12 @@ function sanitizeRecordForOutput(record) {
 function sanitizeObject(value) {
   if (Array.isArray(value)) return value.map(sanitizeObject).filter((item) => item !== null)
   if (!value || typeof value !== 'object') {
-    if (typeof value === 'string' && value.includes('ghot.ai')) return null
+    if (typeof value === 'string' && /(?:ghot\.ai|gettrsearch)/iu.test(value)) return null
     return value
   }
   const output = {}
   for (const [key, item] of Object.entries(value)) {
-    if (typeof item === 'string' && item.includes('ghot.ai')) continue
+    if (typeof item === 'string' && /(?:ghot\.ai|gettrsearch)/iu.test(item)) continue
     const sanitized = sanitizeObject(item)
     if (sanitized !== null) output[key] = sanitized
   }
@@ -919,12 +977,13 @@ function stripPrivateAudit(audit) {
   if (!audit || typeof audit !== 'object') return {}
   const output = sanitizeObject(audit)
   delete output.upstreamCatalogUrl
+  delete output.gettrSearchTranscripts
   return output
 }
 
 function assertNoDisallowedSource(manifest, yearRecords) {
   const serialized = `${JSON.stringify(manifest)}\n${JSON.stringify(yearRecords)}`
-  if (/ghot\.ai/iu.test(serialized)) throw new Error('Disallowed GHOT source URL leaked into public transcript corpus.')
+  if (/(?:ghot\.ai|gettrsearch)/iu.test(serialized)) throw new Error('A disallowed verification-source URL leaked into the public transcript corpus.')
 }
 
 function sourceLinks(candidate) {
@@ -959,7 +1018,7 @@ function safePublicUrl(value) {
     const url = new URL(String(value ?? '').replace(/&amp;/giu, '&').replace(/[.,;]+$/gu, ''))
     if (!['http:', 'https:'].includes(url.protocol)) return null
     const host = url.hostname.replace(/^www\./u, '').toLowerCase()
-    if (host === 'ghot.ai') return null
+    if (host === 'ghot.ai' || host === 'gettrsearch.com' || host === 'gettrsearchassets.s3.amazonaws.com') return null
     if (/\.(?:jpe?g|png|webp|gif|svg)(?:$|\?)/iu.test(url.pathname)) return null
     url.protocol = 'https:'
     url.hostname = host

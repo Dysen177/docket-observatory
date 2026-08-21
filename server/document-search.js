@@ -5,9 +5,11 @@ import { promisify } from 'node:util'
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads'
 import { gzip as gzipCallback, gunzip as gunzipCallback } from 'node:zlib'
 import { atomicWriteJson } from './atomic-write.js'
+import { compareDocketNumbers, docketNumberParts } from './docket-number.js'
 import { normalizeLegalMetadataText } from './legal-metadata.js'
+import { documentAnalysisQualityCurrent } from './document-language-quality.js'
 
-const searchIndexVersion = 'document-search-v4'
+const searchIndexVersion = 'document-search-v7'
 const extractionCacheVersion = 8
 const translationCacheVersion = 'translation-v7'
 const validScopes = new Set(['all', 'original', 'translation', 'analysis', 'web'])
@@ -16,6 +18,12 @@ const bloomBitCount = 32768
 const bloomWordCount = bloomBitCount / 32
 const searchReadConcurrency = 10
 const orphanedSearchTextRetentionMs = 7 * 24 * 60 * 60 * 1000
+const primaryCriminalCaseId = 'sdny-23-cr-118'
+const primaryCriminalDocket = '1:23-cr-118'
+const relatedCriminalCaseOrder = new Map([
+  ['ca2-26-1853', 0],
+  ['ca2-26-563-dx', 1],
+])
 const cacheRoot = path.resolve(process.env.GUO_INTEL_CACHE_DIR ?? path.join(process.cwd(), 'server', 'cache'))
 const indexPath = path.join(cacheRoot, 'document-search-index.json')
 const searchTextDirectory = path.join(cacheRoot, 'document-search-text')
@@ -68,8 +76,24 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
     }
   }).filter(Boolean)
 
-  const filtered = collapseLogicalCatalogResults(matchedRecords, records, compiled, logicalKeys, language)
-  filtered.sort((left, right) => right.score - left.score || compareCatalogRecords(left.record, right.record))
+  const exactDocketMatches = ['all', 'analysis'].includes(scope)
+    ? matchedRecords.filter((item) => exactDocketCoordinateMatch(item.record, query))
+    : []
+  const exactDocumentNumber = exactDocketMatches.length ? null : ['all', 'analysis'].includes(scope) ? exactDocumentNumberQuery(query) : null
+  const exactDocumentMatches = exactDocumentNumber
+    ? matchedRecords.filter((item) => normalizeDocumentSearchText(item.record.docNumber ?? '') === exactDocumentNumber)
+    : []
+  const selectedRecords = exactDocketMatches.length
+    ? exactDocketMatches
+    : exactDocumentMatches.length
+      ? exactDocumentMatches
+      : matchedRecords
+  const filtered = collapseLogicalCatalogResults(selectedRecords, records, compiled, logicalKeys, language)
+  filtered.sort((left, right) => (
+    right.score - left.score
+    || (query.raw ? searchResultAvailabilityRank(right.record) - searchResultAvailabilityRank(left.record) : 0)
+    || compareDocumentCatalogRecords(left.record, right.record)
+  ))
   return {
     generatedAt: new Date().toISOString(),
     total: new Set(logicalKeys.values()).size,
@@ -91,6 +115,27 @@ export async function searchDocumentCatalog(manifest, records, options = {}) {
   }
 }
 
+function exactDocumentNumberQuery(query) {
+  const value = query.normalized
+  if (/^[0-9]+(?:-[0-9]+)?$/.test(value)) return value
+  return value.match(/^(?:doc(?:ument)?|文件|文书|案卷)\s*([0-9]+(?:-[0-9]+)?)$/)?.[1]
+    ?? value.match(/^([0-9]+(?:-[0-9]+)?)\s*(?:号)?(?:文件|文书|案卷)$/)?.[1]
+    ?? null
+}
+
+function exactDocketCoordinateMatch(record, query) {
+  const docket = normalizeDocumentSearchText(record?.docketNumber ?? '')
+  return Boolean(docket && query.normalized === docket)
+}
+
+function searchResultAvailabilityRank(record) {
+  const localPdf = record?.resourceKind === 'pdf' && localFileStatuses.has(record?.status)
+  if (!localPdf) return 0
+  if (record?.aiStatus?.provider === 'human_research') return 400
+  if (record?.aiStatus?.provider === 'local_rules') return 300
+  return 200
+}
+
 function collapseLogicalCatalogResults(items, records, compiled, logicalKeys, language) {
   const allRecordGroups = groupBy(records, (record) => logicalKeys.get(catalogRecordIdentity(record)))
   const groups = groupBy(items, (item) => logicalKeys.get(catalogRecordIdentity(item.record)))
@@ -106,20 +151,42 @@ function collapseLogicalCatalogResults(items, records, compiled, logicalKeys, la
     const canonical = [...group].sort((left, right) => (
       canonicalCatalogRank(right, compiled) - canonicalCatalogRank(left, compiled)
       || right.score - left.score
-      || compareCatalogRecords(left.record, right.record)
+      || compareDocumentCatalogRecords(left.record, right.record)
     ))[0]
+    const readDonor = [...group].sort((left, right) => (
+      logicalReadRank(right.record) - logicalReadRank(left.record)
+      || canonicalCatalogRank(right, compiled) - canonicalCatalogRank(left, compiled)
+    ))[0]?.record
     const score = Math.max(...matchedGroup.map((item) => item.score))
     const searchMatches = uniqueSearchMatches(matchedGroup)
     const sourceAlternatives = mergeLogicalSourceAlternatives(canonical.record, group, documents, compiled, language)
     return {
       record: {
         ...canonical.record,
+        ...(readDonor?.plainEnglish && readDonor.sourceUrl !== canonical.record.sourceUrl
+          ? { plainEnglish: readDonor.plainEnglish }
+          : {}),
         ...(searchMatches.length ? { searchMatches, searchScore: score } : {}),
         ...(sourceAlternatives.length ? { sourceAlternatives } : {}),
       },
       score,
     }
   })
+}
+
+function logicalReadRank(record) {
+  const providerRank = {
+    human_research: 10000,
+    openai: 8000,
+    anthropic: 8000,
+    gemini: 8000,
+    openai_compatible: 8000,
+    ollama: 8000,
+    local_rules: 2000,
+  }[record?.aiStatus?.provider] ?? 0
+  const specificity = Number(record?.offlineRead?.specificity ?? 0)
+  const hasRead = String(record?.plainEnglish ?? '').trim() ? 100 : 0
+  return providerRank + specificity * 10 + hasRead
 }
 
 function buildLogicalCatalogRecordKeys(records, compiled) {
@@ -293,7 +360,7 @@ function logicalAlternativeNote(byteIdentical, languageVariant, language) {
 
 export async function refreshDocumentSearchIndex(manifest) {
   const signature = await documentSearchSignature(manifest)
-  const index = await startIndexBuild(manifest, signature, false)
+  const index = await startIndexBuild(manifest, signature, true)
   return {
     schemaVersion: searchIndexVersion,
     generatedAt: index.generatedAt,
@@ -603,9 +670,10 @@ async function buildDocumentSearchIndex(manifest, signature) {
   const analyses = await scanJsonDirectory('document-ai', async (value, cacheFile) => {
     const file = currentByUrl.get(value?.sourceUrl)
     if (!file || value?.sourceSha256 !== file.sha256 || !value?.aiStatus?.generated) return null
+    const language = documentAnalysisLanguage(value)
+    if (!documentAnalysisQualityCurrent({ ...value, analysisLanguage: language })) return null
     const chunks = legalAnalysisChunks(value)
     if (!chunks.length) return null
-    const language = documentAnalysisLanguage(value)
     return { sha256: file.sha256, language, entry: await indexedAnalysis(value, cacheFile, chunks) }
   })
 
@@ -916,6 +984,7 @@ function searchCatalogMetadata(record, query, scope) {
   const aliases = record.searchAliases ?? []
   const docNumber = normalizeDocumentSearchText(record.docNumber ?? '')
   const caseId = normalizeDocumentSearchText(record.caseId ?? '')
+  const docketNumber = normalizeDocumentSearchText(record.docketNumber ?? '')
   const title = normalizeDocumentSearchText(`${record.title ?? ''} ${record.originalTitle ?? ''}`)
   const direct = normalizeDocumentSearchText([
     record.docNumber ? `doc ${record.docNumber} document ${record.docNumber} 文件 ${record.docNumber}` : '',
@@ -934,16 +1003,20 @@ function searchCatalogMetadata(record, query, scope) {
   ].filter(Boolean).join(' '))
   const web = record.resourceKind === 'web_page' ? normalizeDocumentSearchText(`${direct} ${analysis}`) : ''
   const normalizedQuery = query.normalized
-  const docExpression = normalizedQuery.match(/^(?:doc(?:ument)?|文件)\s*([0-9]+(?:-[0-9]+)?)$/)?.[1]
-  if (scope === 'all' && docNumber && (normalizedQuery === docNumber || docExpression === docNumber)) {
+  const docExpression = exactDocumentNumberQuery(query)
+  if (['all', 'analysis'].includes(scope) && docNumber && (normalizedQuery === docNumber || docExpression === docNumber)) {
     return metadataMatch(record, query, 'docket_number', 1400)
   }
-  if (scope === 'all' && caseId && normalizedQuery === caseId) return metadataMatch(record, query, 'docket_number', 1360)
-  if (scope === 'all' && title === normalizedQuery) return metadataMatch(record, query, 'title', 1240)
-  if (scope === 'all' && aliases.some((alias) => normalizeDocumentSearchText(alias) === normalizedQuery)) return metadataMatch(record, query, 'title', 1160)
+  if (['all', 'analysis'].includes(scope) && docketNumber && normalizedQuery === docketNumber) return metadataMatch(record, query, 'docket_number', 1360)
+  if (['all', 'analysis'].includes(scope) && caseId && normalizedQuery === caseId) return metadataMatch(record, query, 'docket_number', 1360)
+  if (['all', 'analysis'].includes(scope) && title === normalizedQuery) return metadataMatch(record, query, 'title', 1240)
+  if (['all', 'analysis'].includes(scope) && aliases.some((alias) => normalizeDocumentSearchText(alias) === normalizedQuery)) return metadataMatch(record, query, 'title', 1160)
   if (scope === 'web' && textMatchesQuery(web, query)) return metadataMatch(record, query, 'web_page', 680)
-  if (scope === 'all' && textMatchesQuery(direct, query)) return metadataMatch(record, query, record.resourceKind === 'web_page' ? 'web_page' : 'title', 1040)
   if (['all', 'analysis'].includes(scope) && textMatchesQuery(analysis, query)) return metadataMatch(record, query, record.resourceKind === 'web_page' ? 'web_page' : 'legal_analysis', record.resourceKind === 'web_page' ? 650 : 430)
+  if (['all', 'analysis'].includes(scope) && textMatchesQuery(direct, query)) {
+    const score = scope === 'analysis' ? 390 : 1040
+    return metadataMatch(record, query, record.resourceKind === 'web_page' ? 'web_page' : 'title', score)
+  }
   return null
 }
 
@@ -1279,15 +1352,14 @@ function detectLanguage(value) {
 }
 
 async function documentSearchSignature(manifest) {
-  const directories = ['pdf-text', 'translations', 'document-ai']
-  const stamps = await Promise.all(directories.map(async (name) => {
-    const info = await stat(path.join(cacheRoot, name)).catch(() => null)
-    return [name, info?.mtimeMs ?? 0]
-  }))
   const files = (manifest?.files ?? [])
     .map((file) => [file.url, file.sha256, file.status, file.path])
     .sort((left, right) => String(left[0]).localeCompare(String(right[0])))
-  return createHash('sha256').update(JSON.stringify({ version: searchIndexVersion, files, stamps })).digest('hex')
+  // Cache files are written continuously during automation. Their directory
+  // mtimes must not make every foreground search launch another full rebuild.
+  // Automation calls refreshDocumentSearchIndex explicitly after its batch;
+  // manifest changes still invalidate the index immediately.
+  return createHash('sha256').update(JSON.stringify({ version: searchIndexVersion, files })).digest('hex')
 }
 
 async function scanJsonDirectory(relativeDirectory, transform) {
@@ -1363,11 +1435,86 @@ function groupBy(values, keyFor) {
   return groups
 }
 
-function compareCatalogRecords(left, right) {
-  const leftDate = left.publishedAt ?? left.capturedAt ?? ''
-  const rightDate = right.publishedAt ?? right.capturedAt ?? ''
-  if (leftDate !== rightDate) return rightDate.localeCompare(leftDate)
-  return String(right.docNumber ?? '').localeCompare(String(left.docNumber ?? ''), undefined, { numeric: true })
+export function compareDocumentCatalogRecords(left, right) {
+  const leftCase = documentCatalogCaseGroup(left)
+  const rightCase = documentCatalogCaseGroup(right)
+  if (leftCase.familyRank !== rightCase.familyRank) return leftCase.familyRank - rightCase.familyRank
+  if (leftCase.caseRank !== rightCase.caseRank) return leftCase.caseRank - rightCase.caseRank
+
+  const caseOrder = leftCase.key.localeCompare(rightCase.key, 'en', { numeric: true, sensitivity: 'base' })
+  if (caseOrder) return caseOrder
+
+  const documentNumberOrder = compareCatalogDocumentNumbers(left.docNumber, right.docNumber)
+  if (documentNumberOrder) return documentNumberOrder
+
+  return String(left.categoryKey ?? left.category ?? '').localeCompare(String(right.categoryKey ?? right.category ?? ''), 'en', { sensitivity: 'base' })
+    || String(left.title ?? '').localeCompare(String(right.title ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+    || String(left.docketNumber ?? '').localeCompare(String(right.docketNumber ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+    || String(left.caseId ?? '').localeCompare(String(right.caseId ?? ''), undefined, { numeric: true, sensitivity: 'base' })
+    || String(left.sourceUrl ?? '').localeCompare(String(right.sourceUrl ?? ''))
+}
+
+function documentCatalogCaseGroup(record) {
+  const caseId = String(record.caseId ?? '').trim().toLowerCase()
+  const docket = normalizeDocketCoordinate(record.docketNumber)
+  const key = docket || caseId || `source:${String(record.sourceId ?? record.sourceUrl ?? '').trim().toLowerCase()}`
+
+  if (record.resourceKind === 'web_page') return { familyRank: 6, caseRank: 0, key }
+
+  if (caseId === primaryCriminalCaseId || docket === primaryCriminalDocket) {
+    return { familyRank: 0, caseRank: 0, key: primaryCriminalDocket }
+  }
+
+  if (relatedCriminalCaseOrder.has(caseId)) {
+    return { familyRank: 1, caseRank: relatedCriminalCaseOrder.get(caseId), key }
+  }
+
+  if (/(?:^|-)cr-|(?:^|-)mj-/.test(docket) || /(?:^|-)cr(?:iminal)?(?:-|$)/.test(caseId)) {
+    return { familyRank: 2, caseRank: 0, key }
+  }
+
+  if (caseId === 'sdny-23-cv-2200' || caseId.startsWith('sec-') || record.categoryKey === 'Civil Enforcement' || record.categoryKey === 'Fair Fund') {
+    return { familyRank: 3, caseRank: caseId === 'sdny-23-cv-2200' ? 0 : 1, key }
+  }
+
+  if (isBankruptcyCatalogRecord(record, caseId)) {
+    const bankruptcyCaseOrder = caseId === 'dconn-22-50073'
+      ? 0
+      : caseId === 'ca2-24-2504'
+        ? 1
+        : caseId === 'scotus-26-194'
+          ? 2
+          : 3
+    return { familyRank: 4, caseRank: bankruptcyCaseOrder, key }
+  }
+
+  if (docket || caseId) return { familyRank: 5, caseRank: 0, key }
+  return { familyRank: 6, caseRank: 0, key }
+}
+
+function isBankruptcyCatalogRecord(record, caseId) {
+  const docket = String(record.docketNumber ?? '').trim().toLowerCase()
+  return caseId.startsWith('bkd-')
+    || caseId.startsWith('discovered-ctb-')
+    || caseId.startsWith('discovered-nysb-')
+    || caseId === 'dconn-22-50073'
+    || caseId === 'ca2-24-2504'
+    || caseId === 'scotus-26-194'
+    || caseId.startsWith('dconn-26-')
+    || /(?:^|-)bk-/.test(docket)
+    || ['Bankruptcy', 'Bankruptcy Appeal'].includes(record.categoryKey)
+}
+
+function compareCatalogDocumentNumbers(left, right) {
+  const leftText = String(left ?? '').trim()
+  const rightText = String(right ?? '').trim()
+  if (!leftText || !rightText) return leftText ? -1 : rightText ? 1 : 0
+
+  const leftIsNumeric = docketNumberParts(leftText).length > 0
+  const rightIsNumeric = docketNumberParts(rightText).length > 0
+  if (leftIsNumeric !== rightIsNumeric) return leftIsNumeric ? -1 : 1
+  if (leftIsNumeric) return compareDocketNumbers(rightText, leftText)
+  return leftText.localeCompare(rightText, undefined, { numeric: true, sensitivity: 'base' })
 }
 
 function withoutInternalScore(match) {

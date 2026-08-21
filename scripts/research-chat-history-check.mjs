@@ -23,6 +23,7 @@ try {
     content: '回答正文 [D1]',
     response: {
       answer: '回答正文 [D1]',
+      mode: 'research',
       confidenceNote: '需要核对原始文件。',
       reviewNote: '研究辅助。',
       provider: 'openai_compatible',
@@ -44,6 +45,7 @@ try {
   ])
   assert.equal(first.conversation.messageCount, 2)
   assert.equal(first.response.answer, '回答正文 [D1]')
+  assert.equal(first.response.mode, 'research')
   assert.equal(duplicate.conversation.messageCount, 2, 'Concurrent retries of the same turn must not duplicate messages.')
 
   let conversations = await history.listResearchConversations()
@@ -51,6 +53,7 @@ try {
   assert.match(conversations[0].title, /PACER/u)
   let conversation = await history.getResearchConversation(conversationId)
   assert.equal(conversation.messages.length, 2)
+  assert.equal(conversation.messages[1].response.mode, 'research')
   assert.equal(conversation.messages[0].content.includes(fixtureSecret), false)
   assert.doesNotMatch(conversation.messages[0].content, /\/Users\/example/u)
 

@@ -21,10 +21,10 @@ const sourcePriority = new Map([
 
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
 const [extractions, translations, analyses, caseAnalyses] = await Promise.all([
-  readJsonDirectory(path.join(cacheRoot, 'pdf-text')),
-  readJsonDirectory(path.join(cacheRoot, 'translations')),
-  readJsonDirectory(path.join(cacheRoot, 'document-ai')),
-  readJsonDirectory(path.join(cacheRoot, 'case-ai')),
+  readJsonDirectory(path.join(cacheRoot, 'pdf-text'), compactExtraction),
+  readJsonDirectory(path.join(cacheRoot, 'translations'), compactTranslation),
+  readJsonDirectory(path.join(cacheRoot, 'document-ai'), compactAnalysis),
+  readJsonDirectory(path.join(cacheRoot, 'case-ai'), compactCaseAnalysis),
 ])
 
 const extractionByHash = indexBy(extractions, (item) => item.signature?.manifestSha256 || item.signature?.contentSha256)
@@ -66,7 +66,7 @@ console.log(JSON.stringify(summary, null, 2))
 function auditPhysicalRecord(file) {
   const extraction = bestForFile(extractionByHash, null, file)
   const translation = bestForFile(translationByHash, translationByUrl, file)
-  const analysis = bestForFile(analysisByHash, analysisByUrl, file)
+  const analysis = bestAnalysisForFile(analysisByHash, analysisByUrl, file)
   const humanResearch = humanDocumentResearch(file, 'zh')
   const effectiveAnalysis = analysis ?? syntheticHumanAnalysis(humanResearch)
   const variant = documentVariant(file)
@@ -143,7 +143,7 @@ function classifyTranslation(value, file) {
   if (value.status === 'no_translation_needed' || value.mode === 'source-already-target-language') return 'not_needed'
   if (value.mode === '本地法律词表辅助译文；非完整法律翻译' || value.mode === 'local-legal-glossary') return 'glossary_assist'
   if (['requires-openai', 'body-transmission-disabled', 'source-language-retained'].includes(value.mode)) return 'pending'
-  if (value.status === 'translated' && value.translatedText) return 'complete_generated'
+  if (value.status === 'translated' && hasTranslatedText(value)) return 'complete_generated'
   return 'unknown'
 }
 
@@ -173,8 +173,8 @@ function detectIssues(context) {
   const citations = Array.isArray(analysis?.citations) ? analysis.citations : []
   const validCitations = citations.filter((citation) => Number(citation?.pageNumber) > 0 && String(citation?.originalText ?? '').trim())
   if (analysis && validCitations.length === 0) issues.push('page_citations_missing')
-  if (analysis && !Array.isArray(analysis.aiFindings)) issues.push('structured_findings_missing')
-  if (translation && translationQuality === 'complete_generated' && !String(translation.translatedText ?? '').trim()) issues.push('translated_body_empty')
+  if (analysis && !hasStructuredFindings(analysis)) issues.push('structured_findings_missing')
+  if (translation && translationQuality === 'complete_generated' && !hasTranslatedText(translation)) issues.push('translated_body_empty')
   return [...new Set(issues)]
 }
 
@@ -277,7 +277,7 @@ function summarizeAnalysis(value) {
     generated: Boolean(value.aiStatus?.generated),
     citationCount: citations.length,
     citedPages: [...new Set(citations.map((item) => Number(item.pageNumber)).filter((page) => page > 0))],
-    findingCount: Array.isArray(value.aiFindings) ? value.aiFindings.length : 0,
+    findingCount: value.findingCount ?? (Array.isArray(value.aiFindings) ? value.aiFindings.length : 0),
   }
 }
 
@@ -400,6 +400,25 @@ function bestForFile(byHash, byUrl, file) {
   return [...hashMatches, ...urlMatches].sort((a, b) => timestamp(b) - timestamp(a))[0] ?? null
 }
 
+function bestAnalysisForFile(byHash, byUrl, file) {
+  const providerRank = {
+    human_research: 5,
+    openai: 4,
+    anthropic: 4,
+    gemini: 4,
+    openai_compatible: 4,
+    ollama: 4,
+    local_rules: 2,
+  }
+  const hashMatches = file.sha256 ? byHash.get(file.sha256) ?? [] : []
+  const urlMatches = file.url ? byUrl.get(file.url) ?? [] : []
+  return [...hashMatches, ...urlMatches].sort((a, b) => {
+    const leftProvider = a?.aiStatus?.provider ?? a?.provider ?? ''
+    const rightProvider = b?.aiStatus?.provider ?? b?.provider ?? ''
+    return (providerRank[rightProvider] ?? 0) - (providerRank[leftProvider] ?? 0) || timestamp(b) - timestamp(a)
+  })[0] ?? null
+}
+
 function timestamp(value) {
   return Date.parse(value?.reviewedAt ?? value?.generatedAt ?? value?.translatedAt ?? value?.extractedAt ?? 0) || 0
 }
@@ -415,7 +434,7 @@ function indexBy(values, keyFor) {
   return result
 }
 
-async function readJsonDirectory(directory) {
+async function readJsonDirectory(directory, compact = (value) => value) {
   let entries = []
   try {
     entries = await readdir(directory, { withFileTypes: true })
@@ -423,13 +442,90 @@ async function readJsonDirectory(directory) {
     return []
   }
   const files = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-  return (await Promise.all(files.map(async (entry) => {
+  const values = []
+  for (const entry of files) {
     try {
-      return JSON.parse(await readFile(path.join(directory, entry.name), 'utf8'))
+      const value = compact(JSON.parse(await readFile(path.join(directory, entry.name), 'utf8')))
+      if (value) values.push(value)
     } catch {
-      return null
+      // Invalid cache entries are omitted from inventory and surfaced as missing coverage.
     }
-  }))).filter(Boolean)
+  }
+  return values
+}
+
+function compactExtraction(value) {
+  return {
+    signature: {
+      manifestSha256: value.signature?.manifestSha256 ?? null,
+      contentSha256: value.signature?.contentSha256 ?? null,
+    },
+    status: value.status ?? null,
+    engine: value.engine ?? null,
+    coverage: value.coverage ?? null,
+    totalPages: value.totalPages ?? null,
+    pagesParsed: value.pagesParsed ?? null,
+    charCount: Number(value.charCount ?? value.snippet?.length ?? 0),
+    textHash: value.textHash ?? null,
+    warning: value.warning ?? null,
+    extractedAt: value.extractedAt ?? null,
+  }
+}
+
+function compactTranslation(value) {
+  return {
+    sourceSha256: value.sourceSha256 ?? null,
+    sourceUrl: value.sourceUrl ?? null,
+    status: value.status ?? null,
+    mode: value.mode ?? null,
+    targetLanguage: value.targetLanguage ?? null,
+    charCount: Number(value.charCount ?? value.translatedText?.length ?? 0),
+    hasTranslatedText: Boolean(String(value.translatedText ?? '').trim()),
+    coverage: value.coverage ?? null,
+    reviewedAt: value.reviewedAt ?? null,
+    generatedAt: value.generatedAt ?? null,
+    translatedAt: value.translatedAt ?? null,
+  }
+}
+
+function compactAnalysis(value) {
+  const citations = Array.isArray(value.citations) ? value.citations : []
+  return {
+    sourceSha256: value.sourceSha256 ?? null,
+    sourceUrl: value.sourceUrl ?? null,
+    provider: value.provider ?? null,
+    mode: value.mode ?? null,
+    aiStatus: {
+      provider: value.aiStatus?.provider ?? null,
+      mode: value.aiStatus?.mode ?? null,
+      generated: Boolean(value.aiStatus?.generated),
+    },
+    citations: citations.map((citation) => ({
+      pageNumber: citation?.pageNumber ?? null,
+      originalText: Boolean(String(citation?.originalText ?? '').trim()),
+    })),
+    structuredFindings: Array.isArray(value.aiFindings),
+    findingCount: Array.isArray(value.aiFindings) ? value.aiFindings.length : 0,
+    reviewedAt: value.reviewedAt ?? null,
+    generatedAt: value.generatedAt ?? null,
+  }
+}
+
+function compactCaseAnalysis(value) {
+  return {
+    provider: value.provider ?? null,
+    aiStatus: {
+      provider: value.aiStatus?.provider ?? null,
+    },
+  }
+}
+
+function hasTranslatedText(value) {
+  return value?.hasTranslatedText ?? Boolean(String(value?.translatedText ?? '').trim())
+}
+
+function hasStructuredFindings(value) {
+  return value?.structuredFindings ?? Array.isArray(value?.aiFindings)
 }
 
 function countBy(values, keyFor) {

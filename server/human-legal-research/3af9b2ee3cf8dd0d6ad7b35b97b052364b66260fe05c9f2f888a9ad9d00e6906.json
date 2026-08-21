@@ -1,0 +1,86 @@
+{
+  "sha256": "3af9b2ee3cf8dd0d6ad7b35b97b052364b66260fe05c9f2f888a9ad9d00e6906",
+  "caseId": "scotus-26-194",
+  "docNumber": "petition",
+  "posture": "party_certiorari_petition",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-20T20:45:00+08:00",
+  "en": {
+    "summary": "This 167-page official Supreme Court PDF contains the 24-page petition for a writ of certiorari and appendices reproducing the relevant Second Circuit, district-court, and bankruptcy-court decisions and the rehearing denial. Petitioners Mei Guo and HK International ask the Court to decide whether 11 U.S.C. § 544(a) authorizes a bankruptcy trustee to prosecute a state-law alter ego claim merely because creditors hold it generally. It is an advocacy filing asking for review, not a Supreme Court ruling and not proof that review will be granted.",
+    "plainEnglish": "The dispute is about the scope of a trustee's legal key. Everyone agrees § 544(a) gives a trustee strong priority and avoidance powers. Petitioners say that key only handles priority and vulnerable interests in debtor property; they say the Second Circuit wrongly treated it as a master key that also takes over lawsuits belonging to creditors. The Supreme Court has only received the request to examine that issue. It has not accepted the case or decided who is right.",
+    "legalReading": [
+      "The question presented is confined to trustee authority under § 544(a) over a generalized creditor-owned state-law alter ego claim.",
+      "Petitioners distinguish debtor-owned claims that enter the estate under § 541(a) from creditor-owned claims and emphasize that the Second Circuit expressly declined to decide the alternative § 541(a) theory.",
+      "The petition argues from text, pre-Code strong-arm practice, the omission of proposed § 544(c), Caplin, and Harrington v. Purdue Pharma that bankruptcy policy cannot create representative authority absent statutory language.",
+      "The asserted circuit conflict places the Second and Seventh Circuits on the broader-authority side and the Eighth Circuit on the narrower side, while discussing Ninth, Fifth, Sixth, Eleventh, and recent Third Circuit authorities.",
+      "The case-specific dispute reaches HK USA, the Lady May, and a $37 million escrow, but the petition's own factual narrative remains a party presentation and must be separated from the appended lower-court findings.",
+      "A reversal on the question presented would attack the Second Circuit's § 544(a) basis and ordinarily lead to remand; it would not automatically adjudicate every alter ego fact, title question, or unreviewed alternative ground."
+    ],
+    "caseConnections": [
+      "The petition arises from Second Circuit No. 24-2504 and identifies Bankruptcy Adversary No. 5:22-ap-5003 and D. Conn. No. 3:23-cv-458 as related proceedings.",
+      "Its ownership-and-control issue affects the Ho Wan Kwok bankruptcy estate and the Lady May asset line, but it is separate from the criminal conviction, direct criminal appeal, and criminal forfeiture proceedings.",
+      "The appendix is valuable because it places the principal lower-court rulings in one official Supreme Court PDF; each ruling still retains its own procedural posture and standard of review."
+    ],
+    "whyItMatters": [
+      "The issue determines who may investigate, plead, settle, release, and receive recovery from generalized creditor claims against nondebtors.",
+      "If the Court grants review, the case could clarify a recurring nationwide boundary among estate claims, trustee avoidance powers, and creditor-owned state-law rights."
+    ],
+    "verificationTasks": [
+      "Monitor the official docket after the September 28, 2026 conference for a response request, relist, grant, denial, call for the views of the Solicitor General, or other order.",
+      "If a response is requested, compare its characterization of § 544(a), the circuit authorities, the lower-court holdings, and any alternative affirmance grounds with the petition.",
+      "Use PACER for exhaustive lower-court docket verification and do not infer sealed or newly filed items from their absence in public sources."
+    ],
+    "riskFlags": [
+      "A certiorari petition presents one side's facts and law; allegations and advocacy are not Supreme Court findings.",
+      "The Trustee's separate waiver of the present right to respond is not agreement with the petition and is not a merits concession.",
+      "Distribution for conference is not a grant of certiorari, and the Court may deny review without explaining why.",
+      "The 167 PDF pages include appendices; internal petition page numbers and physical PDF page numbers differ. Citations in this review use physical PDF pages."
+    ],
+    "findings": [
+      { "section": "summary", "text": "The petition asks whether § 544(a) authorizes a trustee to prosecute a state-law alter ego claim merely because creditors hold it generally.", "confidence": "high", "pages": [2] },
+      { "section": "legalReading", "text": "Petitioners distinguish § 541(a) debtor-owned claims from the asserted § 544(a) authority over creditor-owned claims, noting that the Second Circuit did not decide § 541(a).", "confidence": "high", "pages": [15, 16, 22] },
+      { "section": "legalReading", "text": "The petition grounds its statutory argument in strong-arm history, omitted proposed § 544(c), Caplin, and Purdue Pharma.", "confidence": "high", "pages": [18, 19, 24, 28, 30, 31, 32] },
+      { "section": "caseConnections", "text": "The petition connects the issue to HK USA, the Lady May, and the $37 million escrow.", "confidence": "high", "pages": [14, 15, 19, 21] },
+      { "section": "riskFlags", "text": "The petition requests review and does not itself establish a Supreme Court grant or merits ruling.", "confidence": "high", "pages": [13, 36] }
+    ]
+  },
+  "zh": {
+    "summary": "这份 167 页的美国最高法院官方 PDF 包含 24 页调卷令申请正文，以及所附第二巡回、地区法院、破产法院相关裁判和复议驳回令。申请人 Mei Guo 与 HK International 请求最高法院判断：《美国法典》第 11 编 § 544(a) 是否仅因一项州法人格混同请求普遍属于债权人，就授权破产受托人提起该请求。这是请求最高法院审查的一方书状，不是最高法院裁判，也不能证明最高法院必然受理。",
+    "plainEnglish": "本案争议的是受托人手中法律“钥匙”的范围。各方不否认 § 544(a) 给受托人很强的优先顺位和撤销权。申请人认为，这把钥匙只能处理债务人财产上的顺位和可撤销权益；第二巡回却把它理解成还能接管债权人诉讼的“万能钥匙”。最高法院目前只是收到审查请求，尚未同意受理，也没有判断哪一方正确。",
+    "legalReading": [
+      "申请提出的问题被限定为：§ 544(a) 是否赋予受托人提起一般化、由债权人拥有的州法人格混同请求的权限。",
+      "申请人区分 § 541(a) 下进入破产财产的债务人诉因与债权人诉因，并强调第二巡回明确没有决定备选的 § 541(a) 理论。",
+      "申请从法条文字、破产法制定前的强臂权实践、拟议 § 544(c) 被删除、Caplin 以及 Harrington v. Purdue Pharma 出发，主张破产政策不能在没有法条授权时创造代表诉讼权。",
+      "申请所称巡回分歧把第二、第七巡回列为较宽权限一方，把第八巡回列为较窄一方，同时讨论第九、第五、第六、第十一巡回及近期第三巡回判例。",
+      "具体争议涉及 HK USA、Lady May 和 3,700 万美元托管款，但申请书中的事实叙述仍是一方陈述，必须与附件中下级法院已经作出的认定分开。",
+      "即使最高法院在所提问题上推翻第二巡回，通常也只是动摇其 § 544(a) 理由并发回下级法院，不会自动裁判全部人格混同事实、所有权问题或尚未审查的备选理由。"
+    ],
+    "caseConnections": [
+      "申请源自第二巡回第 24-2504 号案，并列出破产对抗程序 5:22-ap-5003 和康州地区法院 3:23-cv-458 为关联程序。",
+      "诉权归属问题影响 Ho Wan Kwok 破产财产和 Lady May 资产线，但与刑事定罪、刑事直接上诉和刑事没收属于不同法律程序。",
+      "附件把主要下级法院裁判集中在一份最高法院官方 PDF 内，便于对照；但每项裁判仍有各自程序阶段和审查标准。"
+    ],
+    "whyItMatters": [
+      "问题会决定谁有权调查、起诉、和解、放弃或释放针对非债务第三方的一般化债权人请求，以及追回款由谁取得。",
+      "如果最高法院准许审查，本案可能澄清破产财产诉因、受托人撤销权与债权人州法权利之间具有全国影响的边界。"
+    ],
+    "verificationTasks": [
+      "在 2026 年 9 月 28 日会议后继续核对最高法院官方案卷，看是否要求回应、再次列会、准许或驳回调卷令、要求联邦政府提交意见，或发布其他命令。",
+      "如果法院要求回应，应逐项比较回应对 § 544(a)、巡回判例、下级法院裁判和备选维持理由的表述。",
+      "下级法院完整案卷仍应以 PACER 核验；不能因为公开来源没有显示，就推断不存在密封或刚提交的文件。"
+    ],
+    "riskFlags": [
+      "调卷令申请呈现一方的事实和法律论证；其中主张不是最高法院认定。",
+      "受托人另行放弃当前回应权，不代表其同意申请或承认实体论点。",
+      "分发至法官会议不等于准许调卷令；最高法院可以不说明理由而拒绝受理。",
+      "167 个 PDF 物理页包含附件，申请内部页码与 PDF 物理页码不同；本解读引用的是 PDF 物理页码。"
+    ],
+    "findings": [
+      { "section": "summary", "text": "申请询问 § 544(a) 是否仅因州法人格混同请求普遍属于债权人，就授权受托人提起该请求。", "confidence": "high", "pages": [2] },
+      { "section": "legalReading", "text": "申请人区分 § 541(a) 下债务人诉因与 § 544(a) 下被主张的债权人诉因权限，并指出第二巡回没有决定 § 541(a)。", "confidence": "high", "pages": [15, 16, 22] },
+      { "section": "legalReading", "text": "申请以强臂权历史、拟议 § 544(c) 被删除、Caplin 与 Purdue Pharma 支持其法条解释。", "confidence": "high", "pages": [18, 19, 24, 28, 30, 31, 32] },
+      { "section": "caseConnections", "text": "申请把法律问题与 HK USA、Lady May 和 3,700 万美元托管款相连。", "confidence": "high", "pages": [14, 15, 19, 21] },
+      { "section": "riskFlags", "text": "本文件只是请求最高法院审查，不代表已经准许调卷令或作出实体裁判。", "confidence": "high", "pages": [13, 36] }
+    ]
+  }
+}

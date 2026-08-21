@@ -169,6 +169,7 @@ function sanitizeMessage(value) {
 
 function sanitizeResearchResponse(value) {
   return {
+    mode: value?.mode === 'conversation' ? 'conversation' : 'research',
     confidenceNote: redactSecrets(cleanText(value?.confidenceNote, 4000)),
     reviewNote: cleanText(value?.reviewNote, 2000),
     provider: cleanIdentifier(value?.provider, 60),

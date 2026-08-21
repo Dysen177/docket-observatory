@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#10141b"/>
+  <rect x="50" y="34" width="1180" height="652" rx="24" fill="#171c24" stroke="#344052"/>
+  <path d="M74 34h1132a24 24 0 0 1 24 24v44H50V58a24 24 0 0 1 24-24z" fill="#202732"/>
+  <circle cx="82" cy="68" r="11" fill="#ff625c"/>
+  <circle cx="116" cy="68" r="11" fill="#ffbd45"/>
+  <circle cx="150" cy="68" r="11" fill="#28c940"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif" letter-spacing="0">
+    <text x="640" y="77" text-anchor="middle" fill="#f7f9fc" font-size="23" font-weight="700">GitHub 发布页 - 选择正确安装包</text>
+    <text x="96" y="157" fill="#f7f9fc" font-size="38" font-weight="750">Docket Observatory v0.1.2</text>
+    <text x="96" y="198" fill="#b7bfcd" font-size="25" font-weight="700">Assets（安装文件）</text>
+
+    <rect x="82" y="224" width="1116" height="102" rx="12" fill="#222a35" stroke="#364153"/>
+    <rect x="104" y="248" width="54" height="54" rx="10" fill="#40d7aa"/>
+    <text x="131" y="284" text-anchor="middle" fill="#10202b" font-size="28" font-weight="800">M</text>
+    <text x="184" y="267" fill="#f7f9fc" font-size="24" font-weight="750">Apple 芯片 Mac（M1-M4）</text>
+    <text x="184" y="296" fill="#bec7d6" font-size="18" font-family="SFMono-Regular, Menlo, Consolas, monospace">Docket-Observatory-0.1.2-macOS-arm64-unsigned.dmg</text>
+    <text x="1158" y="287" text-anchor="middle" fill="#40d7aa" font-size="40">↓</text>
+
+    <rect x="82" y="340" width="1116" height="102" rx="12" fill="#222a35" stroke="#364153"/>
+    <rect x="104" y="364" width="54" height="54" rx="10" fill="#59a8ff"/>
+    <text x="131" y="400" text-anchor="middle" fill="#10202b" font-size="28" font-weight="800">I</text>
+    <text x="184" y="383" fill="#f7f9fc" font-size="24" font-weight="750">Intel 芯片 Mac</text>
+    <text x="184" y="412" fill="#bec7d6" font-size="18" font-family="SFMono-Regular, Menlo, Consolas, monospace">Docket-Observatory-0.1.2-macOS-x64-unsigned.dmg</text>
+    <text x="1158" y="403" text-anchor="middle" fill="#59a8ff" font-size="40">↓</text>
+
+    <rect x="82" y="456" width="1116" height="102" rx="12" fill="#222a35" stroke="#364153"/>
+    <rect x="104" y="480" width="54" height="54" rx="10" fill="#f8bd4f"/>
+    <text x="131" y="516" text-anchor="middle" fill="#10202b" font-size="28" font-weight="800">W</text>
+    <text x="184" y="499" fill="#f7f9fc" font-size="24" font-weight="750">Windows 10/11 64 位</text>
+    <text x="184" y="528" fill="#bec7d6" font-size="18" font-family="SFMono-Regular, Menlo, Consolas, monospace">Docket-Observatory-0.1.2-Windows-x64-unsigned.exe</text>
+    <text x="1158" y="519" text-anchor="middle" fill="#f8bd4f" font-size="40">↓</text>
+
+    <text x="96" y="617" fill="#d9e0ea" font-size="21">不知道芯片类型：苹果菜单 &gt; 关于本机 &gt; 芯片</text>
+  </g>
+</svg>

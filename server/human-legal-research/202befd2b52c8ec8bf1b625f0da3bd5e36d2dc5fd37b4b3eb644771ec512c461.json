@@ -1,0 +1,34 @@
+{
+  "sha256": "202befd2b52c8ec8bf1b625f0da3bd5e36d2dc5fd37b4b3eb644771ec512c461",
+  "caseId": "scotus-26-194",
+  "docNumber": "proof-of-service",
+  "posture": "service_affidavit",
+  "researchQuality": "body_verified",
+  "reviewedAt": "2026-08-20T20:45:00+08:00",
+  "en": {
+    "summary": "This two-page affidavit states that on August 11, 2026, the petition was served on respondent's counsel by USPS Express Mail and email, and that copies plus the filing fee were sent to the Supreme Court and the petition was submitted through the electronic filing system. It records asserted service steps, not the merits.",
+    "plainEnglish": "This is the delivery record for the petition. It says who received it, how it was sent, and when. It does not show that the Court accepted the legal argument or that the respondent agrees.",
+    "legalReading": ["The affiant identifies respondent's counsel and describes service by physical mail and electronic means on August 11, 2026.", "The affidavit states that all required parties were served and is declared under penalty of perjury."],
+    "caseConnections": ["The service date matches the official docket's petition filing date and supports the procedural history of the No. 26-194 filing package."],
+    "whyItMatters": ["Proper service is a filing prerequisite and helps explain why the petition proceeded to docketing."],
+    "verificationTasks": ["Treat the Supreme Court docket, not the affidavit alone, as controlling for docket acceptance and later deadlines."],
+    "riskFlags": ["An affidavit of service is the affiant's sworn account of delivery; it contains no merits ruling or concession."],
+    "findings": [
+      { "section": "summary", "text": "The affidavit describes service on respondent's counsel and delivery to the Supreme Court on August 11, 2026.", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "The document proves asserted service steps, not the merits or the Court's view.", "confidence": "high", "pages": [1, 2] }
+    ]
+  },
+  "zh": {
+    "summary": "这份两页送达宣誓书声明：2026 年 8 月 11 日，申请方通过 USPS Express Mail 和电子邮件向被申请人律师送达调卷令申请，并向最高法院寄送纸质副本和申请费，同时通过电子提交系统提交文件。它记录所声明的送达步骤，不涉及实体争议。",
+    "plainEnglish": "这是调卷令申请的“送货记录”，说明何时、用什么方式、向谁送达。它不表示最高法院接受法律论点，也不表示被申请人同意。",
+    "legalReading": ["宣誓人列明被申请人律师，并说明 2026 年 8 月 11 日通过纸质邮件和电子方式完成送达。", "宣誓书声明所有必须送达的当事方均已送达，并以伪证罪责任作出陈述。"],
+    "caseConnections": ["送达日期与最高法院官方案卷记载的申请提交日期一致，构成第 26-194 号申请文件包的程序记录。"],
+    "whyItMatters": ["适当送达是提交程序要求，也解释了申请随后被登记的程序基础。"],
+    "verificationTasks": ["是否正式登记及后续期限应以最高法院官方案卷为准，不能只依赖本宣誓书。"],
+    "riskFlags": ["送达宣誓书是宣誓人对交付过程的陈述，不包含实体裁判或任何一方让步。"],
+    "findings": [
+      { "section": "summary", "text": "宣誓书记载 2026 年 8 月 11 日向被申请人律师送达并向最高法院寄送文件。", "confidence": "high", "pages": [1, 2] },
+      { "section": "riskFlags", "text": "文件证明所声明的送达步骤，不证明实体主张或最高法院观点。", "confidence": "high", "pages": [1, 2] }
+    ]
+  }
+}

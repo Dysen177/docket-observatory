@@ -20,10 +20,12 @@ type TranscriptQuality = 'plausible' | 'possibly_incomplete' | 'unknown'
 type Segment = { start: number; end: number; text: string }
 type OriginalLink = { platform: string; url: string }
 type TranscriptHit = Segment & {
+  segmentIndex: number
   contextBefore: Segment[]
   contextAfter: Segment[]
   matchReason: 'exact' | 'alias'
   matchedTerm: string
+  mentionedNames: string[]
 }
 type TranscriptResult = {
   id: string
@@ -103,12 +105,12 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
   const [payload, setPayload] = useState<TranscriptSearchPayload | null>(null)
   const [selectedId, setSelectedId] = useState('')
   const [detail, setDetail] = useState<TranscriptDetail | null>(null)
-  const [readerSeek, setReaderSeek] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [detailLoading, setDetailLoading] = useState(false)
   const [error, setError] = useState('')
   const readerRef = useRef<HTMLDivElement>(null)
+  const readerSeekRef = useRef<{ segmentIndex: number | null; start: number } | null>(null)
   const requestKey = `${language}\u0000${query}\u0000${year}\u0000${sort}`
   const listGenerationRef = useRef(0)
   const requestKeyRef = useRef(requestKey)
@@ -152,13 +154,13 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
     if (selected.transcriptStatus !== 'available') {
       setDetail(null)
       setDetailLoading(false)
-      setReaderSeek(null)
+      readerSeekRef.current = null
       return
     }
     const controller = new AbortController()
     setDetail(null)
     setDetailLoading(true)
-    setReaderSeek(null)
+    readerSeekRef.current = null
     localApiFetch(`/api/public-record-transcripts/${encodeURIComponent(selected.id)}?lang=${language}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`API ${response.status}`)
@@ -175,9 +177,9 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
   }, [language, selected?.id, selected?.transcriptStatus])
 
   useEffect(() => {
-    if (!detail || readerSeek === null || !readerRef.current) return
-    scrollReaderTo(readerRef.current, readerSeek)
-  }, [detail, readerSeek])
+    if (!detail || readerSeekRef.current === null || !readerRef.current) return
+    scrollReaderTo(readerRef.current, readerSeekRef.current)
+  }, [detail])
 
   async function loadMore() {
     if (!payload?.hasMore || loadingMore) return
@@ -204,9 +206,10 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
     }
   }
 
-  function seekTranscript(start: number) {
-    setReaderSeek(start)
-    if (readerSeek === start && readerRef.current) scrollReaderTo(readerRef.current, start)
+  function seekTranscript(hit: TranscriptHit) {
+    const next = { segmentIndex: Number.isInteger(hit.segmentIndex) && hit.segmentIndex >= 0 ? hit.segmentIndex : null, start: hit.start }
+    readerSeekRef.current = next
+    if (readerRef.current) scrollReaderTo(readerRef.current, next)
   }
 
   return (
@@ -247,6 +250,7 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
                 <button type="button" className={selected?.id === record.id ? 'active' : ''} onClick={() => setSelectedId(record.id)} key={record.id}>
                   <time>{formatDate(record.date, language)}</time>
                   <strong>{record.title}</strong>
+                  {query && record.hits.some((hit) => hit.mentionedNames.length) && <em className="transcript-result-names">{uniqueMentionedNames(record.hits).slice(0, 3).join(' · ')}</em>}
                   <span>{record.transcriptStatus !== 'available' ? text.noTranscript : query ? (record.hits.length ? `${record.hits.length} ${text.hits}` : record.titleMatched ? text.titleHit : `0 ${text.hits}`) : `${record.segmentCount} ${text.segments}`}<i>{record.recordKind === 'public_post' ? text.publicPost : formatDuration(record.durationSec, language)}</i></span>
                   <small className={`transcript-kind-label ${record.transcriptStatus !== 'available' ? 'unavailable' : record.transcriptQuality === 'possibly_incomplete' ? 'warning' : record.recordKind}`}>{record.classificationNote}</small>
                 </button>
@@ -282,8 +286,12 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
               <div className="transcript-hit-list">
                 {selected.hits.map((hit, index) => (
                   <article key={`${selected.id}-${hit.start}-${index}`}>
-                    <button type="button" className="transcript-time-button" onClick={() => seekTranscript(hit.start)}><Clock3 size={14} />{formatTimestamp(hit.start)}</button>
+                    <div className="transcript-hit-anchor">
+                      <button type="button" className="transcript-time-button" onClick={() => seekTranscript(hit)}><Clock3 size={14} />{formatTimestamp(hit.start)}</button>
+                      <small>{text.jumpToFullText}</small>
+                    </div>
                     <div>
+                      {hit.mentionedNames.length > 0 && <div className="transcript-mentioned-names"><span>{text.mentionedNames}</span>{hit.mentionedNames.map((name) => <strong key={name}>{name}</strong>)}</div>}
                       {hit.contextBefore.map((segment) => <p className="context" key={`before-${segment.start}`}>{segment.text}</p>)}
                       <p className="hit"><HighlightedText text={hit.text} terms={payload?.search.terms ?? [query]} /></p>
                       {hit.contextAfter.map((segment) => <p className="context" key={`after-${segment.start}`}>{segment.text}</p>)}
@@ -306,7 +314,7 @@ export default function TranscriptResearchPanel({ language }: { language: Langua
               </div>
               {detailLoading ? <div className="transcript-loading"><Loader2 className="spin" size={20} />{text.loadingFullText}</div> : detail ? (
                 <div className="transcript-reader-body transcript-inline-reader" ref={readerRef}>
-                  {detail.segments.map((segment, index) => <article data-segment-start={segment.start} className={`${detail.transcriptSourceType === 'public_post_caption' ? 'public-post' : ''} ${readerSeek !== null && Math.abs(segment.start - readerSeek) < 0.01 ? 'target' : ''}`.trim()} key={`${detail.id}-${segment.start}-${index}`}>
+                  {detail.segments.map((segment, index) => <article data-segment-index={index} data-segment-start={segment.start} className={detail.transcriptSourceType === 'public_post_caption' ? 'public-post' : ''} key={`${detail.id}-${segment.start}-${index}`}>
                     {detail.transcriptSourceType !== 'public_post_caption' && <time>{formatTimestamp(segment.start)}</time>}<p>{segment.text}</p>
                   </article>)}
                 </div>
@@ -354,9 +362,15 @@ function normalizeTranscriptDetail(detail: TranscriptDetail): TranscriptDetail {
 function normalizeTranscriptHit(hit: TranscriptHit): TranscriptHit {
   return {
     ...hit,
+    segmentIndex: Number.isInteger(Number(hit?.segmentIndex)) ? Number(hit.segmentIndex) : -1,
     contextBefore: Array.isArray(hit?.contextBefore) ? hit.contextBefore : [],
     contextAfter: Array.isArray(hit?.contextAfter) ? hit.contextAfter : [],
+    mentionedNames: Array.isArray(hit?.mentionedNames) ? hit.mentionedNames.filter(Boolean) : [],
   }
+}
+
+function uniqueMentionedNames(hits: TranscriptHit[]) {
+  return [...new Set(hits.flatMap((hit) => hit.mentionedNames))]
 }
 
 function visibleAliasTerms(terms: string[], language: Language) {
@@ -368,25 +382,37 @@ function transcriptText(language: Language) {
     archiveEyebrow: '历史直播与公开言论', archiveTitle: '来源、文字与时间点', archiveCopy: '在同一界面检索 2017–2023 年历史直播、剪辑片段、公开视频和账号公开帖文。不同内容类型会明确标注；每条记录展示可核对的外部链接与本地文字。',
     searchPlaceholder: '搜索原话、人名、机构或主题，例如：喜联储', clear: '清空', newest: '时间从新到旧', oldest: '时间从旧到新', yearFilter: '年份范围', allYears: '全部', aliasExpanded: '同时检索相关名称',
     resultRule: '共有 {count} 条不同直播、公开视频或公开帖文命中；不同来源记录分别保留，同一转载副本不会重复显示。', results: '来源与文字记录', loading: '正在检索本地资料库', hits: '处命中', titleHit: '标题命中', noTranscript: '暂无文字', noTranscriptTitle: '该来源暂无可用文字', noTranscriptCopy: '外部来源链接已保留；后续发现可核对文字时会自动纳入全文检索。', segments: '个文字片段', loadMore: '加载更多', empty: '当前条件没有匹配结果。',
-    originalLinks: '外部媒体', transcriptSources: '文字来源', exact: '精确命中', alias: '相关名称', matchesInSelected: '本条命中与前后文', fullText: '本地已收录文字', loadingFullText: '正在加载已收录文字', characters: '字', publicSubtitles: '公开字幕', humanTranscript: '人工整理全文', publicPost: '公开帖文', publicPostText: '账号帖文原文', noPreciseTimestamps: '无精确时间点', boundaryVerified: '时间边界已核对',
+    originalLinks: '外部媒体', transcriptSources: '文字来源', exact: '精确命中', alias: '相关名称', matchesInSelected: '原文命中', mentionedNames: '本段名称', jumpToFullText: '定位全文', fullText: '本地已收录文字', loadingFullText: '正在加载已收录文字', characters: '字', publicSubtitles: '公开字幕', humanTranscript: '人工整理全文', publicPost: '公开帖文', publicPostText: '账号帖文原文', noPreciseTimestamps: '无精确时间点', boundaryVerified: '时间边界已核对',
     translationPending: '英文译文待生成，当前显示原语言文字',
   } : {
     archiveEyebrow: 'Historical broadcasts and public statements', archiveTitle: 'Sources, transcripts, and timestamps', archiveCopy: 'Search historical livestreams, excerpts, public videos, and public account posts from 2017–2023 in one workspace. Content types are labeled separately, with verifiable external links and locally stored text.',
     searchPlaceholder: 'Search a quotation, person, entity, or topic', clear: 'Clear', newest: 'Newest first', oldest: 'Oldest first', yearFilter: 'Year range', allYears: 'All', aliasExpanded: 'Related names also searched',
     resultRule: '{count} distinct broadcasts, public videos, or public posts match. Different source records remain separate, while identical repost copies are deduplicated.', results: 'Source and transcript records', loading: 'Searching the local archive', hits: 'hits', titleHit: 'Title match', noTranscript: 'Transcript unavailable', noTranscriptTitle: 'No usable transcript is currently available', noTranscriptCopy: 'The external source link remains available. If verifiable text is found later, it will automatically join full-text search.', segments: 'segments', loadMore: 'Load more', empty: 'No result matches the current filters.',
-    originalLinks: 'External media', transcriptSources: 'Text source', exact: 'Exact match', alias: 'Related name', matchesInSelected: 'Matches and context in this record', fullText: 'All locally stored text', loadingFullText: 'Loading stored text', characters: 'characters', publicSubtitles: 'Public subtitles', humanTranscript: 'Human-edited transcript', publicPost: 'Public post', publicPostText: 'Original account-post text', noPreciseTimestamps: 'No precise timestamps', boundaryVerified: 'boundaries verified',
+    originalLinks: 'External media', transcriptSources: 'Text source', exact: 'Exact match', alias: 'Related name', matchesInSelected: 'Transcript matches', mentionedNames: 'Names in this passage', jumpToFullText: 'Jump to full text', fullText: 'All locally stored text', loadingFullText: 'Loading stored text', characters: 'characters', publicSubtitles: 'Public subtitles', humanTranscript: 'Human-edited transcript', publicPost: 'Public post', publicPostText: 'Original account-post text', noPreciseTimestamps: 'No precise timestamps', boundaryVerified: 'boundaries verified',
     translationPending: 'English translation pending; original-language text is shown',
   }
 }
 
-function scrollReaderTo(container: HTMLDivElement, seek: number) {
+function scrollReaderTo(container: HTMLDivElement, seek: { segmentIndex: number | null; start: number }) {
+  for (const item of container.querySelectorAll<HTMLElement>('[data-seek-target="true"]')) item.removeAttribute('data-seek-target')
+  if (seek.segmentIndex !== null) {
+    const exact = container.querySelector<HTMLElement>(`[data-segment-index="${seek.segmentIndex}"]`)
+    if (exact) {
+      exact.dataset.seekTarget = 'true'
+      exact.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      return
+    }
+  }
   const nearest = [...container.querySelectorAll<HTMLElement>('[data-segment-start]')]
     .reduce<HTMLElement | null>((best, item) => {
-      const currentDistance = Math.abs(Number(item.dataset.segmentStart) - seek)
-      const bestDistance = best ? Math.abs(Number(best.dataset.segmentStart) - seek) : Number.POSITIVE_INFINITY
+      const currentDistance = Math.abs(Number(item.dataset.segmentStart) - seek.start)
+      const bestDistance = best ? Math.abs(Number(best.dataset.segmentStart) - seek.start) : Number.POSITIVE_INFINITY
       return currentDistance < bestDistance ? item : best
     }, null)
-  nearest?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  if (nearest) {
+    nearest.dataset.seekTarget = 'true'
+    nearest.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
 }
 
 function localApiFetch(input: RequestInfo | URL, init: RequestInit = {}) {

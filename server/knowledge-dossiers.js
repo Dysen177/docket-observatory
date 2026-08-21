@@ -302,15 +302,90 @@ const knowledgeDossiers = [
     id: 'plan-13579',
     category: 'term',
     labels: { zh: '13579 计划', en: '13579 Plan' },
-    aliases: ['13579计划', '13579 计划', '13579', '13579 plan'],
-    publicRecordAliases: ['13579计划', '13579 计划', '13579', '13579 plan'],
+    aliases: ['13579计划', '13579 计划', '13579', '13579 plan', '13579方案'],
+    publicRecordAliases: ['13579计划', '13579 计划', '13579', '13579 plan', '13579方案'],
     summary: {
-      zh: '爆料革命公开言论和相关问答中出现的计划类名词，属于运动内部叙事和行动框架。',
-      en: 'A plan label appearing in Whistleblower Movement public statements and related Q&A; it belongs to internal movement narrative and action framing.',
+      zh: '郭文贵公开言论中的计划类名词。他将其描述为一份涉及生化武器、病毒传播、疫苗和全球战略的中共绝密方案；这是其公开主张的概括，不是本程序确认存在的官方文件。',
+      en: 'A plan label in Guo Wengui public statements. He describes it as an alleged secret CCP global strategy involving biological weapons, virus spread, vaccines, and related leverage; this summarizes his claim and does not establish that an official plan document exists.',
     },
     neutralNote: {
-      zh: '计划内容和时间线应以具体公开材料为准，不要脱离来源概括。',
-      en: 'Content and timeline should be grounded in specific public materials, not generalized away from sources.',
+      zh: '必须用具体直播文字或原始视频标注“郭文贵称/其主张”，不能把病毒来源、计划存在或实施结果写成已独立证实的事实。',
+      en: 'Cite the specific transcript or recording and attribute the account to Guo; virus origin, the plan\'s existence, and alleged implementation are not independently established by the label itself.',
+    },
+  },
+  {
+    id: 'plan-3f',
+    category: 'term',
+    labels: { zh: '3F 计划', en: '3F Plan' },
+    aliases: ['3F计划', '3F 计划', '3F方案', '3F法', '3F', 'Fall Fail Fell', 'Fall/Fail/Fell', '搞弱搞乱搞死'],
+    publicRecordAliases: ['3F计划', '3F 计划', '3F方案', '3F法', '3F', 'Fall Fail Fell', '搞弱搞乱搞死'],
+    summary: {
+      zh: '郭文贵公开言论中的对美战略术语，通常被解释为 Fall、Fail、Fell 三个阶段，并概括为“搞弱、搞乱、搞死美国”。这是公开言论中的指控框架。',
+      en: 'A Guo Wengui public-statement term for an alleged strategy against the United States, commonly expanded as Fall, Fail, and Fell and paraphrased as weakening, destabilizing, and destroying America. It is an allegation framework in public statements.',
+    },
+    neutralNote: {
+      zh: '该术语不能独立证明存在同名官方计划；具体内容、首次提出时间和关联事件要回到带日期的原始言论核验。',
+      en: 'The label does not independently prove an official plan of that name; content, chronology, and claimed links to events require dated primary-source verification.',
+    },
+  },
+  {
+    id: 'architecture-art-project',
+    category: 'term',
+    labels: { zh: '建筑艺术项目', en: 'Architecture and Art Project' },
+    aliases: ['建筑艺术项目', '建筑艺术', '建築藝術項目', 'Architecture and Art Project', 'Architecture Art Project'],
+    publicRecordAliases: ['建筑艺术项目', '建筑艺术', '建築藝術項目', 'Architecture and Art Project', 'Architecture Art Project'],
+    summary: {
+      zh: '郭文贵公开言论中的代号。他称该词指中共对海外非婚生后代进行登记、培养并扶植进入政商领域的安排；这是其海外渗透叙事中的一项主张。',
+      en: 'A code-name in Guo Wengui public statements. He says it refers to an alleged program to register, groom, and elevate CCP-linked children born abroad into political and business circles; it is part of his overseas-influence narrative.',
+    },
+    neutralNote: {
+      zh: '涉及具体人物、亲属关系、身份或职务时，必须另有可靠原始记录，不能仅凭该术语或直播指称作出认定。',
+      en: 'Specific identities, parentage, relationships, or offices require reliable independent records and cannot be established from the label or a broadcast allegation alone.',
+    },
+  },
+  {
+    id: 'mie-bai-plan',
+    category: 'term',
+    labels: { zh: '灭白计划', en: 'Mie Bai / “Eliminate the White Race” Plan' },
+    aliases: ['灭白计划', '滅白計劃', '灭白', '灭美计划', '滅美計劃', 'Mie Bai', 'Mie Bai Plan', 'Eliminate the White Race Plan'],
+    publicRecordAliases: ['灭白计划', '滅白計劃', '灭白', '灭美计划', '滅美計劃', 'Mie Bai', 'Mie Bai Plan'],
+    summary: {
+      zh: '郭文贵公开言论中的政治叙事术语。他用该词指称其所主张的、针对白人和西方主导秩序的系统性图谋，并把病毒、疫苗、财富与信仰等议题纳入该叙事。',
+      en: 'A political-narrative term in Guo Wengui public statements. He uses it for an alleged systematic scheme against white populations and the Western-led order, linking it to claims about viruses, vaccines, wealth, and religion.',
+    },
+    neutralNote: {
+      zh: '这是高度争议且带有族群指向的公开主张，不是法院认定或本程序确认的事实；引用时必须保留归因并避免扩大解释。',
+      en: 'This is a highly contested, race-directed public allegation, not a court finding or a fact established by this app; preserve attribution and avoid expanding it beyond the cited source.',
+    },
+  },
+  {
+    id: 'nanputuo-plan',
+    category: 'term',
+    labels: { zh: '南普陀会议 / 南普陀计划', en: 'Nanputuo Meeting / Plan' },
+    aliases: ['南普陀会议', '南普陀會議', '南普陀计划', '南普陀計劃', '南普陀', '南普图会议', '南普圖會議', 'Nanputuo Meeting', 'Nanputuo Plan'],
+    publicRecordAliases: ['南普陀会议', '南普陀會議', '南普陀计划', '南普陀計劃', '南普陀', '南普图会议', '南普圖會議', 'Nanputuo Meeting', 'Nanputuo Plan'],
+    summary: {
+      zh: '郭文贵公开言论中的秘密会议和政治计划称谓。他把该会议及后续安排描述为江泽民家族、王岐山、孟建柱等相关力量借人事、政法和对领导人身边人的控制来“盗国、控国、监国”的布局。',
+      en: 'A secret-meeting and political-plan label in Guo Wengui public statements. He describes it as an alleged arrangement involving the Jiang Zemin family, Wang Qishan, Meng Jianzhu, and others to use personnel, political-legal institutions, and leverage over a leader\'s circle to “steal, control, and regent the state.”',
+    },
+    neutralNote: {
+      zh: '会议地点、参与者、录音、事件因果和具体执行均属于待核公开主张；人物关联不能脱离逐段原文被写成已证实事实。',
+      en: 'Location, participants, recordings, causation, and implementation remain claims requiring verification; do not turn named associations into established facts without source-specific support.',
+    },
+  },
+  {
+    id: 'double-dragon-plan',
+    category: 'term',
+    labels: { zh: '双龙计划 / 双龙行动', en: 'Double Dragon Plan / Action' },
+    aliases: ['双龙计划', '雙龍計劃', '双龙行动', '雙龍行動', '香港双龙计划', '香港雙龍計劃', '台湾双龙计划', '台灣雙龍計劃', '香港台湾双龙计划', 'Double Dragon Plan', 'Double Dragon Action'],
+    publicRecordAliases: ['双龙计划', '雙龍計劃', '双龙行动', '雙龍行動', '香港双龙计划', '香港雙龍計劃', '台湾双龙计划', '台灣雙龍計劃', '香港台湾双龙计划', 'Double Dragon Plan', 'Double Dragon Action'],
+    summary: {
+      zh: '郭文贵公开言论中的军事与政治行动称谓。其 2019 年 9 月等直播把它描述为以控制香港为前置或组成部分、继而对台湾实施突然军事打击并夺取台湾的联动方案，后来也常被概括为“拿下香港、拿下台湾”。',
+      en: 'A military-political action label in Guo Wengui public statements. In broadcasts including September 2019, he described it as a linked alleged plan in which control of Hong Kong precedes or accompanies a sudden military attack to seize Taiwan, later often paraphrased as “take Hong Kong, take Taiwan.”',
+    },
+    neutralNote: {
+      zh: '这是郭文贵对中共计划的公开指称，不是已公开的官方作战计划或法院认定；应引用对应日期的直播原文，并把后来的回顾性说法与最初陈述分开。',
+      en: 'This is Guo\'s public characterization of an alleged CCP plan, not a published official operation plan or court finding; cite the dated transcript and distinguish later retrospective claims from the original statement.',
     },
   },
   {
@@ -686,6 +761,21 @@ const knowledgeDossiers = [
     neutralNote: {
       zh: '机构行动和法律意义必须以官方公告、法院文件或监管文件为准。',
       en: 'Agency actions and legal meaning must be grounded in official releases, court filings, or regulatory records.',
+    },
+  },
+  {
+    id: 'morgan-family',
+    category: 'person',
+    labels: { zh: '摩根家族 / John Morgan', en: 'Morgan family / John Morgan' },
+    aliases: ['摩根', '摩根家族', '摩根先生', '摩根夫人', '约翰摩根', '约翰·摩根', '摩根大通', '摩根斯坦利', '摩根银行', 'Morgan', 'John Morgan', 'Henry Sturgis Morgan', 'Morgan family', 'JPMorgan', 'JPMorgan Chase', 'Morgan Stanley'],
+    publicRecordAliases: ['摩根', '摩根家族', '摩根先生', '摩根夫人', '约翰摩根', '约翰·摩根', '摩根大通', '摩根斯坦利', '摩根银行', 'Morgan', 'John Morgan', 'Henry Sturgis Morgan', 'Morgan family', 'JPMorgan', 'JPMorgan Chase', 'Morgan Stanley'],
+    summary: {
+      zh: '郭文贵历史公开言论中多次出现“摩根家族”“摩根先生”“摩根夫人”和 John Morgan 等称谓；同一关键词也可能指摩根大通、摩根士丹利或其他金融机构，因此检索结果必须保留原文名称和上下文，不能自动认定为同一个人或同一实体。',
+      en: 'Guo Wengui historical public statements repeatedly use labels such as the Morgan family, Mr. Morgan, Mrs. Morgan, and John Morgan. The same root term may also refer to JPMorgan, Morgan Stanley, or another financial institution, so retrieval must preserve the exact wording and context rather than merge every mention into one person or entity.',
+    },
+    neutralNote: {
+      zh: '这是内部检索档案，不证明任何家族关系、职务、组织成员身份或历史事件；具体陈述必须回到对应直播文字和时间点核对。',
+      en: 'This internal retrieval dossier does not establish family relationships, offices, organizational membership, or historical events; each claim must be checked against the cited transcript and timestamp.',
     },
   },
   {

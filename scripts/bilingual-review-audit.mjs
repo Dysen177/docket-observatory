@@ -1,6 +1,9 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { humanDocumentResearch } from '../server/human-legal-research.js'
+import { auditDocumentAnalysisLanguage, auditDocumentAnalysisSemantics } from '../server/document-language-quality.js'
+import { buildOfflineDocumentAnalysis } from '../server/document-analysis.js'
+import { createSeedState } from '../server/seed.js'
 
 const root = process.cwd()
 const manifest = JSON.parse(await readFile(path.join(root, 'downloads', 'court-files-complete', 'manifest.json'), 'utf8'))
@@ -11,6 +14,9 @@ const filesByHash = groupBy(
   (file) => file.sha256,
 )
 const indexByHash = new Map((searchIndex.documents ?? []).map((document) => [document.contentSha256, document]))
+const currentFilesByUrl = new Map((manifest.files ?? []).filter((file) => file?.url).map((file) => [file.url, file]))
+const state = createSeedState()
+const offlineFallbacks = new Map()
 
 const documents = [...filesByHash.entries()].map(([sha256, files]) => {
   const indexed = indexByHash.get(sha256)
@@ -43,6 +49,11 @@ const documents = [...filesByHash.entries()].map(([sha256, files]) => {
   }
 }).sort(compareDocuments)
 
+const languageConsistency = await auditAnalysisCaches(path.join(root, 'server', 'cache', 'document-ai'), currentFilesByUrl)
+const bilingualSemanticConsistency = await auditBilingualSemanticPairs(
+  (manifest.files ?? []).filter((file) => file.status !== 'error' && file.sha256),
+)
+
 const summary = {
   generatedAt: new Date().toISOString(),
   manifestRecords: manifest.files?.length ?? 0,
@@ -56,6 +67,27 @@ const summary = {
   chineseLegalAnalysis: countBy(documents, (document) => document.legalAnalysis.zh.status),
   professionalReview: countBy(documents, (document) => document.professionalReview.status),
   releaseReady: documents.filter((document) => document.releaseReady).length,
+  languageConsistency: {
+    cachesScanned: languageConsistency.cachesScanned,
+    recordsWithMismatches: languageConsistency.recordsWithMismatches,
+    fieldMismatches: languageConsistency.issues.length,
+    byLanguage: languageConsistency.byLanguage,
+    byProvider: languageConsistency.byProvider,
+    byField: languageConsistency.byField,
+    ignoredStaleCaches: languageConsistency.ignoredStaleCaches,
+  },
+  semanticConsistency: {
+    recordsWithConflicts: languageConsistency.recordsWithSemanticConflicts,
+    fieldConflicts: languageConsistency.semanticIssues.length,
+    byReason: languageConsistency.semanticByReason,
+    byProvider: languageConsistency.semanticByProvider,
+  },
+  bilingualSemanticConsistency: {
+    pairsCompared: bilingualSemanticConsistency.pairsCompared,
+    pairsWithConflicts: bilingualSemanticConsistency.pairsWithConflicts,
+    fieldConflicts: bilingualSemanticConsistency.issues.length,
+    byReason: bilingualSemanticConsistency.byReason,
+  },
   methodology: {
     unit: 'Unique PDF body by SHA-256; duplicate source records inherit the same body review.',
     professionalReview: 'Completed only when a version-locked bilingual editorial legal-review record matches the current SHA-256.',
@@ -64,13 +96,160 @@ const summary = {
   },
 }
 
-const payload = { schemaVersion: 1, summary, documents }
+const payload = {
+  schemaVersion: 3,
+  summary,
+  documents,
+  languageConsistencyIssues: languageConsistency.issues,
+  semanticConsistencyIssues: languageConsistency.semanticIssues,
+  bilingualSemanticConsistencyIssues: bilingualSemanticConsistency.issues,
+}
 await mkdir(outputDir, { recursive: true })
 await Promise.all([
   writeFile(path.join(outputDir, 'bilingual-review-audit.json'), `${JSON.stringify(payload, null, 2)}\n`),
   writeFile(path.join(outputDir, 'bilingual-review-audit.md'), renderMarkdown(summary)),
 ])
 console.log(JSON.stringify(summary, null, 2))
+if (languageConsistency.issues.length || languageConsistency.semanticIssues.length || bilingualSemanticConsistency.issues.length) process.exitCode = 1
+
+async function auditAnalysisCaches(directory, currentByUrl) {
+  const filenames = (await readdir(directory).catch(() => [])).filter((filename) => filename.endsWith('.json'))
+  const result = {
+    cachesScanned: 0,
+    recordsWithMismatches: 0,
+    issues: [],
+    byLanguage: {},
+    byProvider: {},
+    byField: {},
+    ignoredStaleCaches: 0,
+    recordsWithSemanticConflicts: 0,
+    semanticIssues: [],
+    semanticByReason: {},
+    semanticByProvider: {},
+  }
+  for (let offset = 0; offset < filenames.length; offset += 8) {
+    const batch = await Promise.all(filenames.slice(offset, offset + 8).map(async (filename) => {
+      try {
+        return [filename, JSON.parse(await readFile(path.join(directory, filename), 'utf8'))]
+      } catch {
+        return [filename, null]
+      }
+    }))
+    for (const [filename, value] of batch) {
+      if (!value) continue
+      result.cachesScanned += 1
+      const currentFile = currentByUrl.get(value.sourceUrl)
+      if (!currentFile || currentFile.sha256 !== value.sourceSha256) {
+        result.ignoredStaleCaches += 1
+        continue
+      }
+      const language = analysisLanguage(value)
+      const issues = auditDocumentAnalysisLanguage(value, language)
+      const fallback = await offlineFallback(currentFile, language)
+      const semanticIssues = auditDocumentAnalysisSemantics(value, fallback)
+      if (semanticIssues.length) {
+        result.recordsWithSemanticConflicts += 1
+        increment(result.semanticByProvider, value?.aiStatus?.provider ?? 'unknown')
+        for (const issue of semanticIssues) {
+          increment(result.semanticByReason, issue.reason)
+          result.semanticIssues.push({
+            cacheFile: filename,
+            sourceUrl: value.sourceUrl ?? null,
+            sourceSha256: value.sourceSha256 ?? null,
+            provider: value?.aiStatus?.provider ?? null,
+            language,
+            ...issue,
+          })
+        }
+      }
+      if (!issues.length) continue
+      result.recordsWithMismatches += 1
+      increment(result.byLanguage, language)
+      increment(result.byProvider, value?.aiStatus?.provider ?? 'unknown')
+      for (const issue of issues) {
+        const field = issue.fieldPath.replace(/\[\d+\]/gu, '[]')
+        increment(result.byField, field)
+        result.issues.push({
+          cacheFile: filename,
+          sourceUrl: value.sourceUrl ?? null,
+          sourceSha256: value.sourceSha256 ?? null,
+          provider: value?.aiStatus?.provider ?? null,
+          ...issue,
+        })
+      }
+    }
+  }
+  return result
+}
+
+async function offlineFallback(file, language) {
+  const key = `${file.url}|${file.sha256}|${language}`
+  let pending = offlineFallbacks.get(key)
+  if (!pending) {
+    pending = buildOfflineDocumentAnalysis(file, state, language)
+    offlineFallbacks.set(key, pending)
+  }
+  return pending
+}
+
+async function auditBilingualSemanticPairs(files) {
+  const result = { pairsCompared: 0, pairsWithConflicts: 0, issues: [], byReason: {} }
+  for (let offset = 0; offset < files.length; offset += 16) {
+    const batch = await Promise.all(files.slice(offset, offset + 16).map(async (file) => {
+      const [zh, en] = await Promise.all([offlineFallback(file, 'zh'), offlineFallback(file, 'en')])
+      return { file, zh, en, issues: compareBilingualSemanticPair(zh, en) }
+    }))
+    for (const { file, issues } of batch) {
+      result.pairsCompared += 1
+      if (!issues.length) continue
+      result.pairsWithConflicts += 1
+      for (const issue of issues) {
+        increment(result.byReason, issue.reason)
+        result.issues.push({
+          sourceUrl: file.url,
+          sourceSha256: file.sha256,
+          caseId: file.caseId ?? null,
+          docNumber: file.docNumber ?? null,
+          ...issue,
+        })
+      }
+    }
+  }
+  return result
+}
+
+function compareBilingualSemanticPair(zh, en) {
+  const issues = []
+  for (const key of ['typeKey', 'reliefKey', 'outcomeKey']) {
+    const zhValue = zh?.offlineRead?.[key] ?? null
+    const enValue = en?.offlineRead?.[key] ?? null
+    if (zhValue !== enValue) issues.push({ reason: `offline_${key}_mismatch`, fieldPath: `offlineRead.${key}`, zh: zhValue, en: enValue })
+  }
+  const zhFacts = criticalFactFingerprint(zh)
+  const enFacts = criticalFactFingerprint(en)
+  for (const key of ['dates', 'amounts', 'statutes']) {
+    if (sameValues(zhFacts[key], enFacts[key])) continue
+    issues.push({ reason: `${key}_mismatch`, fieldPath: key, zh: zhFacts[key], en: enFacts[key] })
+  }
+  return issues
+}
+
+function criticalFactFingerprint(record) {
+  return record?.criticalFacts ?? { dates: [], amounts: [], statutes: [] }
+}
+
+function sameValues(left, right) {
+  return JSON.stringify([...left].sort()) === JSON.stringify([...right].sort())
+}
+
+function analysisLanguage(value) {
+  if (value?.analysisLanguage === 'en' || value?.analysisLanguage === 'zh') return value.analysisLanguage
+  return /[\u3400-\u9fff]/u.test([value?.summary, value?.plainEnglish, ...(value?.legalReading ?? [])].join(' ')) ? 'zh' : 'en'
+}
+
+function increment(counts, key) {
+  counts[key] = (counts[key] ?? 0) + 1
+}
 
 function detectedSourceLanguage(document) {
   const retained = (document?.translations ?? []).filter((entry) => entry.status === 'no_translation_needed')
@@ -177,7 +356,7 @@ function unique(values) {
 }
 
 function renderMarkdown(value) {
-  return `# Bilingual legal-review audit\n\nGenerated: ${value.generatedAt}\n\n- Unique PDF contents: ${value.uniquePdfContents}\n- Professional reviews completed: ${value.professionalReview.completed ?? 0}\n- Professional reviews pending: ${value.professionalReview.pending ?? 0}\n- Release-ready bilingual records: ${value.releaseReady}\n\n## English target\n\n${renderCounts(value.englishTarget)}\n\n## Chinese target\n\n${renderCounts(value.chineseTarget)}\n\n## English legal analysis\n\n${renderCounts(value.englishLegalAnalysis)}\n\n## Chinese legal analysis\n\n${renderCounts(value.chineseLegalAnalysis)}\n`
+  return `# Bilingual legal-review audit\n\nGenerated: ${value.generatedAt}\n\n- Unique PDF contents: ${value.uniquePdfContents}\n- Professional reviews completed: ${value.professionalReview.completed ?? 0}\n- Professional reviews pending: ${value.professionalReview.pending ?? 0}\n- Release-ready bilingual records: ${value.releaseReady}\n- Analysis caches scanned for language consistency: ${value.languageConsistency.cachesScanned}\n- Records with wrong-language prose: ${value.languageConsistency.recordsWithMismatches}\n- Wrong-language fields: ${value.languageConsistency.fieldMismatches}\n- Records with high-risk semantic conflicts: ${value.semanticConsistency.recordsWithConflicts}\n- High-risk semantic field conflicts: ${value.semanticConsistency.fieldConflicts}\n- Chinese/English document pairs compared: ${value.bilingualSemanticConsistency.pairsCompared}\n- Chinese/English pairs with fact conflicts: ${value.bilingualSemanticConsistency.pairsWithConflicts}\n\n## Language consistency by field\n\n${renderCounts(value.languageConsistency.byField) || '- none'}\n\n## Semantic conflicts by reason\n\n${renderCounts(value.semanticConsistency.byReason) || '- none'}\n\n## Bilingual fact conflicts by reason\n\n${renderCounts(value.bilingualSemanticConsistency.byReason) || '- none'}\n\n## English target\n\n${renderCounts(value.englishTarget)}\n\n## Chinese target\n\n${renderCounts(value.chineseTarget)}\n\n## English legal analysis\n\n${renderCounts(value.englishLegalAnalysis)}\n\n## Chinese legal analysis\n\n${renderCounts(value.chineseLegalAnalysis)}\n`
 }
 
 function renderCounts(values) {

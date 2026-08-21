@@ -1067,6 +1067,73 @@ const documentResearch = {
       findings: [finding('summary', '上诉通知对 2026 年 7 月 2 日判决中的定罪和刑罚同时提出上诉。', [1])],
     },
   }),
+  'ca2-26-1853:14': report({
+    caseId: 'ca2-26-1853',
+    sha256: '6d576f248cc3e90e9d195b9a82ccf564b673031f760c288dc74f8e15f5a8a138',
+    posture: 'appellate_counsel_appearance',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-21T04:00:00.000+08:00',
+    en: {
+      summary: 'This one-page Second Circuit form identifies Joshua L. Dratel of Dratel & Lewis as lead counsel appearing for appellant Miles Guo in appeal 26-1853. The checked form acknowledges the appellate docket information and records counsel\'s appearance. It is a procedural filing by counsel, not a judicial ruling or an appellate merits brief.',
+      plainEnglish: 'This is the appeal\'s lawyer-registration and docket-check form. It tells the court who was acting as lead lawyer for Miles Guo on August 5, 2026 and confirms basic case-record information. It does not reveal the appeal arguments, predict whether the appeal will succeed, or prevent counsel from later asking to withdraw.',
+      legalReading: [
+        'The form names Joshua L. Dratel of Dratel & Lewis as lead counsel of record and states that the appearance is for the appellant.',
+        'The document is an acknowledgment-and-appearance filing used to confirm docket, party-designation, contact, related-case, and admission information. It does not adjudicate any of those matters beyond recording counsel\'s submitted responses.',
+        'An appearance places counsel on the appellate docket at that time. A later request to withdraw or substitute counsel requires separate treatment and is not granted by this form.',
+        'The filing contains no challenge to conviction, sentence, forfeiture, evidentiary ruling, or other merits issue.',
+      ],
+      caseConnections: [
+        'Read it with Document 15, the Form B transcript filing submitted the same day, and Entry 16, the separate request concerning appellate representation.',
+        'The public docket later records a case-manager change at Entry 17; that administrative notice does not alter this counsel filing.',
+      ],
+      whyItMatters: [
+        'It confirms who appeared for the appellant when required appellate forms were being completed.',
+        'It prevents the filing from being mistaken for a forfeiture document, a merits submission, or a court decision on representation.',
+      ],
+      verificationTasks: [
+        'Monitor the docket for the complete Entry 16 motion papers, any order granting or denying withdrawal, and any later appearance by successor counsel.',
+        'Use the current PACER or RECAP docket to confirm counsel of record because this form is only the August 5 snapshot.',
+      ],
+      riskFlags: [
+        'A filed appearance does not establish that the same lawyer remained counsel throughout the appeal.',
+        'The form is counsel\'s procedural submission, not a ruling on the merits or on any later substitution request.',
+      ],
+      findings: [
+        finding('summary', 'Joshua L. Dratel of Dratel & Lewis appears on the form as lead counsel for appellant Miles Guo in docket 26-1853.', [1]),
+        finding('legalReading', 'The document is an acknowledgment and notice of appearance, not a merits brief or judicial order.', [1]),
+      ],
+    },
+    zh: {
+      summary: '这份一页的第二巡回表格写明，Dratel & Lewis 的 Joshua L. Dratel 在 26-1853 号上诉中以 Miles Guo 上诉方首席律师身份出庭。表格通过勾选确认上诉案卷信息并登记律师出庭。它是律师提交的程序文件，不是法院裁定，也不是实体上诉书。',
+      plainEnglish: '可以把它理解为上诉阶段的“律师登记和案卷核对表”。它告诉法院，2026 年 8 月 5 日由谁担任 Miles Guo 的首席上诉律师，并确认基本案卷信息。它没有披露上诉理由，不能预测上诉成败，也不妨碍律师后来另行申请退出。',
+      legalReading: [
+        '表格列出 Dratel & Lewis 的 Joshua L. Dratel 为在册首席律师，并写明代表上诉人出庭。',
+        '这类出庭确认表用于核对案卷、当事方身份、联系信息、关联案件及律师准入信息；它只是记录律师提交的答复，不对这些事项作实体裁判。',
+        '提交出庭表表示该律师当时进入上诉案卷。后来如要解除或替换律师，需要另行申请，本表本身不会批准退出。',
+        '文件没有提出针对定罪、刑罚、没收、证据裁定或其他实体问题的上诉理由。',
+      ],
+      caseConnections: [
+        '应与同日提交的文件 15（Form B 庭审记录信息表）及 Entry 16 的上诉代理变更请求一起阅读。',
+        '公开案卷随后在 Entry 17 记录案件管理员变更；该行政通知不改变本律师出庭文件。',
+      ],
+      whyItMatters: [
+        '它确认提交必要上诉表格时由谁代表上诉人出庭。',
+        '它能防止本文件被误判为没收文件、实体上诉书或法院对律师身份作出的裁定。',
+      ],
+      verificationTasks: [
+        '继续追踪 Entry 16 的完整动议材料、法院批准或驳回退出的命令，以及接任律师后续提交的出庭表。',
+        '应通过当前 PACER 或 RECAP 案卷确认现任在册律师，因为本表只反映 8 月 5 日状态。',
+      ],
+      riskFlags: [
+        '提交出庭表不证明同一律师在整个上诉期间始终担任代理。',
+        '该表是律师的程序性提交，不是实体裁定，也不是对后续换律师请求的裁定。',
+      ],
+      findings: [
+        finding('summary', '表格把 Dratel & Lewis 的 Joshua L. Dratel 列为 26-1853 号案中 Miles Guo 上诉方首席律师。', [1]),
+        finding('legalReading', '该文件是出庭确认及案卷信息确认表，不是实体上诉书或法院命令。', [1]),
+      ],
+    },
+  }),
   'ca2-26-1853:15': report({
     caseId: 'ca2-26-1853',
     sha256: '2a247490751890832fa5cd7285540772d84327b48f4e5a273d4219d69efeef7f',
@@ -1143,6 +1210,150 @@ const documentResearch = {
         finding('legalReading', '律师说明大部分记录已经制作，其中包括完整审判记录。', [2]),
         finding('legalReading', '律师还说明其正申请解除代理；如申请获准，应由接任律师判断是否缺少或需要其他记录。', [2]),
         finding('riskFlags', '该文件不是实体上诉书，也不是批准解除代理的命令，其中没有实体上诉论证。', [1, 2]),
+      ],
+    },
+  }),
+  'ca2-26-1853:16-1': report({
+    caseId: 'ca2-26-1853',
+    sha256: 'd4f3d54b69c72ef8e1c9bcaad40a8ebe50a6bfe46d8589eebf50d772ce21b2a1',
+    posture: 'appellate_counsel_substitution_motion_information',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-21T04:00:00.000+08:00',
+    en: {
+      summary: 'This one-page Motion Information Statement asks the Second Circuit to relieve Joshua L. Dratel as CJA appellate counsel for Miles Guo and substitute the Federal Defenders as counsel. It identifies the requested relief and the participants, but it is not an order granting the change. The form refers readers to paragraph 5 of counsel\'s separate declaration for the government\'s position; that declaration is not contained in this PDF.',
+      plainEnglish: 'This is the cover sheet for a request to change the appeal lawyer. The request says Joshua Dratel should be allowed to leave and the Federal Defenders should take over. A request is not approval: this page does not show that the Second Circuit accepted the change, and it does not contain the separate declaration needed to understand the government\'s stated position.',
+      legalReading: [
+        'The requested relief is to relieve Joshua L. Dratel as CJA appellate counsel and substitute the Federal Defenders. The moving party is Miles Guo and the opposing party is the United States.',
+        'The form identifies the appealed-from judge as Judge Analisa Torres in the Southern District of New York. It does not challenge or decide any particular district-court ruling.',
+        'For the government\'s position, the form states only: “Gov\'t position set forth at para 5 of defense counsel\'s Declaration.” The referenced declaration must be reviewed before the government\'s consent, opposition, or reasoning can be characterized.',
+        'A Motion Information Statement summarizes the motion for docket administration. The operative request, factual grounds, legal authority, and any supporting declaration or response must be read from the complete motion papers.',
+        'Nothing on this page states that the court granted withdrawal, appointed the Federal Defenders, changed a briefing deadline, or addressed the merits of conviction, sentence, or forfeiture.',
+      ],
+      caseConnections: [
+        'Document 14 records Dratel\'s same-day appearance for the appellant, while Document 15 explains that the transcript-order decision was being deferred in part because counsel was moving to be relieved.',
+        'Document 17 is only a later case-manager change notice and is not an order on this motion.',
+        'The public docket metadata identifies additional material under Entry 16, but the current local corpus does not contain the referenced declaration body as a public PDF.',
+      ],
+      whyItMatters: [
+        'Who serves as appellate counsel affects record review, issue selection, and merits briefing.',
+        'The document must be described as a pending request unless a later court order and successor-counsel appearance confirm the change.',
+      ],
+      verificationTasks: [
+        'Obtain and review the complete Entry 16 motion, including the referenced declaration and any response, through PACER or a later RECAP upload.',
+        'Monitor for a Second Circuit order granting or denying withdrawal and for an appearance or appointment confirming successor counsel.',
+        'Check whether any briefing or transcript deadline changed after the representation issue was resolved.',
+      ],
+      riskFlags: [
+        'Do not report that the Federal Defenders were substituted from this cover sheet alone.',
+        'Do not characterize the government\'s position without paragraph 5 of the separate declaration and any government filing.',
+        'The document contains no appellate merits argument and supports no prediction about the appeal outcome.',
+      ],
+      findings: [
+        finding('summary', 'The form requests that Joshua L. Dratel be relieved as CJA appellate counsel and that the Federal Defenders be substituted.', [1]),
+        finding('legalReading', 'The form points to paragraph 5 of a separate defense-counsel declaration for the government\'s position.', [1]),
+        finding('riskFlags', 'This Motion Information Statement is not a court order granting withdrawal or substitution.', [1]),
+      ],
+    },
+    zh: {
+      summary: '这份一页动议信息表请求第二巡回解除 Joshua L. Dratel 作为 Miles Guo 的 CJA 上诉律师，并由 Federal Defenders 接替。它列出所请求的救济和参与方，但不是批准换律师的命令。关于检方立场，表格只要求读者查看律师另一份声明第 5 段；该声明正文不在这份 PDF 中。',
+      plainEnglish: '可以把它理解成“更换上诉律师申请”的封面。申请内容是让 Joshua Dratel 退出、由 Federal Defenders 接手。但提出申请不等于法院批准：这一页不能证明第二巡回已经同意换律师，而且缺少理解检方立场所需的另一份声明。',
+      legalReading: [
+        '所请求的救济是解除 Joshua L. Dratel 的 CJA 上诉律师职务，并由 Federal Defenders 接替。动议方是 Miles Guo，对方是美国政府。',
+        '表格把被上诉法院法官列为纽约南区 Analisa Torres 法官，但没有在本页挑战或裁判任何具体地区法院裁定。',
+        '关于检方立场，表格只写明：“见辩方律师声明第 5 段”。在审阅该声明前，不能把检方描述为同意、反对或具有某项具体理由。',
+        '动议信息表主要用于案卷管理和概括请求。实际请求的事实基础、法律依据、支持声明及回应，必须从完整动议材料读取。',
+        '本页没有说明法院批准律师退出、任命 Federal Defenders、变更书状期限，也没有处理定罪、刑罚或没收的实体问题。',
+      ],
+      caseConnections: [
+        '文件 14 记录 Dratel 同日代表上诉人出庭；文件 15 则解释，当时暂不新增订购庭审记录的原因之一，就是律师正在申请解除代理。',
+        '文件 17 只是后来发出的案件管理员变更通知，不是对本动议的裁定。',
+        '公开案卷元数据显示 Entry 16 另有材料，但当前本地资料库没有作为公开 PDF 收到本表所引用的声明正文。',
+      ],
+      whyItMatters: [
+        '由谁担任上诉律师，会影响案卷审阅、争点选择和实体上诉书准备。',
+        '在后续法院命令和接任律师出庭得到确认前，本文件只能表述为待裁请求。',
+      ],
+      verificationTasks: [
+        '通过 PACER 或后续 RECAP 上传取得并审阅完整 Entry 16 动议，包括所引用声明和任何回应。',
+        '继续追踪第二巡回批准或驳回退出的命令，以及能够确认接任律师的出庭表或任命记录。',
+        '核对代理问题解决后，实体书状或庭审记录期限是否发生变化。',
+      ],
+      riskFlags: [
+        '不能仅凭这张动议封面报告 Federal Defenders 已经接替。',
+        '没有声明第 5 段及任何检方文件时，不能概括检方立场。',
+        '文件没有实体上诉论证，不能用来预测上诉结果。',
+      ],
+      findings: [
+        finding('summary', '表格请求解除 Joshua L. Dratel 的 CJA 上诉律师职务，并由 Federal Defenders 接替。', [1]),
+        finding('legalReading', '表格把检方立场指向辩方律师另一份声明第 5 段。', [1]),
+        finding('riskFlags', '该动议信息表不是法院批准解除或替换律师的命令。', [1]),
+      ],
+    },
+  }),
+  'ca2-26-1853:17': report({
+    caseId: 'ca2-26-1853',
+    sha256: 'a976cceb019746a89c98d22f22152b690920ea4269eca9fe757438bade6850fb',
+    posture: 'appellate_case_manager_change_notice',
+    researchQuality: 'body_verified',
+    reviewedAt: '2026-08-21T04:00:00.000+08:00',
+    en: {
+      summary: 'This one-page August 6, 2026 notice states that the Second Circuit case manager assigned to appeal 26-1853 changed and directs inquiries to telephone number 212-857-8503. It is an administrative contact notice, not a ruling on counsel, briefing, the judgment, or the appeal.',
+      plainEnglish: 'The court changed the staff contact handling routine administration for this appeal. The notice is similar to receiving a new case-contact telephone number. It does not mean the judge changed, a lawyer was replaced, a deadline moved, or either side won anything.',
+      legalReading: [
+        'The notice identifies Second Circuit docket 26-1853, the related Southern District of New York docket 1:23-cr-118-1, and Judge Analisa Torres as the district judge.',
+        'Its only operative statement is that the assigned case manager changed; it supplies 212-857-8503 for inquiries.',
+        'The document does not identify a new judge, decide the motion concerning appellate counsel, establish a briefing schedule, or address any appellate issue.',
+        'A case manager performs court-administration functions. A change in that assignment has no stated effect on conviction, sentence, forfeiture, custody, or the applicable standards of review.',
+      ],
+      caseConnections: [
+        'The notice followed Documents 14 and 15 and the Entry 16 representation request, but it does not grant or deny any of them.',
+        'Any counsel change must be confirmed through an order, appointment, or later appearance; any deadline must be confirmed through a scheduling order or docket text.',
+      ],
+      whyItMatters: [
+        'It updates the administrative inquiry channel for the appeal.',
+        'Its narrow scope prevents a routine staffing notice from being misread as an appellate ruling or a change in representation.',
+      ],
+      verificationTasks: [
+        'Use the current Second Circuit docket for the latest case-contact and scheduling information.',
+        'Track separate orders on counsel, record preparation, briefing, sealed material, oral argument, and disposition.',
+      ],
+      riskFlags: [
+        'A case-manager change is not a judge reassignment and not a counsel substitution.',
+        'The notice changes no deadline or merits issue on its face.',
+      ],
+      findings: [
+        finding('summary', 'The Second Circuit states that the case manager assigned to appeal 26-1853 changed.', [1]),
+        finding('legalReading', 'The notice directs administrative inquiries to 212-857-8503 and contains no merits ruling.', [1]),
+      ],
+    },
+    zh: {
+      summary: '这份 2026 年 8 月 6 日的一页通知写明，第二巡回 26-1853 号上诉案的案件管理员已经变更，案件查询可拨打 212-857-8503。它是行政联系通知，不裁定律师身份、书状排期、原判或上诉实体问题。',
+      plainEnglish: '法院只是更换了负责这起上诉日常行政联系的工作人员，可以理解为“案件联系电话更新”。它不表示法官变了、律师被替换、期限被调整，也不表示任何一方取得了胜利。',
+      legalReading: [
+        '通知列出第二巡回案号 26-1853、关联纽约南区案号 1:23-cr-118-1，并列出地区法院法官 Analisa Torres。',
+        '文件唯一具有操作性的内容，是通知案件管理员已经变更，并提供查询电话 212-857-8503。',
+        '文件没有指定新法官，没有裁定上诉律师动议，没有确定实体书状排期，也没有处理任何上诉争点。',
+        '案件管理员负责法院行政事务。其分工变更对定罪、刑罚、没收、羁押或上诉审查标准没有任何已写明的影响。',
+      ],
+      caseConnections: [
+        '本通知出现在文件 14、15 及 Entry 16 的代理变更请求之后，但它没有批准或驳回其中任何事项。',
+        '律师变更必须由命令、任命或后续出庭记录确认；期限变更必须由排期命令或案卷文字确认。',
+      ],
+      whyItMatters: [
+        '它更新了本案的行政查询渠道。',
+        '明确其狭窄范围，可以防止普通行政通知被误读为上诉裁定或律师变更。',
+      ],
+      verificationTasks: [
+        '应以当前第二巡回案卷核对最新案件联系和排期信息。',
+        '另行追踪律师、案卷准备、实体书状、密封材料、口头辩论及最终处分相关命令。',
+      ],
+      riskFlags: [
+        '案件管理员变更不是法官更换，也不是律师替换。',
+        '从本通知文字看，它没有改变任何期限或实体争点。',
+      ],
+      findings: [
+        finding('summary', '第二巡回通知 26-1853 号上诉案的案件管理员已经变更。', [1]),
+        finding('legalReading', '通知把行政查询电话更新为 212-857-8503，其中没有实体裁定。', [1]),
       ],
     },
   }),
@@ -2194,13 +2405,77 @@ const documentResearch = {
 }
 
 const caseResearch = {
+  'scotus-26-194': bilingualCase(
+    `Core conclusion
+- Supreme Court No. 26-194 is a pending petition for a writ of certiorari, not a grant of review and not a merits ruling. Petitioners Mei Guo and HK International ask the Court to review the Second Circuit's construction of 11 U.S.C. § 544(a). [Official docket; Petition PDF pp. 1-2, 13-16]
+
+Current procedural posture
+- The petition was filed August 11 and docketed August 14, 2026. The Trustee filed a waiver of the present right to respond on August 17. On August 19, the petition was distributed for the September 28, 2026 conference. A waiver is not agreement, and conference distribution is not a certiorari grant. [Official docket; Waiver p. 1]
+
+Question presented
+- The petition asks whether § 544(a) authorizes a bankruptcy trustee to prosecute a state-law alter ego claim merely because the claim belongs generally to creditors of the estate. The dispute is about who owns and controls the cause of action before the alter ego merits are reached. [Petition PDF pp. 2, 15-16]
+
+Petitioners' legal theory
+- Petitioners characterize § 544(a) as a priority and avoidance tool that gives the trustee hypothetical lien-creditor, execution-creditor, and bona-fide-purchaser status. They argue that it does not assign creditor-owned causes of action against nondebtor third parties to the trustee. [Petition PDF pp. 14-19, 28-33]
+- They emphasize that Congress considered but omitted proposed § 544(c), which would expressly have allowed a trustee to enforce creditor causes of action, and rely on Caplin and Harrington v. Purdue Pharma to argue that bankruptcy policy cannot substitute for statutory authority. [Petition PDF pp. 18-19, 24-32]
+- They allege a direct circuit conflict: the Second and Seventh Circuits permit generalized creditor claims, while the Eighth Circuit rejects that use of § 544(a); the petition also discusses Ninth, Fifth, Sixth, and Eleventh Circuit authorities. That circuit-split description is advocacy in the petition until tested by any response and the Court's own assessment. [Petition PDF pp. 23-27]
+
+Connection to the asset dispute
+- The petition ties the legal question to HK USA, the Lady May, and a $37 million escrow. It says the Second Circuit affirmed under § 544(a) and expressly declined to decide the alternative § 541(a) theory. Reversal would challenge the appellate basis for trustee authority and ordinarily require remand; it would not itself decide every alter ego fact, ownership issue, or separate lower-court ground. [Petition PDF pp. 14-16, 19-23, 35]
+
+Plain-language explanation
+- Think of § 544(a) as giving a trustee a strong priority key. The dispute is whether that key only opens doors involving priority and avoidable interests in debtor property, or also lets the trustee take over lawsuits that state law originally gives to creditors. The petition argues the Second Circuit turned the key into a broader master key that Congress never supplied. The lower courts accepted the broader authority; the Supreme Court has not said whether it will review that question.
+
+What is not established
+- The Trustee has not filed a merits response in the Supreme Court. His waiver does not concede the alleged circuit split, statutory interpretation, facts, or requested relief.
+- The petition is one side's request for review. Its factual narrative and descriptions of other circuits must be checked against the appended decisions, the full lower-court record, and any later response or Supreme Court order.
+
+Watch next
+- Monitor whether the Court requests a response, relists the petition, calls for the views of the Solicitor General, grants certiorari, or denies the petition after the September 28 conference.
+- If review is granted, track the question accepted by the Court, merits briefing, amici, argument, and whether any disposition reaches only § 544(a) or also affects § 541(a), Lady May, and the escrow.
+
+Limitations
+This is neutral legal research based on the official Supreme Court docket and four version-locked official PDFs downloaded August 20, 2026. PACER remains necessary for exhaustive lower-court docket verification. This is legal information, not legal advice.`,
+    `核心结论
+- 美国最高法院第 26-194 号案目前只是待处理的调卷令申请，不是已经准许审查，也不是实体裁判。申请人 Mei Guo 和 HK International 请求最高法院审查第二巡回对《美国法典》第 11 编 § 544(a) 的解释。[最高法院官方案卷；申请书 PDF 第 1-2、13-16 页]
+
+当前程序状态
+- 调卷令申请于 2026 年 8 月 11 日提交、8 月 14 日登记。受托人于 8 月 17 日放弃当前回应权；8 月 19 日，申请被分发至 2026 年 9 月 28 日法官会议。放弃回应不等于同意，分发至会议也不等于最高法院已受理。[最高法院官方案卷；放弃书第 1 页]
+
+申请提出的法律问题
+- 申请询问：仅仅因为一项州法人格混同请求普遍属于破产财产的债权人，§ 544(a) 是否就授权破产受托人提起该请求。这里首先争议的是“谁拥有并控制诉权”，尚未直接进入人格混同实体事实是否成立。[申请书 PDF 第 2、15-16 页]
+
+申请人的法律理论
+- 申请人把 § 544(a) 解释为优先顺位和撤销工具：它赋予受托人假想的司法留置权债权人、执行债权人和善意不动产购买人地位，但不会把债权人针对非债务第三方拥有的诉因转让给受托人。[申请书 PDF 第 14-19、28-33 页]
+- 申请人强调，国会曾考虑但最终删除拟议的 § 544(c)；该条本来会明确授权受托人执行债权人的诉因。申请还援引 Caplin 与 Harrington v. Purdue Pharma，主张破产政策目标不能代替法条授权。[申请书 PDF 第 18-19、24-32 页]
+- 申请人主张存在直接巡回法院分歧：第二、第七巡回允许受托人提起一般化债权人请求，第八巡回拒绝这种 § 544(a) 用法；申请还讨论第九、第五、第六和第十一巡回的判例。对“巡回分歧”的描述属于申请方论证，仍需与以后可能出现的回应及最高法院自身判断区分。[申请书 PDF 第 23-27 页]
+
+与资产争议的连接
+- 申请把法律问题与 HK USA、Lady May 及 3,700 万美元托管款相连。申请称第二巡回依据 § 544(a) 维持裁判，并明确没有决定备选的 § 541(a) 理论。即使最高法院推翻该理由，通常也只是动摇受托人权限的上诉依据并要求发回，并不会自动决定全部人格混同事实、资产所有权或其他下级法院理由。[申请书 PDF 第 14-16、19-23、35 页]
+
+通俗解读
+- 可以把 § 544(a) 想成给受托人的一把“优先顺位钥匙”。争议在于：这把钥匙只能打开与债务人财产优先顺位、可撤销权益有关的门，还是也能让受托人接管州法原本交给债权人的诉讼。申请人认为，第二巡回把普通钥匙扩成了国会没有明确交付的“万能钥匙”；下级法院接受了较宽的权限解释，但最高法院尚未决定是否审查。
+
+尚未确认的事项
+- 受托人尚未在最高法院提交实体回应。放弃当前回应权不代表其承认巡回分歧、法条解释、事实叙述或申请人请求的救济。
+- 调卷令申请是一方请求最高法院审查的书状。其事实叙述和对其他巡回判例的概括，必须结合所附下级法院裁判、完整下级法院记录，以及以后可能出现的回应或最高法院命令核验。
+
+后续观察
+- 关注最高法院是否要求回应、再次列会、要求联邦政府提交意见、准许调卷令，或在 9 月 28 日会议后驳回申请。
+- 如果准许审查，应继续追踪最高法院实际接受的问题、实体书状、法庭之友意见、口头辩论，以及最终处理是否仅涉及 § 544(a)，还是进一步影响 § 541(a)、Lady May 和托管款。
+
+分析限制
+本中立法律研究依据最高法院官方案卷及 2026 年 8 月 20 日下载并按哈希锁定的四份官方 PDF。下级法院案卷是否穷尽仍需 PACER 核验。本内容属于法律信息，不是法律意见。`,
+    4,
+  ),
   'ca2-26-1853': bilingualCase(
     `Core conclusion
 - The direct criminal appeal is open in the Second Circuit. The notice of appeal reaches both conviction and sentence, but no merits brief or briefing schedule appears in the public docket reviewed through August 12, 2026. [SDNY Doc 862, p. 1; CA2 docket 26-1853]
 
 Current procedural posture
-- After dismissal warnings concerning required forms, counsel filed the appearance form and Form B. Form B states that no additional transcript was being ordered on August 5 because much of the record, including the complete trial transcript, had already been produced and because counsel simultaneously moved to withdraw. [CA2 Entries 12-16; Doc 15, pp. 1-2]
-- The public docket reviewed through August 12 shows the withdrawal motion and a later case-manager assignment, but no displayed order granting withdrawal. The identity of continuing or successor merits counsel must therefore remain marked as pending public confirmation. [CA2 Entries 16-17]
+- After dismissal warnings concerning required forms, Dratel filed the appearance form and Form B. Form B states that no additional transcript was being ordered on August 5 because much of the record, including the complete trial transcript, had already been produced and because counsel simultaneously moved to withdraw. [CA2 Docs 14-15]
+- Document 16-1 requests that Dratel be relieved as CJA appellate counsel and that the Federal Defenders be substituted. It is a motion information statement, not an order. It points to a separate declaration for the government's position, and that declaration body is not in the current local PDF set. [CA2 Doc 16-1, p. 1]
+- Document 17 only changes the court's administrative case manager and inquiry telephone number. It does not decide the representation motion. No collected order grants withdrawal, so the identity of continuing or successor merits counsel remains pending public confirmation. [CA2 Doc 17, p. 1]
 
 What is and is not established
 - The appeal itself is established, and its notice covers conviction and sentence. The particular appellate claims, preservation record, standards of review, requested relief, and government responses are not yet established by merits briefs. [SDNY Doc 862, p. 1]
@@ -2220,8 +2495,9 @@ This neutral procedural analysis uses the public CourtListener/RECAP docket and 
 - 刑事直接上诉已在第二巡回立案。上诉通知同时覆盖定罪和刑罚，但截至 2026 年 8 月 12 日核验的公开案卷，尚未显示实体上诉书或实体书状排期。[SDNY Doc 862，第 1 页；第二巡回案号 26-1853]
 
 当前程序状态
-- 法院曾因必要表格未提交而警告可能驳回上诉；之后律师提交了出庭表和 Form B。Form B 说明，2026 年 8 月 5 日没有新增订购庭审记录，因为大部分记录（包括完整审判记录）已经制作，而且律师同日申请解除代理。[第二巡回 Entries 12-16；Doc 15，第 1-2 页]
-- 截至 8 月 12 日核验的公开案卷显示了解除代理动议以及其后的案件管理员分配，但没有显示批准解除代理的命令。因此，后续究竟由原律师还是接任律师负责实体上诉，仍应标记为等待公开确认。[第二巡回 Entries 16-17]
+- 法院曾因必要表格未提交而警告可能驳回上诉；之后 Dratel 提交了出庭表和 Form B。Form B 说明，2026 年 8 月 5 日没有新增订购庭审记录，因为大部分记录（包括完整审判记录）已经制作，而且律师同日申请解除代理。[第二巡回 Docs 14-15]
+- 文件 16-1 请求解除 Dratel 的 CJA 上诉律师职务，并由 Federal Defenders 接替。它是动议信息表，不是法院命令；表格把检方立场指向另一份声明，而该声明正文不在当前本地 PDF 集中。[第二巡回 Doc 16-1，第 1 页]
+- 文件 17 只变更法院内部案件管理员和查询电话，不裁定律师动议。当前已收集文件中没有批准解除代理的命令，因此后续究竟由原律师还是接任律师负责实体上诉，仍应标记为等待公开确认。[第二巡回 Doc 17，第 1 页]
 
 已经确认与尚未确认的事项
 - 已确认上诉存在，且通知范围包括定罪和刑罚。具体上诉理由、争点是否保留、审查标准、请求的救济及检方回应，尚未由实体书状确定。[SDNY Doc 862，第 1 页]
@@ -2237,7 +2513,7 @@ This neutral procedural analysis uses the public CourtListener/RECAP docket and 
 
 分析限制
 本中立程序分析依据公开 CourtListener/RECAP 案卷及版本锁定文件。公开页面可能滞后于 PACER；公开页面没有显示某项文件，也不能证明密封或刚提交的文件绝对不存在。本内容属于法律信息，不是法律意见。`,
-    2,
+    5,
   ),
   'edny-26-mc-2795': bilingualCase(
     `Core conclusion
@@ -2294,9 +2570,9 @@ This neutral analysis is limited to the signed one-page order. It is legal infor
     1,
   ),
   'bkd-24-05249-aca': bilingualCase(
-    'Core conclusion\n- Doc 192 supplies a substantial defense-side response: admissions, denials, insufficient-information responses, fifteen affirmative or other defenses, and a jury demand. [Doc 192, pp. 14-29]\n\nContested positions\n- Defendants dispute whether the debtor owned an interest in the transferred property, whether § 550 permits recovery, standing, due process, and personal and subject-matter jurisdiction. These are preserved defenses, not rulings. [Doc 192, pp. 27-28]\n\nEvidence gaps\n- Amended Complaint Doc 106 and later dispositive rulings are required for a reliable whole-case analysis.\n\nWatch next\n- Track jurisdiction, jury entitlement, withdrawal of the reference, limitations, standing, and settlement or merits disposition.\n\nLimitations\nA joint answer does not prove common ownership, control, alter ego, or liability.',
-    '核心结论\n- Doc 192 提供了重要的被告方回应：承认、否认、信息不足答复、十五项积极或其他抗辩，以及陪审团请求。[Doc 192，第 14-29 页]\n\n争议立场\n- 被告争议债务人是否拥有转移财产利益、§ 550 是否允许追回、诉讼资格、正当程序、属人和事项管辖权；这些是保留的抗辩，不是裁定。[Doc 192，第 27-28 页]\n\n证据缺口\n- 必须取得修订起诉状 Doc 106 和后续终局性裁定，才能形成可靠的案件整体分析。\n\n后续观察\n- 追踪管辖权、陪审团权、withdrawal of reference、时效、诉讼资格以及和解或实体处分。\n\n分析限制\n共同答辩不能证明共同所有、控制、人格混同或责任。',
-    1,
+    'Core conclusion\n- The case has reached a major dispositive-motion stage. In Doc 331, the trustee asks for summary judgment on Claims 17-21 and 26 concerning ACA Capital and five Himalaya entities; the attached judgment is expressly proposed, not entered. [Doc 331, pp. 1-3, 7-12]\n- Doc 331-1 argues that English-law beneficial-ownership principles, criminal findings, issue preclusion, discovery sanctions, witness evidence, and transfers establish estate ownership. Those are trustee arguments until adopted by the court. [Doc 331-1, pp. 6-15, 41-62]\n- Doc 192 remains the principal local defense pleading, preserving denials, fifteen defenses, jurisdictional objections, and a jury demand. [Doc 192, pp. 14-29]\n\nContested positions\n- The court must decide whether criminal findings bind Je or nonparty entities, what weight sentencing findings receive, whether discovery sanctions narrow the defense record, whether beneficial ownership is established without a trial, and whether any genuine material-fact dispute remains.\n- Defendants previously disputed debtor property interests, § 550 recovery, standing, due process, and jurisdiction; the current local set does not yet include their response to Doc 331. [Doc 192, pp. 27-28]\n\nCross-case connections\n- The motion overlaps factually with the criminal case, forfeiture, main bankruptcy estate, foreign corporate records, other alter-ego proceedings, and Supreme Court No. 26-194, but these tracks do not share one automatic ownership standard.\n\nEvidence integrity\n- Doc 331-2 ¶ 2 says the criminal judgment issued July 6, 2026; criminal Doc 860 records entry on July 2, 2026. Treat July 6 as a party-file discrepancy, not the established judgment date. [Doc 331-2, p. 2]\n\nWatch next\n- Collect the opposition, Rule 56(a)(2) counterstatement, reply, hearing, signed order, and any Rule 54(b) judgment or appeal.\n\nLimitations\nNo estate ownership transfer, turnover, immediate enforcement, or foreign implementation should be reported unless the court actually grants it.',
+    '核心结论\n- 本案已进入重要的终局性动议阶段。受托人在 Doc 331 中就 ACA Capital 和五家 Himalaya 实体相关的第十七至二十一及第二十六项诉因请求简易判决；附件明确是拟议判决，不是已录入判决。[Doc 331，第 1-3、7-12 页]\n- Doc 331-1 主张英格兰法实益所有权原则、刑事认定、争点排除、证据开示制裁、证人证据和转账足以证明破产财产所有权。在法院采纳前，这些仍是受托人论证。[Doc 331-1，第 6-15、41-62 页]\n- Doc 192 仍是本地最主要的被告方诉状，保留否认、十五项抗辩、管辖权异议和陪审团请求。[Doc 192，第 14-29 页]\n\n争议立场\n- 法院仍需决定：刑事认定是否约束 Je 或非刑事案当事方实体；量刑认定具有何种效力；证据开示制裁是否限缩被告证据；能否不经审判认定实益所有权；是否仍存在真实重大事实争议。\n- 被告此前争议债务人财产利益、§ 550 追回、诉讼资格、正当程序和管辖权；当前本地资料尚未包含其对 Doc 331 的回应。[Doc 192，第 27-28 页]\n\n跨案件关联\n- 本动议与刑事案、没收、破产主案、境外公司记录、其他人格混同程序及最高法院 26-194 号案存在事实交叉，但这些程序并不自动适用同一所有权标准。\n\n证据完整性\n- Doc 331-2 第 2 段称刑事判决于 2026 年 7 月 6 日作出；刑事 Doc 860 记载判决于 2026 年 7 月 2 日录入。应把 7 月 6 日视为当事方文件中的日期冲突，而非已确定判决日期。[Doc 331-2，第 2 页]\n\n后续观察\n- 收集反对书、Rule 56(a)(2) 反事实陈述、回复、听证、签署命令，以及任何 Rule 54(b) 判决或上诉。\n\n分析限制\n法院实际准许前，不得报告破产财产所有权已经转移、资产已经交付、救济可立即执行或已经可以境外实施。',
+    4,
   ),
   'bkd-24-05275-lamp': bilingualCase(
     'Core conclusion\n- The trustee complaint pleads 109 avoidance and recovery claims across a broad alleged entity and transfer network. It seeks relief under §§ 544, 548, 549, and 550 and New York law. [Doc 1, pp. 18-166]\n\nContested positions\n- Alter-ego, control, ownership, transfer, insolvency, intent, and recoverability statements are trustee allegations unless later adopted by the court.\n\nEvidence gaps\n- Page 168 states the transaction schedules are sealed. The local set also lacks the defendants\' substantive responses and later merits disposition.\n\nCross-case connections\n- Compare each entity and transfer with ACA Doc 192, the main bankruptcy case, criminal forfeiture, SEC/Fair Fund, and withdrawal-of-reference proceedings.\n\nLimitations\nRequested amounts under overlapping legal theories are not adjudicated recoveries and should not be simply totaled.',

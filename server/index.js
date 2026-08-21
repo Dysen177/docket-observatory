@@ -1199,7 +1199,11 @@ app.post('/api/research-chat', async (request, response, next) => {
         createdAt: new Date().toISOString(),
       }
       messages = [
-        ...(existingConversation?.messages ?? []).map((message) => ({ role: message.role, content: message.content })),
+        ...(existingConversation?.messages ?? []).map((message) => ({
+          role: message.role,
+          content: message.content,
+          ...(message.role === 'assistant' && message.response?.mode ? { mode: message.response.mode } : {}),
+        })),
         { role: 'user', content },
       ]
     }
@@ -1400,10 +1404,12 @@ app.post('/api/automation/start', async (request, response, next) => {
           ? request.body.outputLanguages
           : getPublicSettings().settings.automationLanguage,
         includeAi: typeof request.body?.includeAi === 'boolean' ? request.body.includeAi : getPublicSettings().settings.includeAi,
+        forceLocalRules: request.body?.forceLocalRules === true,
         includeTranslation: typeof request.body?.includeTranslation === 'boolean' ? request.body.includeTranslation : getPublicSettings().settings.includeTranslation,
         limit: request.body?.limit,
         pageLimit: request.body?.pageLimit,
         charLimit: request.body?.charLimit,
+        reuseCurrentManifest: request.body?.reuseCurrentManifest === true,
       },
     )
     response.status(202).json(run)

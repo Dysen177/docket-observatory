@@ -41,7 +41,18 @@ export async function queryPublicRecordTranscripts(query = {}, language = 'zh') 
   const matchesById = new Map()
   const addMatch = (record) => {
     const current = matchesById.get(record.id)
-    if (!current || Number(record.score ?? 0) > Number(current.score ?? 0)) matchesById.set(record.id, record)
+    if (!current) {
+      matchesById.set(record.id, record)
+      return
+    }
+    if (language === 'en') {
+      if (current.language === 'en' && record.language !== 'en') return
+      if (current.language !== 'en' && record.language === 'en') {
+        matchesById.set(record.id, record)
+        return
+      }
+    }
+    if (Number(record.score ?? 0) > Number(current.score ?? 0)) matchesById.set(record.id, record)
   }
   let matches = q ? [] : candidateMetadata.map((record) => compactMetadataRecord(record))
 
@@ -100,6 +111,9 @@ export async function queryPublicRecordTranscripts(query = {}, language = 'zh') 
     return left.id.localeCompare(right.id)
   })
 
+  const page = matches.slice(offset, offset + limit)
+  const displayTranslationsById = await loadDisplayTranslationRecords(page, language, translationMetadataById)
+
   return {
     coverage: publicCoverage(manifest),
     filters: { q, year: year || 'all', sort },
@@ -112,8 +126,27 @@ export async function queryPublicRecordTranscripts(query = {}, language = 'zh') 
     offset,
     limit,
     hasMore: offset + limit < matches.length,
-    records: matches.slice(offset, offset + limit).map((record) => localizeSearchResult(record, language, translationMetadataById)),
+    records: page.map((record) => localizeSearchResult(record, language, translationMetadataById, displayTranslationsById)),
   }
+}
+
+async function loadDisplayTranslationRecords(records, language, translationMetadataById) {
+  if (language !== 'en') return new Map()
+  const requiredIds = new Set(records
+    .filter((record) => record.language !== 'en' && record.hits?.length)
+    .map((record) => record.id))
+  if (!requiredIds.size) return new Map()
+  const metadata = [...requiredIds]
+    .map((id) => translationMetadataById.get(id))
+    .filter((record) => record?.status !== 'missing' && record?.dataShard)
+  const translations = new Map()
+  for (const [dataShard, shardMetadata] of Map.groupBy(metadata, (record) => record.dataShard)) {
+    const shardIds = new Set(shardMetadata.map((record) => record.id))
+    for (const record of await loadTranslationDataShard(dataShard, language)) {
+      if (shardIds.has(record.id)) translations.set(record.id, record)
+    }
+  }
+  return translations
 }
 
 export async function getPublicRecordCorpusSummary(language = 'en') {
@@ -155,8 +188,14 @@ export async function retrieveTranscriptEvidence(query, options = {}) {
     context: 1,
   }, options.language ?? 'zh')
   const citations = []
-  for (const record of payload.records) {
-    for (const hit of record.hits.slice(0, 2)) {
+  const maxCitations = Number(options.citationLimit) || 14
+  // Give the model the best passage from several independent records before
+  // adding a second passage from any one record. This preserves source breadth
+  // and prevents a weak secondary hit from displacing a stronger co-occurrence.
+  for (let hitIndex = 0; hitIndex < 2; hitIndex += 1) {
+    for (const record of payload.records) {
+      const hit = record.hits[hitIndex]
+      if (!hit) continue
       const citation = {
         transcriptId: record.id,
         date: record.date,
@@ -171,9 +210,9 @@ export async function retrieveTranscriptEvidence(query, options = {}) {
       }
       if (citations.some((existing) => equivalentCitation(existing, citation))) continue
       citations.push(citation)
-      if (citations.length >= (Number(options.citationLimit) || 14)) break
+      if (citations.length >= maxCitations) break
     }
-    if (citations.length >= (Number(options.citationLimit) || 14)) break
+    if (citations.length >= maxCitations) break
   }
   return { coverage: payload.coverage, totalRecords: payload.total, citations }
 }
@@ -313,30 +352,74 @@ function metadataMatchesQuery(record, terms) {
 function matchTranscript(record, terms, rawQuery, contextRadius) {
   if (!rawQuery) return compactTranscriptRecord(record, [], 0)
   const normalizedTitle = normalizeSearchText(record.title)
-  const hits = []
-  let score = 0
-  for (const [index, segment] of record.segments.entries()) {
-    const normalized = normalizeSearchText(segment.text)
+  const normalizedSegments = record.segments.map((segment) => normalizeSearchText(segment.text))
+  const exactSubjectTerms = independentExactTerms(terms, rawQuery)
+  const candidates = []
+  for (const index of record.segments.keys()) {
+    const normalized = normalizedSegments[index]
     const matched = bestMatchingTerm(normalized, terms)
     if (!matched) continue
     const start = Math.max(0, index - contextRadius)
     const end = Math.min(record.segments.length, index + contextRadius + 1)
-    hits.push({
+    const localText = normalizedSegments.slice(start, end).join(' ')
+    const localExactMatches = exactSubjectTerms.filter((term) => localText.includes(term.normalized))
+    const localSegments = record.segments.slice(start, end)
+    const mentionedNames = extractMentionedNames(localSegments.map((item) => item.text).join(' '), matched.value)
+    candidates.push({
+      index,
+      contextStart: start,
+      contextEnd: end,
+      localExactMatchCount: localExactMatches.length,
+      matchesAllExactSubjects: exactSubjectTerms.length > 1 && localExactMatches.length === exactSubjectTerms.length,
+      matchSpecificity: matched.normalized.length,
+      nameSpecificity: mentionedNames.reduce((value, name) => Math.max(value, normalizeSearchText(name).length), 0),
+      mentionedNames,
+      matched,
+    })
+  }
+  candidates.sort(compareTranscriptHitCandidates)
+  const hits = candidates.slice(0, 8).map((candidate) => {
+    const segment = record.segments[candidate.index]
+    return {
+      segmentIndex: candidate.index,
       start: segment.start,
       end: segment.end,
       text: segment.text,
-      contextBefore: record.segments.slice(start, index).map(publicSegment),
-      contextAfter: record.segments.slice(index + 1, end).map(publicSegment),
-      matchReason: matched.reason,
-      matchedTerm: matched.value,
-    })
-    score += matched.reason === 'exact' ? 12 : 7
-    if (hits.length >= 8) break
-  }
+      contextBefore: record.segments.slice(candidate.contextStart, candidate.index).map(publicSegment),
+      contextAfter: record.segments.slice(candidate.index + 1, candidate.contextEnd).map(publicSegment),
+      matchReason: candidate.matched.reason,
+      matchedTerm: candidate.matched.value,
+      mentionedNames: candidate.mentionedNames,
+    }
+  })
   const titleMatch = bestMatchingTerm(normalizedTitle, terms)
-  if (titleMatch) score += titleMatch.reason === 'exact' ? 20 : 12
   if (!hits.length && !titleMatch) return null
+  const topCandidate = candidates[0]
+  const score = topCandidate
+    ? (topCandidate.matchesAllExactSubjects ? 50_000 : 0)
+      + topCandidate.localExactMatchCount * 10_000
+      + (topCandidate.matched.reason === 'exact' ? 1_000 : 0)
+      + Math.min(500, topCandidate.nameSpecificity * 10 + topCandidate.matchSpecificity)
+      + Math.min(99, candidates.length)
+      + (titleMatch ? titleMatch.reason === 'exact' ? 20 : 12 : 0)
+    : titleMatch?.reason === 'exact' ? 20 : 12
   return compactTranscriptRecord(record, hits, score, Boolean(titleMatch))
+}
+
+function compareTranscriptHitCandidates(left, right) {
+  return Number(right.matchesAllExactSubjects) - Number(left.matchesAllExactSubjects)
+    || right.localExactMatchCount - left.localExactMatchCount
+    || Number(right.matched.reason === 'exact') - Number(left.matched.reason === 'exact')
+    || right.nameSpecificity - left.nameSpecificity
+    || right.matchSpecificity - left.matchSpecificity
+    || Number(left.index) - Number(right.index)
+}
+
+function independentExactTerms(terms, rawQuery) {
+  const normalizedQuery = normalizeSearchText(rawQuery)
+  const lexical = terms.filter((term) => term.reason === 'exact' && term.normalized !== normalizedQuery)
+  const candidates = lexical.length ? lexical : terms.filter((term) => term.reason === 'exact')
+  return candidates.filter((term, index, values) => values.findIndex((item) => item.normalized === term.normalized) === index)
 }
 
 function bestMatchingTerm(haystack, terms) {
@@ -370,9 +453,32 @@ function lexicalSearchTerms(query) {
   const latinTokens = (String(query).match(/[a-z0-9][a-z0-9._-]*/giu) ?? []).filter((token) => token.length >= 2 && !latinStopWords.has(token.toLowerCase()))
   const latin = latinTokens.length ? [latinTokens.join(' ')] : []
   const cjkWithoutQuestionWords = String(query)
-    .replace(/郭文贵|哪些|哪一|直播|视频|公开言论|文字|里面|当中|谈到|提到|说过|说了什么|是什么|如何|怎么|为什么|请|帮我|查找|搜索|关于|相关|梳理|时间线|按时间|按日期|变化|观点|看法|情况|陈述|说法|发言|原文|内容|代表性|是否|有没有|分别|所有|最早|最晚|最后|最近|何时|时候|首次|第一次|计划/gu, ' ')
+    .replace(/郭文贵|哪些|哪一|直播|视频|公开言论|文字|里面|当中|谈到|提到|怎么说|说了什么|说过|说的|谈论|是什么|如何|怎么|为什么|请|帮我|查找|搜索|关于|相关|梳理|时间线|按时间|按日期|变化|观点|看法|情况|陈述|说法|发言|原文|内容|代表性|是否|有没有|分别|所有|最早|最晚|最后|最近|何时|时候|首次|第一次|计划/gu, ' ')
+    .replace(/是不是|是/gu, ' ')
+    .replace(/[的了呢吗]/gu, ' ')
   const cjk = cjkWithoutQuestionWords.match(/[\p{Script=Han}]{2,24}/gu) ?? []
   return [...new Set([...quoted, ...latin, ...cjk])]
+}
+
+function extractMentionedNames(value, matchedTerm = '') {
+  const text = String(value ?? '').normalize('NFKC')
+  if (!text) return []
+  const names = []
+  const add = (name) => {
+    const cleaned = String(name ?? '').replace(/\s+/gu, ' ').trim()
+    if (cleaned.length >= 2 && !names.some((item) => normalizeSearchText(item) === normalizeSearchText(cleaned))) names.push(cleaned)
+  }
+  const patterns = [
+    /(?:John|Henry\s+Sturgis|J\.?\s*P\.?)\s+Morgan\b/giu,
+    /\bMorgan\s+Stanley\b/giu,
+    /约翰[·・]?摩根|摩根先生|摩根夫人|摩根家族|摩根大通|摩根斯坦利|摩根银行/gu,
+  ]
+  for (const pattern of patterns) {
+    for (const match of text.matchAll(pattern)) add(match[0])
+  }
+  const subject = String(matchedTerm ?? '').trim()
+  if (!names.length && subject.length >= 2 && text.includes(subject)) add(subject)
+  return names.slice(0, 6)
 }
 
 function normalizeTranscriptSort(value, hasQuery) {
@@ -422,7 +528,7 @@ function publicCoverage(manifest) {
   }
 }
 
-function localizeSearchResult(record, language, translationMetadataById = new Map()) {
+function localizeSearchResult(record, language, translationMetadataById = new Map(), displayTranslationsById = new Map()) {
   const classification = classifyTranscriptRecord(record)
   const translationMetadata = language === 'en' ? translationMetadataById.get(record.id) : null
   return {
@@ -441,7 +547,7 @@ function localizeSearchResult(record, language, translationMetadataById = new Ma
     transcriptSourceLinks: record.transcriptSourceLinks ?? [],
     segmentCount: translationMetadata?.segmentCount ?? record.segmentCount,
     charCount: translationMetadata?.charCount ?? record.charCount,
-    hits: record.hits,
+    hits: localizeTranscriptHits(record.hits ?? [], language, displayTranslationsById.get(record.id)),
     titleMatched: Boolean(record.titleMatched),
     score: record.score,
     ...classification,
@@ -458,6 +564,46 @@ function localizeSearchResult(record, language, translationMetadataById = new Ma
         ? 'The external source link is retained, but no usable transcript is currently available. Public content is not a judicial finding.'
         : '外部来源链接已保留，当前没有可用文字；公开内容不等于法院认定。',
   }
+}
+
+function localizeTranscriptHits(hits, language, translationRecord) {
+  if (language !== 'en') return hits
+  const translatedSegments = Array.isArray(translationRecord?.segments) ? translationRecord.segments : []
+  return hits.map((hit) => {
+    const segmentIndex = Number(hit.segmentIndex)
+    const translated = Number.isInteger(segmentIndex) ? translatedSegments[segmentIndex] : null
+    const contextStart = Number.isInteger(segmentIndex) ? segmentIndex - (hit.contextBefore?.length ?? 0) : -1
+    return {
+      ...hit,
+      text: String(translated?.text ?? hit.text),
+      contextBefore: (hit.contextBefore ?? []).map((segment, index) => translatedPublicSegment(translatedSegments[contextStart + index], segment)),
+      contextAfter: (hit.contextAfter ?? []).map((segment, index) => translatedPublicSegment(translatedSegments[segmentIndex + index + 1], segment)),
+      mentionedNames: (hit.mentionedNames ?? []).map(localizeMentionedName),
+    }
+  })
+}
+
+function translatedPublicSegment(translated, fallback) {
+  return {
+    start: Number.isFinite(Number(translated?.start)) ? Number(translated.start) : fallback.start,
+    end: Number.isFinite(Number(translated?.end)) ? Number(translated.end) : fallback.end,
+    text: String(translated?.text ?? fallback.text),
+  }
+}
+
+function localizeMentionedName(name) {
+  const labels = {
+    '摩根': 'Morgan',
+    '摩根家族': 'Morgan family',
+    '摩根先生': 'Mr. Morgan',
+    '摩根夫人': 'Mrs. Morgan',
+    '约翰摩根': 'John Morgan',
+    '约翰·摩根': 'John Morgan',
+    '摩根大通': 'JPMorgan',
+    '摩根斯坦利': 'Morgan Stanley',
+    '摩根银行': 'Morgan bank',
+  }
+  return labels[name] ?? name
 }
 
 function compactMetadataRecord(record) {

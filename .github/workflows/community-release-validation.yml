@@ -108,8 +108,8 @@ jobs:
                       $parsed.version -eq $expectedVersion -and
                       $parsed.platform -eq 'win32' -and
                       $parsed.arch -eq 'x64' -and
-                      $parsed.transcriptCorpus.searchableTranscripts -eq 5097 -and
-                      $parsed.transcriptCorpus.englishRecords -eq 5097 -and
+                      $parsed.transcriptCorpus.searchableTranscripts -eq 5098 -and
+                      $parsed.transcriptCorpus.englishRecords -eq 5098 -and
                       $parsed.transcriptCorpus.englishMissingRecords -eq 0 -and
                       $parsed.transcriptCorpus.englishComplete -eq $true
                     ) {

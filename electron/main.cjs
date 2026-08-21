@@ -1,19 +1,19 @@
 const { app, BrowserWindow, ipcMain, safeStorage, session, shell } = require('electron')
 const { randomBytes } = require('node:crypto')
 const { appendFile, chmod, mkdir, readFile, stat, writeFile } = require('node:fs/promises')
+const { createServer } = require('node:net')
 const path = require('node:path')
 const { pathToFileURL } = require('node:url')
 const { APPLICATION_NAME } = require('./app-identity.cjs')
 const { createMacSecretStore } = require('./macos-secret-store.cjs')
-const { isAllowedExternalUrl } = require('../server/network-policy.cjs')
 const { installBundledSeedCache } = require('./seed-installer.cjs')
 
 app.setName(APPLICATION_NAME)
 if (process.platform === 'darwin') app.commandLine.appendSwitch('use-mock-keychain')
 if (process.platform === 'win32') app.disableHardwareAcceleration()
 
-const apiPort = process.env.GUO_INTEL_API_PORT || '4177'
 const devUrl = process.env.GUO_INTEL_ELECTRON_DEV_URL
+let apiPort = process.env.GUO_INTEL_API_PORT || (devUrl ? '4177' : '')
 let downloadsRoot = null
 let secretVaultPath = null
 const localApiToken = randomBytes(32).toString('base64url')
@@ -30,6 +30,23 @@ function recordDiagnostic(message, error = null) {
   const detail = error instanceof Error ? `${message}: ${error.stack || error.message}` : `${message}: ${String(error ?? '')}`
   console.error(detail)
   void appendFile(diagnosticPath(), `[${new Date().toISOString()}] ${detail}\n`).catch(() => undefined)
+}
+
+function findAvailableLoopbackPort() {
+  return new Promise((resolve, reject) => {
+    const probe = createServer()
+    probe.unref()
+    probe.once('error', reject)
+    probe.listen(0, '127.0.0.1', () => {
+      const address = probe.address()
+      const selectedPort = typeof address === 'object' && address ? address.port : 0
+      probe.close((error) => {
+        if (error) reject(error)
+        else if (selectedPort > 0) resolve(String(selectedPort))
+        else reject(new Error('The operating system did not allocate a loopback port.'))
+      })
+    })
+  })
 }
 
 async function waitForLocalApi(timeoutMs = 30000) {
@@ -49,6 +66,7 @@ async function waitForLocalApi(timeoutMs = 30000) {
 }
 
 async function startLocalServer() {
+  if (!apiPort) apiPort = await findAvailableLoopbackPort()
   secretVaultPath = path.join(app.getPath('userData'), process.platform === 'darwin' ? 'secret-vault-v2.bin' : 'secret-vault.bin')
   downloadsRoot = path.resolve(
     process.env.GUO_INTEL_DOWNLOAD_DIR
@@ -136,7 +154,7 @@ function createWindow() {
     recordDiagnostic('Renderer process exited', error)
     void showStartupError(error)
   })
-  mainWindow.webContents.on('console-message', (_event, details) => {
+  mainWindow.webContents.on('console-message', (details) => {
     if (!['warning', 'error'].includes(details.level)) return
     recordDiagnostic(`Renderer console ${details.level} at ${details.sourceId}:${details.lineNumber}`, details.message)
   })
@@ -274,7 +292,8 @@ function isLocalAppRequest(value) {
     const url = new URL(String(value))
     if (!['127.0.0.1', 'localhost', '::1'].includes(url.hostname)) return false
     if (url.port === String(apiPort)) return true
-    return url.port === '5173' && url.pathname.startsWith('/api/')
+    if (!devUrl || !url.pathname.startsWith('/api/')) return false
+    return url.origin === new URL(devUrl).origin
   } catch {
     return false
   }
@@ -405,6 +424,7 @@ function createWindowsSecretStore() {
 
 function isAllowedShellTarget(value) {
   try {
+    const { isAllowedExternalUrl } = require('../server/network-policy.cjs')
     const url = new URL(String(value))
     return isAllowedExternalUrl(url.toString())
   } catch {
@@ -419,28 +439,42 @@ function configureSessionSecurity() {
   defaultSession.setDevicePermissionHandler?.(() => false)
 }
 
-app.whenReady().then(async () => {
-  configureSessionSecurity()
-  createStartupWindow()
-  ipcMain.handle('guo-intel-secure-storage-status', () => ({
-    available: Boolean(globalThis.guoIntelSecretStore?.available),
-    status: globalThis.guoIntelSecretStore?.status ?? 'uninitialized',
-    applicationName: APPLICATION_NAME,
-  }))
-  try {
-    await startLocalServer()
-    await createWindow()
-  } catch (error) {
-    await showStartupError(error)
-  }
+const hasSingleInstanceLock = app.requestSingleInstanceLock()
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      void createWindow().catch((error) => showStartupError(error))
-    }
+if (!hasSingleInstanceLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    const window = mainWindow && !mainWindow.isDestroyed() ? mainWindow : startupWindow
+    if (!window || window.isDestroyed()) return
+    if (window.isMinimized()) window.restore()
+    window.show()
+    window.focus()
   })
-})
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  app.whenReady().then(async () => {
+    configureSessionSecurity()
+    createStartupWindow()
+    ipcMain.handle('guo-intel-secure-storage-status', () => ({
+      available: Boolean(globalThis.guoIntelSecretStore?.available),
+      status: globalThis.guoIntelSecretStore?.status ?? 'uninitialized',
+      applicationName: APPLICATION_NAME,
+    }))
+    try {
+      await startLocalServer()
+      await createWindow()
+    } catch (error) {
+      await showStartupError(error)
+    }
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        void createWindow().catch((error) => showStartupError(error))
+      }
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
+}

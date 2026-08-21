@@ -5,6 +5,7 @@ import { gunzipSync } from 'node:zlib'
 import path from 'node:path'
 import { createSeedState } from '../server/seed.js'
 import { allCaseRecords } from '../server/discovered-case-records.js'
+import { humanCaseResearch } from '../server/human-legal-research.js'
 
 const root = process.cwd()
 const sourceCorpusRoot = path.join(root, 'downloads', 'court-files-complete')
@@ -66,8 +67,8 @@ for (const sha256 of validCorpusHashes) {
   if (!indexedHashes.has(sha256)) throw new Error(`Valid PDF content is absent from the bundled search baseline: ${sha256}`)
 }
 
-const expectedCaseLanguages = new Set(allCaseRecords(createSeedState(), corpusManifest)
-  .flatMap((caseRecord) => [`${caseRecord.id}:zh`, `${caseRecord.id}:en`]))
+const expectedCaseRecords = allCaseRecords(createSeedState(), corpusManifest)
+const expectedCaseLanguages = new Set(expectedCaseRecords.flatMap((caseRecord) => [`${caseRecord.id}:zh`, `${caseRecord.id}:en`]))
 const bundledCaseLanguages = new Set()
 for (const file of seedManifest.files ?? []) {
   if (!file.path.startsWith('case-ai/') || !file.path.endsWith('.json')) continue
@@ -76,8 +77,13 @@ for (const file of seedManifest.files ?? []) {
   if (match) bundledCaseLanguages.add(`${match[1]}:${match[2]}`)
   if (!payload.analysis || !payload.text) throw new Error(`Bundled case dossier is incomplete: ${file.path}`)
 }
-for (const expected of expectedCaseLanguages) {
-  if (!bundledCaseLanguages.has(expected)) throw new Error(`Bundled release lacks a current case dossier: ${expected}`)
+for (const caseRecord of expectedCaseRecords) {
+  for (const language of ['zh', 'en']) {
+    const expected = `${caseRecord.id}:${language}`
+    if (!bundledCaseLanguages.has(expected) && !humanCaseResearch(caseRecord.id, corpusManifest, language)) {
+      throw new Error(`Bundled release lacks a current case dossier: ${expected}`)
+    }
+  }
 }
 
 for (const forbidden of ['app-settings.json', 'integration-diagnostics.json', 'automation-run.json', 'dev-api.log']) {
