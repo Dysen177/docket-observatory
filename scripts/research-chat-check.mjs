@@ -73,7 +73,9 @@ try {
   assert.match(emptyOfflineSearch.answer, /未使用生成式模型|检索/u)
 
   const state = createSeedState()
-  const manifest = JSON.parse(await readFile(new URL('../downloads/court-files-complete/manifest.json', import.meta.url), 'utf8'))
+  const manifestPath = process.env.RESEARCH_CHAT_TEST_MANIFEST
+    || new URL('./fixtures/research-chat-manifest.json', import.meta.url)
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
   const dashboard = {
     cases: state.cases,
     events: state.events,
