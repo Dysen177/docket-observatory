@@ -229,16 +229,16 @@
     "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
+    "@types/node": "^26.2.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.5",
-    "concurrently": "^9.2.4",
-    "electron": "43.4.0",
+    "concurrently": "^10.0.5",
+    "electron": "43.4.1",
     "electron-builder": "^26.15.3",
-    "oxlint": "^1.75.0",
+    "oxlint": "^1.79.0",
     "tar": "7.5.22",
-    "typescript": "~6.0.2",
+    "typescript": "~7.0.2",
     "vite": "^8.2.0",
     "wait-on": "^9.1.0"
   }
