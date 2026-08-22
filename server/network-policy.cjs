@@ -1,10 +1,5 @@
 const allowedFetchHosts = [
   {
-    host: 'ghot.ai',
-    purpose: 'Public GHOT text-archive catalog and bilingual document summaries used as a secondary research reference.',
-    dataClass: 'public archive metadata, glossary entries, and secondary document summaries',
-  },
-  {
     host: 'nfsc.press',
     purpose: 'Public mirror for court-file PDFs already linked from the source page.',
     dataClass: 'public court-file mirror metadata and PDFs',

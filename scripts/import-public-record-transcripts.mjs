@@ -14,8 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 const outputDir = path.resolve(process.env.TRANSCRIPT_OUTPUT_DIR ?? path.join(root, 'server', 'public-record-transcripts'))
 const workDir = path.resolve(process.env.TRANSCRIPT_IMPORT_CACHE_DIR ?? path.join(root, 'output', 'transcript-import-cache'))
-const archiveOrigin = 'https://ghot.ai'
-const archiveDataUrl = `${archiveOrigin}/static/data/archive-videos.js`
+const localCatalogPath = path.resolve(process.env.PUBLIC_TRANSCRIPT_CATALOG_PATH ?? path.join(root, 'output', 'public-transcript-catalog.json'))
 const communityArchiveOrigin = 'https://mubeitech.com'
 const communityArchiveIndexUrl = `${communityArchiveOrigin}/api/live`
 const legacyTranscriptRepository = 'https://github.com/qiuwenhuifx/txt'
@@ -103,7 +102,7 @@ await mkdir(workDir, { recursive: true })
 if (refreshCommunityTranscripts) await mkdir(communityDetailDir, { recursive: true })
 
 const [catalog, publicCorpus] = await Promise.all([
-  fetchCatalog(),
+  loadLocalCatalog(),
   readFile(corpusPath, 'utf8').then(JSON.parse),
 ])
 const matchIndex = buildPublicRecordMatchIndex(publicCorpus.records ?? [])
@@ -373,7 +372,7 @@ const manifest = {
     linkedTranscriptId: record.linkedTranscriptId ?? null,
   })),
   audit: {
-    upstreamCatalogUrl: archiveDataUrl,
+    catalogType: 'local source catalog',
     importedAt: new Date().toISOString(),
     duplicateHashes,
     communityArchive: communityAudit,
@@ -403,12 +402,12 @@ async function importRecord(record, matchIndex) {
     importError: null,
     sourceAudit: {
       catalogId: record.id,
-      catalogPage: `${archiveOrigin}/archive/videos/${encodeURIComponent(record.id)}`,
-      transcriptUrl: record.transcriptUrl ? new URL(record.transcriptUrl, archiveOrigin).toString() : null,
+      catalogPage: record.catalogPage ?? null,
+      transcriptUrl: record.transcriptUrl ? new URL(record.transcriptUrl).toString() : null,
       fetchedAt: new Date().toISOString(),
     },
   }
-  const metadata = await fetchJson(new URL(`/api/videos/${encodeURIComponent(record.id)}`, archiveOrigin)).catch(() => null)
+  const metadata = record.metadataUrl ? await fetchJson(new URL(record.metadataUrl)).catch(() => null) : null
   const originalLinks = collectOriginalLinks(metadata?.record)
   const matchedPublicRecordId = matchPublicRecord(record, originalLinks, matchIndex)
   if (!transcriptIsFetchable) {
@@ -416,7 +415,7 @@ async function importRecord(record, matchIndex) {
   }
 
   try {
-    const transcript = await fetchJson(new URL(record.transcriptUrl, archiveOrigin))
+    const transcript = await fetchJson(new URL(record.transcriptUrl))
     const segments = normalizeSegments(transcript)
     const joined = segments.map((segment) => `${segment.start}\t${segment.end}\t${segment.text}`).join('\n')
     return {
@@ -2214,7 +2213,7 @@ function collectOriginalLinks(record) {
   for (const candidate of candidates) {
     try {
       const url = new URL(String(candidate ?? ''))
-      if (url.protocol !== 'https:' || url.hostname === 'ghot.ai' || /\.(?:jpe?g|png|webp|gif)$/iu.test(url.pathname)) continue
+      if (url.protocol !== 'https:' || /\.(?:jpe?g|png|webp|gif)$/iu.test(url.pathname)) continue
       const canonical = canonicalUrl(url.toString())
       if (seen.has(canonical)) continue
       seen.add(canonical)
@@ -2259,10 +2258,8 @@ function duplicateHashGroups(records) {
   return [...groups.entries()].filter(([, ids]) => ids.length > 1).map(([sha256, ids]) => ({ sha256, ids }))
 }
 
-async function fetchCatalog() {
-  const text = await fetchText(new URL(archiveDataUrl))
-  const json = text.replace(/^\s*window\.GHOT_ARCHIVE_DATA\s*=\s*/u, '').replace(/;\s*$/u, '')
-  const parsed = JSON.parse(json)
+async function loadLocalCatalog() {
+  const parsed = JSON.parse(await readFile(localCatalogPath, 'utf8'))
   if (!Array.isArray(parsed.records)) throw new Error('Archive catalog did not include records.')
   return parsed
 }
@@ -2272,12 +2269,6 @@ async function fetchJson(url) {
   const response = await fetch(url, { headers: { Accept: 'application/json', 'User-Agent': 'Docket-Observatory-Transcript-Importer/0.1 (+https://github.com/Dysen177/docket-observatory)' } })
   if (!response.ok) throw new Error(`${url.pathname} returned HTTP ${response.status}`)
   return response.json()
-}
-
-async function fetchText(url) {
-  const response = await fetch(url, { headers: { Accept: 'text/javascript', 'User-Agent': 'Docket-Observatory-Transcript-Importer/0.1 (+https://github.com/Dysen177/docket-observatory)' } })
-  if (!response.ok) throw new Error(`${url.pathname} returned HTTP ${response.status}`)
-  return response.text()
 }
 
 async function fetchPublicText(url, accept) {

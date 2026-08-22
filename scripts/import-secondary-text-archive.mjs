@@ -1,7 +1,7 @@
-import { ghotTextArchivePaths, syncGhotTextArchive } from '../server/ghot-text-archive.js'
+import { secondaryTextArchivePaths, syncSecondaryTextArchive } from '../server/secondary-text-archive.js'
 
-const { bundled } = ghotTextArchivePaths()
-const archive = await syncGhotTextArchive({
+const { bundled } = secondaryTextArchivePaths()
+const archive = await syncSecondaryTextArchive({
   outputPath: bundled,
   forceAll: true,
   refreshRecentCourtCount: 0,

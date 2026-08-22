@@ -109,9 +109,9 @@ function localizedOfficialStatus(value) {
 }
 
 const sourceTranslations = {
-  'ghot-text-archive': {
-    shortName: 'GHOT 文字档案',
-    name: 'GHOT 公开文字档案',
+  'secondary-text-archive': {
+    shortName: '辅助文字档案',
+    name: '本地辅助文字档案',
     coverage: '中英双语名词解释、宣言、报告，以及郭文贵相关公开法院文件的外部摘要。',
     limitations: '这是二级研究档案，不是法院正式案卷或独立事实证明。争议性主张必须保留归因，法律结论必须回到 PDF 原件和官方案卷核验。',
   },
@@ -202,7 +202,7 @@ const sourceTranslations = {
 }
 
 const sourceEnglishOverrides = {
-  'ghot-text-archive': { shortName: 'GHOT Archive' },
+  'secondary-text-archive': { shortName: 'Local Secondary Archive' },
   'nfsc-criminal-mirror': { shortName: 'NFSC Mirror' },
   'doj-victim-page': { shortName: 'DOJ Victim Page' },
   'doj-sentencing-release': { shortName: 'DOJ Sentencing' },

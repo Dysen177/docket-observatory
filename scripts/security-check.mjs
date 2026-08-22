@@ -419,7 +419,7 @@ async function assertProjectControls() {
 
   const networkPolicy = await readFile(path.join(root, 'server', 'network-policy.cjs'), 'utf8')
   const networkManifest = await readFile(path.join(root, 'NETWORK.md'), 'utf8')
-  for (const host of ['ghot.ai', 'nfsc.press', 'www.justice.gov', 'www.sec.gov', 'www.courtlistener.com', 'storage.courtlistener.com', 'www.federalregister.gov']) {
+  for (const host of ['nfsc.press', 'www.justice.gov', 'www.sec.gov', 'www.courtlistener.com', 'storage.courtlistener.com', 'www.federalregister.gov']) {
     if (!networkPolicy.includes(host)) addFinding('network-policy-gap', 'medium', path.join(root, 'server', 'network-policy.cjs'), `Expected outbound host is missing: ${host}`)
     if (!networkManifest.includes(host)) addFinding('network-manifest-gap', 'medium', path.join(root, 'NETWORK.md'), `Expected outbound host is undocumented: ${host}`)
   }

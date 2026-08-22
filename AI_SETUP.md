@@ -2,9 +2,9 @@
 
 [**中文教程**](#中文教程) | [**English Guide**](#english-guide)
 
-案卷观察台不要求配置 AI。没有 Ollama 或 API Key 时，“全库研究”仍可检索法院文件、案件资料、直播文字、GHOT 档案、人物公司和政策资料，但不会冒充生成式模型进行整合、联想或推理。配置模型后，翻译、文件解读和全库研究的质量、速度、上下文长度及费用取决于所选模型和服务商。
+案卷观察台不要求配置 AI。没有 Ollama 或 API Key 时，“全库研究”仍可检索法院文件、案件资料、直播文字、本地辅助文字档案、人物公司和政策资料，但不会冒充生成式模型进行整合、联想或推理。配置模型后，翻译、文件解读和全库研究的质量、速度、上下文长度及费用取决于所选模型和服务商。
 
-Docket Observatory does not require AI. Without Ollama or an API key, Whole-Library Research still retrieves court filings, case records, transcripts, GHOT archive material, people, companies, and policy records, but it does not pretend to perform generative synthesis or reasoning. After a model is configured, quality, speed, context length, and cost depend on that model and provider.
+Docket Observatory does not require AI. Without Ollama or an API key, Whole-Library Research still retrieves court filings, case records, transcripts, the bundled local secondary text archive, people, companies, and policy records, but it does not pretend to perform generative synthesis or reasoning. After a model is configured, quality, speed, context length, and cost depend on that model and provider.
 
 ## 中文教程
 

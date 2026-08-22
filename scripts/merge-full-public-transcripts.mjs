@@ -961,12 +961,12 @@ function sanitizeRecordForOutput(record) {
 function sanitizeObject(value) {
   if (Array.isArray(value)) return value.map(sanitizeObject).filter((item) => item !== null)
   if (!value || typeof value !== 'object') {
-    if (typeof value === 'string' && /(?:ghot\.ai|gettrsearch)/iu.test(value)) return null
+    if (typeof value === 'string' && /gettrsearch/iu.test(value)) return null
     return value
   }
   const output = {}
   for (const [key, item] of Object.entries(value)) {
-    if (typeof item === 'string' && /(?:ghot\.ai|gettrsearch)/iu.test(item)) continue
+    if (typeof item === 'string' && /gettrsearch/iu.test(item)) continue
     const sanitized = sanitizeObject(item)
     if (sanitized !== null) output[key] = sanitized
   }
@@ -983,7 +983,7 @@ function stripPrivateAudit(audit) {
 
 function assertNoDisallowedSource(manifest, yearRecords) {
   const serialized = `${JSON.stringify(manifest)}\n${JSON.stringify(yearRecords)}`
-  if (/(?:ghot\.ai|gettrsearch)/iu.test(serialized)) throw new Error('A disallowed verification-source URL leaked into the public transcript corpus.')
+  if (/gettrsearch/iu.test(serialized)) throw new Error('A disallowed verification-source URL leaked into the public transcript corpus.')
 }
 
 function sourceLinks(candidate) {
@@ -1018,7 +1018,7 @@ function safePublicUrl(value) {
     const url = new URL(String(value ?? '').replace(/&amp;/giu, '&').replace(/[.,;]+$/gu, ''))
     if (!['http:', 'https:'].includes(url.protocol)) return null
     const host = url.hostname.replace(/^www\./u, '').toLowerCase()
-    if (host === 'ghot.ai' || host === 'gettrsearch.com' || host === 'gettrsearchassets.s3.amazonaws.com') return null
+    if (host === 'gettrsearch.com' || host === 'gettrsearchassets.s3.amazonaws.com') return null
     if (/\.(?:jpe?g|png|webp|gif|svg)(?:$|\?)/iu.test(url.pathname)) return null
     url.protocol = 'https:'
     url.hostname = host

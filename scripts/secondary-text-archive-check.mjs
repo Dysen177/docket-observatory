@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict'
-import { loadGhotTextArchive, retrieveGhotArchiveEvidence } from '../server/ghot-text-archive.js'
+import { loadSecondaryTextArchive, retrieveSecondaryArchiveEvidence } from '../server/secondary-text-archive.js'
 import { expandKnowledgeSearchValues, retrieveKnowledgeDossierEvidence } from '../server/knowledge-dossiers.js'
 import { retrieveTranscriptEvidence } from '../server/public-record-transcripts.js'
 
-const archive = await loadGhotTextArchive()
+const archive = await loadSecondaryTextArchive()
 assert.equal(archive.schemaVersion, 1)
-assert.ok(archive.records.length >= 374, 'Bundled GHOT archive should include the complete public document list.')
-assert.ok((archive.counts.byKind?.court_filing ?? 0) >= 365, 'Bundled GHOT archive should include the court-filing summaries.')
-assert.ok((archive.counts.byKind?.concept ?? 0) >= 7, 'Bundled GHOT archive should include all known concept explainers.')
+assert.ok(archive.records.length >= 374, 'Bundled secondary archive should include the complete document list.')
+assert.ok((archive.counts.byKind?.court_filing ?? 0) >= 365, 'Bundled secondary archive should include the court-filing summaries.')
+assert.ok((archive.counts.byKind?.concept ?? 0) >= 7, 'Bundled secondary archive should include all known concept explainers.')
 assert.ok(archive.records.every((record) => record.details?.zh && record.details?.en), 'Every archived record should have Chinese and English detail data.')
 
-const nfsc = await retrieveGhotArchiveEvidence('新中国联邦是什么', ['新中国联邦'], 'zh', 4)
+const nfsc = await retrieveSecondaryArchiveEvidence('新中国联邦是什么', ['新中国联邦'], 'zh', 4)
 assert.equal(nfsc[0]?.title, '新中国联邦宣言')
 assert.equal(nfsc[0]?.kind, 'archive_reference')
 assert.equal(nfsc[0]?.archiveKind, 'declaration')
@@ -23,13 +23,13 @@ assert.match(nfsc[0]?.excerpt, /7 项基本内容/u)
 assert.match(nfsc[0]?.excerpt, /喜马拉雅监督机构/u)
 assert.match(nfsc[0]?.excerpt, /18 条政策/u)
 
-const bgy = await retrieveGhotArchiveEvidence('蓝金黄是什么意思', ['蓝金黄'], 'zh', 4)
+const bgy = await retrieveSecondaryArchiveEvidence('蓝金黄是什么意思', ['蓝金黄'], 'zh', 4)
 assert.equal(bgy[0]?.title, '蓝金黄/BGY')
 
-const doubleDragonArchive = await retrieveGhotArchiveEvidence('双龙计划是什么', ['双龙计划'], 'zh', 4)
+const doubleDragonArchive = await retrieveSecondaryArchiveEvidence('双龙计划是什么', ['双龙计划'], 'zh', 4)
 assert.equal(doubleDragonArchive[0]?.title, '双龙计划')
 
-const courtOnly = await retrieveGhotArchiveEvidence('郭文贵定罪罪名', ['郭文贵', '定罪', '罪名'], 'zh', 8, {
+const courtOnly = await retrieveSecondaryArchiveEvidence('郭文贵定罪罪名', ['郭文贵', '定罪', '罪名'], 'zh', 8, {
   includeCourt: true,
   courtOnly: true,
 })
@@ -49,7 +49,7 @@ const doubleDragonTranscripts = await retrieveTranscriptEvidence('双龙计划',
 assert.ok(doubleDragonTranscripts.citations.some((citation) => /香港|台湾/u.test(`${citation.text} ${citation.contextBefore?.map((item) => item.text).join(' ')} ${citation.contextAfter?.map((item) => item.text).join(' ')}`)))
 
 const doc867 = archive.records.find((record) => record.docKind === 'court_filing' && String(record.docNum) === '867')
-assert.ok(doc867?.details?.zh?.longSummaryMd.includes('不是法院裁定'), 'GHOT Doc 867 summary should retain its party-filing limitation.')
+assert.ok(doc867?.details?.zh?.longSummaryMd.includes('不是法院裁定'), 'Doc 867 summary should retain its party-filing limitation.')
 
 const nfscRecord = archive.records.find((record) => record.slug === 'nfsc-declaration')
 assert.ok(nfscRecord?.details?.zh?.abstract.includes('18 条政策'), 'NFSC archive detail should retain the policy appendix.')

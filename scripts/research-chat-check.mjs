@@ -100,7 +100,7 @@ try {
       id: 'S2',
       kind: 'archive_reference',
       archiveKind: 'court_filing',
-      title: 'GHOT Doc 860',
+      title: 'Secondary archive Doc 860',
       subtitle: '外部二级摘要',
       excerpt: '九项罪名成立，但逐项对应存在错误。',
     },
@@ -137,14 +137,14 @@ try {
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '爱因斯坦说过什么？' }]), 'conversation')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '如何把 PDF 转成 Word？' }]), 'conversation')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '我只是举摩根和王岐山作为问题例子，模型能力是不是关键？' }]), 'conversation')
-  assert.equal(classifyResearchChatMode([{ role: 'user', content: 'AI Chat 回答完全和问题无关，质量跟 GHOT 比差很多。' }]), 'conversation')
+  assert.equal(classifyResearchChatMode([{ role: 'user', content: 'AI Chat 回答完全和问题无关，质量跟外部档案比差很多。' }]), 'conversation')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '刑事主案目前的程序进展是什么？' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '郭文贵有几项定罪？' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '不要检索，直接告诉我郭文贵有几项定罪？' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '不用搜索，请直接说新中国联邦是什么？' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '搜索本地资料库中的867文件。' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: '查找本地法院 PDF 中提到喜联储的文件。' }]), 'research')
-  assert.equal(classifyResearchChatMode([{ role: 'user', content: 'GHOT 档案里的 Doc 867 是什么？' }]), 'research')
+  assert.equal(classifyResearchChatMode([{ role: 'user', content: '外部档案里的 Doc 867 是什么？' }]), 'research')
   assert.equal(classifyResearchChatMode([{ role: 'user', content: 'Which records mention Himalaya Exchange?' }]), 'research')
   assert.equal(classifyResearchChatMode([
     { role: 'user', content: '哪些法院文件与喜联储有关？' },
@@ -468,8 +468,8 @@ try {
   const localDoc867Context = modelCitationsForProvider(doc867Evidence.citations, 'ollama', '刑事主案文件 867 是什么？')
   assert.ok(localDoc867Context.some((citation) => citation.kind === 'document' && /867/u.test(`${citation.title} ${citation.subtitle}`)))
   assert.equal(localDoc867Context.some((citation) => citation.kind === 'archive_reference'), false)
-  const ghotDoc867Context = modelCitationsForProvider(doc867Evidence.citations, 'ollama', 'GHOT 对文件 867 的摘要是什么？')
-  assert.ok(ghotDoc867Context.some((citation) => citation.kind === 'archive_reference' && /867/u.test(`${citation.title} ${citation.subtitle} ${citation.excerpt}`)))
+  const secondaryDoc867Context = modelCitationsForProvider(doc867Evidence.citations, 'ollama', '外部档案对文件 867 的摘要是什么？')
+  assert.ok(secondaryDoc867Context.some((citation) => citation.kind === 'archive_reference' && /867/u.test(`${citation.title} ${citation.subtitle} ${citation.excerpt}`)))
 
   const latestCourtDocument = await retrieveResearchChatEvidence({
     messages: [{ role: 'user', content: '刑事主案文件 869 是什么？' }],

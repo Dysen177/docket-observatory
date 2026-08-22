@@ -6,7 +6,7 @@ import networkPolicy from './network-policy.cjs'
 import { normalizeDocketNumber } from './docket-number.js'
 import { scanCurrentHimalayaRestoration, scanHistoricalHimalayaRestoration } from './himalaya-restoration.js'
 import { parseSupremeCourtDocket } from './supreme-court-docket.js'
-import { syncGhotTextArchive } from './ghot-text-archive.js'
+import { syncSecondaryTextArchive } from './secondary-text-archive.js'
 
 const { isAllowedOutboundUrl } = networkPolicy
 
@@ -95,9 +95,9 @@ export function parseDocketFilingDate(text) {
   return `${year}-${month}-${String(day).padStart(2, '0')}`
 }
 
-export async function ghotTextArchive(source) {
+export async function secondaryTextArchive(source) {
   const start = Date.now()
-  const archive = await syncGhotTextArchive({
+  const archive = await syncSecondaryTextArchive({
     refreshRecentCourtCount: 12,
     concurrency: 4,
     requestDelayMs: 80,
@@ -111,8 +111,8 @@ export async function ghotTextArchive(source) {
       start,
       failures ? 'limited' : 'ok',
       failures
-        ? `Synced ${archive.counts.total} GHOT text-archive records with ${failures} detail request failure(s); previous cached details were retained where available.`
-        : `Synced ${archive.counts.total} GHOT text-archive records, including ${archive.counts.byKind?.concept ?? 0} glossary entries and ${archive.counts.byKind?.court_filing ?? 0} secondary court-file summaries.`,
+        ? `Loaded ${archive.counts.total} local secondary text-archive records with ${failures} retained detail issue(s).`
+        : `Loaded ${archive.counts.total} local secondary text-archive records, including ${archive.counts.byKind?.concept ?? 0} glossary entries and ${archive.counts.byKind?.court_filing ?? 0} secondary court-file summaries.`,
       {
         itemCount: archive.counts.total,
         retryable: failures > 0,
@@ -759,7 +759,7 @@ export async function bopInmateLocator(source) {
 }
 
 const adapterMap = {
-  ghotTextArchive,
+  secondaryTextArchive,
   nfscCriminalMirror,
   dojVictimPage,
   dojSentencingRelease,

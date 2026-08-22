@@ -49,7 +49,7 @@
 | Docket updates | Finds new or changed public files and preserves source, filing date, and update status. |
 | Bilingual reading | Shows the source, Chinese reading aid, plain-language explanation, professional details, provenance, and quality label together. |
 | Historical public records | Searches 2017-2023 broadcasts, videos, public posts, and their Chinese and English transcripts. |
-| GHOT text archive | Searches bilingual filing summaries, terminology, declarations, reports, and public guides. |
+| Secondary text archive | Searches bundled bilingual filing summaries, terminology, declarations, and reports. |
 | Whole-library research / AI Chat | Searches locally without a model; adds cross-source synthesis, follow-up conversation, and cited answers with Ollama or a cloud model. |
 | Cases and relationships | Organizes timelines and public links among cases, people, companies, funds, and bankruptcy assets. |
 
@@ -87,7 +87,7 @@ See the [illustrated Ollama and API key guide](AI_SETUP.md). Cloud text transmis
 
 - 1,924 legal records, 1,897 valid PDFs, and 1,846 content-unique PDF bodies;
 - 5,152 historical broadcast, video, and public-post records, including 5,098 searchable transcripts with English coverage;
-- 375 GHOT public text records, including 365 filing summaries and 7 concept or terminology records;
+- 374 local secondary text records, including 365 filing summaries and 7 concept or terminology records;
 - bilingual overviews for 132 cases, plus translations, readings, relationships, and search indexes.
 
 See the [v0.1.2 release notes](release-notes/v0.1.2.md) for detailed counts, quality levels, checksums, and validation results. Original PDFs, professional review, deterministic first reads, and model-generated content remain separately labeled.
@@ -96,7 +96,7 @@ See the [v0.1.2 release notes](release-notes/v0.1.2.md) for detailed counts, qua
 
 - Automatic updates process only new or changed files from public sources and then refresh sorting, search, and AI retrieval.
 - PACER is the official federal docket source. CourtListener / RECAP is the main free public source and may not contain every filing.
-- GHOT, NFSC, web archives, and third-party video platforms are secondary or contextual sources. Material conclusions should be checked against original PDFs and official dockets.
+- NFSC, web archives, and third-party video platforms are secondary or contextual sources. Material conclusions should be checked against original PDFs and official dockets.
 - The project does not claim access to sealed, restricted, removed, unsynchronized, or nonpublic records.
 
 See the [network allowlist](NETWORK.md), [risk-audit summary](release-metadata/corpus-risk-audit.md), and [file-level decisions](release-metadata/corpus-review-decisions.json).

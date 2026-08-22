@@ -19,7 +19,6 @@ Conflicting sources remain separate. A lower-tier source cannot silently overrid
 
 | Host | Purpose | Data |
 | --- | --- | --- |
-| `ghot.ai` | Public bilingual text-archive catalog used as a secondary research reference. | Public glossary entries, declarations, reports, and secondary court-file summaries; court summaries do not replace PDF originals or official dockets. |
 | `nfsc.press` | Public mirror for docket-linked PDFs. | Public mirror metadata and PDFs. |
 | `www.justice.gov` | DOJ victim information and press releases. | Public agency pages. |
 | `www.sec.gov` | SEC enforcement releases and linked files. | Public agency pages and PDFs. |
