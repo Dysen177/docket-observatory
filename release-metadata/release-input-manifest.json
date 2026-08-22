@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "appVersion": "0.1.2",
-  "generatedAt": "2026-08-21T06:19:54.078Z",
+  "generatedAt": "2026-08-22T13:32:32.148Z",
   "evidence": {
     "package-lock.json": {
       "bytes": 234391,
@@ -9,7 +9,7 @@
     },
     "output/release-review/corpus-risk-audit.json": {
       "bytes": 237390,
-      "sha256": "cdcf7425ec38d6a03f59f32ce6d5615867ca5033fcb53793ebf160fc3e0a5782"
+      "sha256": "490ba669e1ad4737ac8b939087733b6318ee827ecef3deeda14b4db78d7d524b"
     },
     "release-metadata/corpus-review-decisions.json": {
       "bytes": 414899,
@@ -20,8 +20,8 @@
       "sha256": "9ce50c6660bdf83f84f948fa27a41dceb374f6b1873f029dabfa01d4fdcbf8d0"
     },
     "release-metadata/seed-cache-manifest.json": {
-      "bytes": 3729851,
-      "sha256": "449577f60ceec5d5232550f1323fd04dd00ba42ba68a8b1847830f2fccda53b0"
+      "bytes": 3697514,
+      "sha256": "fcdb87ad80286a7bc6889554ec1df262cce412e1dc36b0a2d429f37408cb6cd9"
     }
   }
 }
