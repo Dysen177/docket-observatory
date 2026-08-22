@@ -6187,6 +6187,7 @@ function SettingsView({
   const [draft, setDraft] = useState<AppSettingsRecord | null>(payload?.settings ?? null)
   const [activeSection, setActiveSection] = useState(() => window.location.hash.startsWith('#settings-') ? window.location.hash.slice(1) : 'settings-overview')
   const settingsGridRef = useRef<HTMLDivElement | null>(null)
+  const settingsViewReady = Boolean(payload && draft)
   useEffect(() => {
     if (payload?.settings) setDraft(payload.settings)
   }, [payload?.settings])
@@ -6212,13 +6213,13 @@ function SettingsView({
     }
     const observer = new ResizeObserver(scheduleLayout)
     cards.forEach((card) => observer.observe(card))
-    scheduleLayout()
+    layoutCards()
     return () => {
       window.cancelAnimationFrame(frame)
       observer.disconnect()
       cards.forEach((card) => card.style.removeProperty('grid-row-end'))
     }
-  }, [payload])
+  }, [settingsViewReady])
 
   useEffect(() => {
     const targetId = window.location.hash.replace(/^#/, '')

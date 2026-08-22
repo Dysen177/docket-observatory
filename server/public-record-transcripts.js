@@ -189,11 +189,12 @@ export async function retrieveTranscriptEvidence(query, options = {}) {
   }, options.language ?? 'zh')
   const citations = []
   const maxCitations = Number(options.citationLimit) || 14
+  const records = options.diversifyYears ? yearDiverseRecords(payload.records) : payload.records
   // Give the model the best passage from several independent records before
   // adding a second passage from any one record. This preserves source breadth
   // and prevents a weak secondary hit from displacing a stronger co-occurrence.
   for (let hitIndex = 0; hitIndex < 2; hitIndex += 1) {
-    for (const record of payload.records) {
+    for (const record of records) {
       const hit = record.hits[hitIndex]
       if (!hit) continue
       const citation = {
@@ -215,6 +216,38 @@ export async function retrieveTranscriptEvidence(query, options = {}) {
     if (citations.length >= maxCitations) break
   }
   return { coverage: payload.coverage, totalRecords: payload.total, citations }
+}
+
+function yearDiverseRecords(records) {
+  const firstByYear = []
+  const remaining = []
+  const recordsByYear = new Map()
+  for (const record of records ?? []) {
+    const year = String(record.date ?? '').slice(0, 4)
+    if (!/^\d{4}$/u.test(year)) {
+      remaining.push(record)
+      continue
+    }
+    if (!recordsByYear.has(year)) recordsByYear.set(year, [])
+    recordsByYear.get(year).push(record)
+  }
+  for (const group of recordsByYear.values()) {
+    const ranked = [...group].sort((left, right) => transcriptEvidenceQuality(right) - transcriptEvidenceQuality(left))
+    firstByYear.push(ranked[0])
+    remaining.push(...ranked.slice(1))
+  }
+  return [...firstByYear, ...remaining]
+}
+
+function transcriptEvidenceQuality(record) {
+  const hit = record?.hits?.[0]
+  const textLength = String(hit?.text ?? '').trim().length
+  const contextLength = [...(hit?.contextBefore ?? []), ...(hit?.contextAfter ?? [])]
+    .reduce((total, segment) => total + String(segment?.text ?? '').trim().length, 0)
+  return Math.min(900, textLength * 4)
+    + Math.min(400, contextLength)
+    + (hit?.matchReason === 'exact' ? 120 : 0)
+    + Math.min(80, Number(record?.hits?.length ?? 0) * 10)
 }
 
 export function resetTranscriptCachesForTests() {

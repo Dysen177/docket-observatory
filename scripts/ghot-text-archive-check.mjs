@@ -29,6 +29,13 @@ assert.equal(bgy[0]?.title, '蓝金黄/BGY')
 const doubleDragonArchive = await retrieveGhotArchiveEvidence('双龙计划是什么', ['双龙计划'], 'zh', 4)
 assert.equal(doubleDragonArchive[0]?.title, '双龙计划')
 
+const courtOnly = await retrieveGhotArchiveEvidence('郭文贵定罪罪名', ['郭文贵', '定罪', '罪名'], 'zh', 8, {
+  includeCourt: true,
+  courtOnly: true,
+})
+assert.ok(courtOnly.length > 0)
+assert.ok(courtOnly.every((citation) => citation.archiveKind === 'court_filing'))
+
 const doubleDragonDossier = retrieveKnowledgeDossierEvidence('双龙计划是什么', [], 'zh', 4)
 assert.equal(doubleDragonDossier[0]?.title, '双龙计划 / 双龙行动')
 assert.ok(expandKnowledgeSearchValues('双龙计划是什么', { publicOnly: true }).includes('双龙行动'))

@@ -511,7 +511,7 @@ const priorityWeight = {
 
 const analysisCacheVersion = 'document-analysis-v39'
 const translationCacheVersion = 'translation-v7'
-const documentCatalogCacheVersion = 'document-catalog-v19'
+const documentCatalogCacheVersion = 'document-catalog-v20'
 const analysisBuilds = new Map()
 const analysisMemoryCache = new Map()
 const documentCatalogBuilds = new Map()
@@ -1532,6 +1532,7 @@ function catalogResponseRecord(record) {
     sourceVerification: record.sourceVerification,
     sourceAlternatives: record.sourceAlternatives ?? [],
     searchMatches: record.searchMatches ?? [],
+    searchScore: Number(record.searchScore ?? 0),
   }
 }
 

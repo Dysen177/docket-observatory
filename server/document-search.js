@@ -8,9 +8,9 @@ import { atomicWriteJson } from './atomic-write.js'
 import { compareDocketNumbers, docketNumberParts } from './docket-number.js'
 import { normalizeLegalMetadataText } from './legal-metadata.js'
 import { documentAnalysisQualityCurrent } from './document-language-quality.js'
+import { pdfExtractionCacheVersion } from './pdf-extraction.js'
 
-const searchIndexVersion = 'document-search-v7'
-const extractionCacheVersion = 8
+const searchIndexVersion = 'document-search-v8'
 const translationCacheVersion = 'translation-v7'
 const validScopes = new Set(['all', 'original', 'translation', 'analysis', 'web'])
 const localFileStatuses = new Set(['downloaded', 'downloaded_new_version', 'skipped_existing'])
@@ -657,7 +657,7 @@ async function buildDocumentSearchIndex(manifest, signature) {
   // Scan cache families in stages so their parsed PDF bodies do not overlap.
   const extractions = await scanJsonDirectory('pdf-text', async (value, cacheFile) => {
     const sha256 = value?.signature?.contentSha256 || value?.signature?.manifestSha256
-    if (value?.cacheVersion !== extractionCacheVersion || !currentHashes.has(sha256) || value?.status !== 'extracted') return null
+    if (value?.cacheVersion !== pdfExtractionCacheVersion || !currentHashes.has(sha256) || value?.status !== 'extracted') return null
     return { sha256, entry: await indexedOriginal(value, cacheFile) }
   })
   const translations = await scanJsonDirectory('translations', async (value, cacheFile) => {
@@ -1029,7 +1029,7 @@ function metadataMatch(record, query, kind, score) {
     kind,
     score,
     pageNumber: null,
-    snippet: kind === 'docket_number' ? record.title : kind === 'title' ? titleSnippet : record.plainEnglish || record.summary || record.title,
+    snippet: kind === 'docket_number' ? record.title : kind === 'title' ? titleSnippet : record.summary || record.plainEnglish || record.title,
     terms: query.terms.map((term) => term.raw),
     language: detectLanguage(record.title),
     coverage: kind === 'web_page' ? (record.researchQuality?.key === 'body_verified' ? 'complete' : 'partial') : 'metadata',
@@ -1216,6 +1216,8 @@ async function indexedAnalysis(value, cacheFile, chunks) {
     language: documentAnalysisLanguage(value),
     provider: value.aiStatus?.provider ?? 'unknown',
     mode: value.aiStatus?.mode ?? '',
+    generatedAt: value.generatedAt ?? value.aiStatus?.reviewedAt ?? null,
+    charCount: chunks.reduce((total, chunk) => total + chunk.text.length, 0),
     searchBloom: buildSectionBloom(chunks),
   }
 }
@@ -1336,6 +1338,8 @@ function preferTranslation(candidate, current) {
 function preferAnalysis(candidate, current) {
   const weight = (value) => ({ human_research: 5, openai: 4, anthropic: 4, gemini: 4, openai_compatible: 4, ollama: 4, local_rules: 2 }[value?.provider ?? value?.aiStatus?.provider] ?? 1)
   return weight(candidate) > weight(current)
+    || weight(candidate) === weight(current) && String(candidate?.generatedAt ?? '') > String(current?.generatedAt ?? '')
+    || weight(candidate) === weight(current) && String(candidate?.generatedAt ?? '') === String(current?.generatedAt ?? '') && Number(candidate?.charCount ?? 0) > Number(current?.charCount ?? 0)
 }
 
 function documentAnalysisLanguage(value) {

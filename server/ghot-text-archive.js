@@ -125,11 +125,13 @@ export async function retrieveGhotArchiveEvidence(query, tokens = [], language =
   const requestedDocNumbers = new Set([...String(query ?? '').matchAll(/(?:doc(?:ument)?\.?|文件|案卷)\s*#?\s*(\d+(?:-\d+)?)/giu)].map((match) => match[1]))
   const definitionIntent = /是什么|什么意思|含义|解释|介绍|define|definition|what (?:is|does)|meaning|explain/iu.test(String(query ?? ''))
   const includeCourt = options.includeCourt === true || requestedDocNumbers.size > 0
+  const courtOnly = options.courtOnly === true
   const searchTerms = [...new Set([normalizedQuery, ...(tokens ?? []).map(normalizeArchiveText)].filter((term) => term.length >= 2))]
   const candidates = []
 
   for (const record of archive.records) {
     if (record.docKind === 'site_guide') continue
+    if (courtOnly && record.docKind !== 'court_filing') continue
     if (record.docKind === 'court_filing' && !includeCourt) continue
     const detail = selectDetail(record, english ? 'en' : 'zh')
     const title = String(detail?.title ?? '').trim()

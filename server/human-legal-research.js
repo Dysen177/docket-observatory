@@ -1002,11 +1002,12 @@ const documentResearch = {
   'sdny-23-cr-118:860': report({
     sha256: '746004083ed5561a399b9b33abc8c69cf1e0540d6f2a6f39d682150c2c1429bd',
     posture: 'final_judgment',
+    reviewedAt: '2026-08-22T16:22:00.000+08:00',
     en: {
-      summary: 'This is the July 2, 2026 criminal judgment. It records convictions on Counts 1, 2, 3, 4, 7, 8, 9, 10, and 11, acquittals on Counts 5, 6, and 12, a total prison term of 360 months, a $900 assessment, no fine or restitution, and forfeiture including an $889 million money judgment.',
-      plainEnglish: 'This is the controlling judgment sheet. Nine counts produced a total 30-year sentence, not separate terms added into a longer total. The count-by-count wording is unusual, but both page 3 and the sentencing transcript confirm the total is 360 months.',
+      summary: 'This is the July 2, 2026 criminal judgment. It records convictions on Count 1 (racketeering conspiracy), Count 2 (conspiracy to commit wire fraud and bank fraud), Count 3 (money laundering conspiracy), Count 4 (conspiracy to commit securities fraud), Count 7 (Farm Loan Program wire fraud), Count 8 (Farm Loan Program securities fraud), Count 9 (G Clubs wire fraud), Count 10 (G Clubs securities fraud), and Count 11 (Himalaya Exchange wire fraud). It records acquittals on Counts 5, 6, and 12, a total prison term of 360 months, a $900 assessment, no fine or restitution, and forfeiture including an $889 million money judgment.',
+      plainEnglish: 'This is the controlling judgment sheet. The nine convictions are separate charged counts, even where several fall into the same broad fraud category. They produced a total 30-year sentence, not separate terms added into a longer total. The count-by-count sentence wording is unusual, but both page 3 and the sentencing transcript confirm the total is 360 months.',
       legalReading: [
-        'Pages 1-2 identify the nine counts of conviction and three acquitted counts.',
+        'Pages 1-2 identify the nine counts of conviction by number and offense: Count 1 racketeering conspiracy; Count 2 conspiracy to commit wire fraud and bank fraud; Count 3 money laundering conspiracy; Count 4 conspiracy to commit securities fraud; Count 7 Farm Loan Program wire fraud; Count 8 Farm Loan Program securities fraud; Count 9 G Clubs wire fraud; Count 10 G Clubs securities fraud; and Count 11 Himalaya Exchange wire fraud.',
         'Page 3 states a total term of 360 months. Count 4\'s 60 months runs concurrently with Count 2\'s 360 months and consecutively to the 240-month group; it does not add 60 months on top of Count 2.',
         'Page 4 records a $900 assessment and zero restitution and fine.',
         'Page 6 incorporates ECF 720, 858, and 790 and the $889 million forfeiture money judgment.',
@@ -1023,10 +1024,10 @@ const documentResearch = {
       ],
     },
     zh: {
-      summary: '这是 2026 年 7 月 2 日录入的刑事判决。判决记录第 1、2、3、4、7、8、9、10、11 项定罪，第 5、6、12 项无罪，总刑期 360 个月，特别评估费 900 美元，罚金和赔偿均为 0，并包含 8.89 亿美元没收金钱判决。',
-      plainEnglish: '这是控制后续上诉和执行的正式判决书。九项定罪合并后的总刑期是 30 年，不是把每项刑期逐项相加。第 3 页的写法比较特殊，但判决和量刑记录都确认总刑期是 360 个月。',
+      summary: '这是 2026 年 7 月 2 日录入的刑事判决。判决记录第 1 项有组织犯罪共谋、第 2 项电汇欺诈和银行欺诈共谋、第 3 项洗钱共谋、第 4 项证券欺诈共谋、第 7 项 Farm Loan Program 电汇欺诈、第 8 项 Farm Loan Program 证券欺诈、第 9 项 G Clubs 电汇欺诈、第 10 项 G Clubs 证券欺诈、第 11 项 Himalaya Exchange 电汇欺诈，共九项定罪；第 5、6、12 项无罪。判决另记录总刑期 360 个月、特别评估费 900 美元、罚金和赔偿均为 0，并包含 8.89 亿美元没收金钱判决。',
+      plainEnglish: '这是控制后续上诉和执行的正式判决书。九项是九个独立的起诉罪项，其中有些属于同一大类欺诈罪；九项合并后的总刑期是 30 年，不是把每项刑期逐项相加。第 3 页的写法比较特殊，但判决和量刑记录都确认总刑期是 360 个月。',
       legalReading: [
-        '第 1-2 页列出九项定罪和三项无罪。',
+        '第 1-2 页逐项列明九项定罪：第 1 项有组织犯罪共谋；第 2 项电汇欺诈和银行欺诈共谋；第 3 项洗钱共谋；第 4 项证券欺诈共谋；第 7 项 Farm Loan Program 电汇欺诈；第 8 项 Farm Loan Program 证券欺诈；第 9 项 G Clubs 电汇欺诈；第 10 项 G Clubs 证券欺诈；第 11 项 Himalaya Exchange 电汇欺诈。',
         '第 3 页明确总刑期 360 个月。第 4 项的 60 个月与第 2 项的 360 个月并行，同时与 240 个月组连续；它不是在第 2 项之后再加 60 个月。',
         '第 4 页记录特别评估费 900 美元，赔偿和罚金均为 0。',
         '第 6 页纳入 ECF 720、858、790 及 8.89 亿美元没收金钱判决。',

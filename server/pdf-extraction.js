@@ -6,7 +6,7 @@ import { createRequire } from 'node:module'
 import { runtimeSetting } from './settings-store.js'
 import { atomicWriteJson } from './atomic-write.js'
 
-const extractionCacheVersion = 8
+export const pdfExtractionCacheVersion = 8
 const require = createRequire(import.meta.url)
 const extractionQueue = []
 let activeExtractions = 0
@@ -119,18 +119,23 @@ async function performPdfExtraction(file, options = {}) {
     let effectivePageSnippets = pageSnippets
     let engine = 'pdf-parse'
     let ocr = null
+    let ocrWarning = ''
     const sparseTextLayer = ocrEnabled && shouldUseLocalOcr(normalizedText, effectivePageSnippets)
     if (sparseTextLayer) {
-      const ocrResult = await extractWithLocalOcr(parser, ocrPageLimit, charLimit, result.total)
-      if (ocrResult.text.length > normalizedText.length) {
-        ocr = ocrResult
-        normalizedText = ocr.text
-        effectivePageSnippets = ocr.pageSnippets
-        engine = 'pdf-parse + local Tesseract.js OCR'
+      try {
+        const ocrResult = await extractWithLocalOcr(parser, ocrPageLimit, charLimit, result.total)
+        if (ocrResult.text.length > normalizedText.length) {
+          ocr = ocrResult
+          normalizedText = ocr.text
+          effectivePageSnippets = ocr.pageSnippets
+          engine = 'pdf-parse + local Tesseract.js OCR'
+        }
+      } catch (error) {
+        ocrWarning = safeExtractionWarning(error)
       }
     }
     const payload = {
-      cacheVersion: extractionCacheVersion,
+      cacheVersion: pdfExtractionCacheVersion,
       status: normalizedText ? 'extracted' : 'empty_text',
       engine,
       extractedAt: new Date().toISOString(),
@@ -153,9 +158,13 @@ async function performPdfExtraction(file, options = {}) {
             ? 'The PDF text layer was empty or materially sparse; body text was recovered with bundled local OCR.'
             : 'The PDF had no text layer; body text was recovered with bundled local OCR.'
           : sparseTextLayer
-            ? 'The PDF text layer appears materially sparse, but local OCR did not recover a stronger body-text result.'
+            ? ocrWarning
+              ? `The PDF text layer appears materially sparse; its available text was retained because local OCR was unavailable: ${ocrWarning}`
+              : 'The PDF text layer appears materially sparse, but local OCR did not recover a stronger body-text result.'
             : null
-        : 'PDF parser and local OCR returned no body text; the file may be blank, sealed, corrupt, or extraction-restricted.',
+        : ocrWarning
+          ? `PDF parser returned no body text and local OCR was unavailable: ${ocrWarning}`
+          : 'PDF parser and local OCR returned no body text; the file may be blank, sealed, corrupt, or extraction-restricted.',
     }
     await atomicWriteJson(cachePath, payload, { directoryMode: 0o700 })
     rememberExtractionCache(cachePath, payload)
@@ -163,7 +172,7 @@ async function performPdfExtraction(file, options = {}) {
   } catch (error) {
     const warning = error instanceof Error ? error.message : String(error)
     const payload = {
-      cacheVersion: extractionCacheVersion,
+      cacheVersion: pdfExtractionCacheVersion,
       status: 'error',
       engine: 'pdf-parse',
       extractedAt: new Date().toISOString(),
@@ -274,10 +283,16 @@ async function loadPdfParser() {
     pdfParserPromise = (async () => {
       // Electron exposes a browser-like process marker to pdfjs. Install the
       // Node canvas primitives before loading pdf-parse on any desktop OS.
-      const { DOMMatrix, ImageData, Path2D } = await import('@napi-rs/canvas')
-      if (!globalThis.DOMMatrix) globalThis.DOMMatrix = DOMMatrix
-      if (!globalThis.ImageData) globalThis.ImageData = ImageData
-      if (!globalThis.Path2D) globalThis.Path2D = Path2D
+      try {
+        const { DOMMatrix, ImageData, Path2D } = await import('@napi-rs/canvas')
+        if (!globalThis.DOMMatrix) globalThis.DOMMatrix = DOMMatrix
+        if (!globalThis.ImageData) globalThis.ImageData = ImageData
+        if (!globalThis.Path2D) globalThis.Path2D = Path2D
+      } catch {
+        // PDF.js only needs a constructible DOMMatrix while loading and while
+        // reading ordinary text layers. Rendering/OCR still requires Canvas.
+        if (!globalThis.DOMMatrix) globalThis.DOMMatrix = TextExtractionDOMMatrix
+      }
       const { PDFParse } = await import('pdf-parse')
       return PDFParse
     })().catch((error) => {
@@ -286,6 +301,26 @@ async function loadPdfParser() {
     })
   }
   return pdfParserPromise
+}
+
+class TextExtractionDOMMatrix {
+  constructor(value = [1, 0, 0, 1, 0, 0]) {
+    const source = Array.isArray(value) || ArrayBuffer.isView(value)
+      ? value
+      : [value?.a, value?.b, value?.c, value?.d, value?.e, value?.f]
+    ;[this.a, this.b, this.c, this.d, this.e, this.f] = [
+      source[0] ?? 1,
+      source[1] ?? 0,
+      source[2] ?? 0,
+      source[3] ?? 1,
+      source[4] ?? 0,
+      source[5] ?? 0,
+    ]
+  }
+}
+
+function safeExtractionWarning(error) {
+  return String(error instanceof Error ? error.message : error).replace(/\s+/gu, ' ').trim().slice(0, 320)
 }
 
 async function ensureBundledLanguageDirectory(languages) {
@@ -315,7 +350,7 @@ function stableExtractionId(file, signature, options = {}) {
   const contentIdentity = signature?.contentSha256 || signature?.manifestSha256 || file?.sha256 || `${file?.url ?? ''}|${file?.path ?? ''}`
   return createHash('sha256')
     .update(JSON.stringify({
-      version: extractionCacheVersion,
+      version: pdfExtractionCacheVersion,
       contentIdentity,
       pageLimit: options.pageLimit ?? configuredPageLimit(),
       charLimit: options.charLimit ?? configuredCharLimit(),
@@ -384,7 +419,7 @@ async function reusableExtractionCache(cacheDir, cachePath, signature, options) 
 }
 
 function extractionCacheMatches(cached, signature, options) {
-  if (!cached || cached.cacheVersion !== extractionCacheVersion) return false
+  if (!cached || cached.cacheVersion !== pdfExtractionCacheVersion) return false
   if (cached.status === 'error' && (cached.retryable === true || isRetryableExtractionWarning(cached.warning))) return false
   const cachedSha256 = cached.signature?.contentSha256 || cached.signature?.manifestSha256
   const currentSha256 = signature?.contentSha256 || signature?.manifestSha256
@@ -422,7 +457,7 @@ async function buildExtractionCacheIndex(cacheDir) {
       const filePath = path.join(cacheDir, filename)
       const payload = await readExtractionCache(filePath)
       const contentSha256 = payload?.signature?.contentSha256 || payload?.signature?.manifestSha256
-      if (!contentSha256 || payload?.cacheVersion !== extractionCacheVersion) continue
+      if (!contentSha256 || payload?.cacheVersion !== pdfExtractionCacheVersion) continue
       const key = extractionReuseKey(contentSha256, payload)
       const values = index.get(key) ?? []
       values.push({ filePath, payload: compactExtractionCacheIndexValue(payload) })
@@ -507,7 +542,7 @@ function substantivePageText(value) {
 
 function emptyExtraction(status) {
   return {
-    cacheVersion: extractionCacheVersion,
+    cacheVersion: pdfExtractionCacheVersion,
     status,
     engine: 'pdf-parse',
     extractedAt: null,

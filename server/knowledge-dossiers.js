@@ -805,6 +805,10 @@ export function publicRecordAliasGroupsForQuery(query) {
   return matchedDossiers(query).map((dossier) => dossier.publicRecordAliases ?? dossier.aliases)
 }
 
+export function knowledgeAliasGroupsForQuery(query) {
+  return matchedDossiers(query).map((dossier) => dossier.aliases)
+}
+
 export function expandKnowledgeSearchValues(query, { publicOnly = false } = {}) {
   const values = []
   for (const dossier of matchedDossiers(query)) {

@@ -154,6 +154,25 @@
       "lastModified": "Sun, 02 Aug 2026 22:46:38 GMT"
     },
     {
+      "sourceId": "nfsc-criminal-mirror",
+      "caseId": "sdny-23-cr-118",
+      "courtId": "nysd",
+      "court": "S.D.N.Y.",
+      "docketNumber": "1:23-cr-00118",
+      "sourceLabel": "S.D.N.Y. criminal judgment public mirror",
+      "title": "Case 1:23-cr-00118-AT Document 860: criminal judgment",
+      "docNumber": "860",
+      "filedAt": "2026-07-02",
+      "url": "https://nfsc.press/wp-content/uploads/2024/08/860.pdf",
+      "status": "downloaded",
+      "path": "/fixture/doc-860.pdf",
+      "filename": "doc-860.pdf",
+      "bytes": 100000,
+      "sha256": "746004083ed5561a399b9b33abc8c69cf1e0540d6f2a6f39d682150c2c1429bd",
+      "verifiedAt": "2026-08-22T16:22:00.000+08:00",
+      "lastModified": null
+    },
+    {
       "sourceId": "courtlistener-recap",
       "caseId": "bkd-24-05249-aca",
       "courtId": "ctb",

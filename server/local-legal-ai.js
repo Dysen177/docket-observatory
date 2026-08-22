@@ -98,10 +98,12 @@ export async function ollamaGenerateJson({
   model: modelOverride = null,
   format = 'json',
   options = {},
+  chat = false,
   onProgress = null,
   signal = null,
 }) {
-  const response = await fetchLocalAi('/api/generate', {
+  const strictJsonInstruction = `Return strict JSON for ${schemaName}. Do not include markdown fences.`
+  const response = await fetchLocalAi(chat ? '/api/chat' : '/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -109,7 +111,14 @@ export async function ollamaGenerateJson({
       stream: true,
       think: false,
       format,
-      prompt: `${system}\n\nReturn strict JSON for ${schemaName}. Do not include markdown fences.\n\n${user}`,
+      ...(chat
+        ? {
+            messages: [
+              { role: 'system', content: `${system}\n\n${strictJsonInstruction}` },
+              { role: 'user', content: user },
+            ],
+          }
+        : { prompt: `${system}\n\n${strictJsonInstruction}\n\n${user}` }),
       options: {
         temperature: 0.1,
         ...options,
@@ -189,7 +198,7 @@ function ollamaResponseFragment(line) {
   if (!line.trim()) return ''
   const payload = JSON.parse(line)
   if (payload.error) throw new Error(`Local Ollama error: ${payload.error}`)
-  return String(payload.response ?? '')
+  return String(payload.response ?? payload.message?.content ?? '')
 }
 
 export async function ollamaTranslateText(text, targetLanguage, segmentLabel = 'Document segment') {
